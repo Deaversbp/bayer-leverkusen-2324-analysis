@@ -1,0 +1,20 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw and temporary data
+data/raw/
+data/interim/
+
+# Temporary output
+outputs/temp/
+
+# OS files
+.DS_Store
+Thumbs.db
