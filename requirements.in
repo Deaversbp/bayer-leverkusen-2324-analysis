@@ -1,0 +1,17 @@
+# Runtime: preserve raw nested JSON with the existing requests dependency.
+pandas
+requests
+# Existing notebook and plotting environment.
+numpy
+scipy
+matplotlib
+seaborn
+mplsoccer
+networkx
+jupyter
+# Configuration and development.
+PyYAML
+pytest
+ruff
+setuptools>=68
+# Add spatial/model dependencies only when their implementations need them.

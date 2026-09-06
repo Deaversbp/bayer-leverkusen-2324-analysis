@@ -1,0 +1,8 @@
+# IDs verified against existing repository match records and notebooks.
+competition_id: 9
+season_id: 281
+team_name: Bayer Leverkusen
+team_id: 904
+coordinate_length: 120
+coordinate_width: 80
+# Descriptive configuration for future orchestration; loader retains 9/281.

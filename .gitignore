@@ -18,3 +18,20 @@ outputs/temp/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Development and package build artifacts
+venv/
+.pytest_cache/
+.ruff_cache/
+.env
+*.egg-info/
+build/
+dist/
+
+# Generated analytical outputs (retain directory markers)
+outputs/diagnostics/*
+outputs/figures/*
+outputs/tables/*
+!outputs/diagnostics/.gitkeep
+!outputs/figures/.gitkeep
+!outputs/tables/.gitkeep

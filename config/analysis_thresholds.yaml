@@ -1,0 +1,6 @@
+# Calibration required before these parameters can drive analysis.
+local_overload_radius: null
+deep_defensive_centroid_threshold: null
+future_xg_window_seconds: null
+future_shot_window_seconds: null
+future_box_entry_window_seconds: null

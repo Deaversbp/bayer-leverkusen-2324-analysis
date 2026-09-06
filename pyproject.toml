@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leverkusen"
+version = "0.1.0"
+description = "Bayer Leverkusen 2023/24 spatial sequence research"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["pandas", "requests"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["leverkusen*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-m 'not network'"
+markers = ["network: optional live StatsBomb Open Data checks"]
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

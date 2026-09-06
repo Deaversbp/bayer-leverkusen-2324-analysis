@@ -1,0 +1,15 @@
+# Project operationalizations; revise before analysis is locked.
+# Coordinate bounds only: x increases toward the attacking goal (120).
+# Lateral labels assume an attack toward increasing x, with left at low y.
+# Orientation must be audited before applying these zones to 360 frames.
+# Intervals are lower-inclusive, upper-exclusive except pitch edges 120/80.
+# Longitudinal thirds and lateral lanes are separate, overlapping partitions.
+defensive_third: {x: [0, 40], y: [0, 80]}
+middle_third: {x: [40, 80], y: [0, 80]}
+attacking_third: {x: [80, 120], y: [0, 80]}
+penalty_area: {x: [102, 120], y: [18, 62]}
+central_lane: {x: [0, 120], y: [32, 48]}
+left_half_space: {x: [0, 120], y: [16, 32]}
+right_half_space: {x: [0, 120], y: [48, 64]}
+left_wide_lane: {x: [0, 120], y: [0, 16]}
+right_wide_lane: {x: [0, 120], y: [64, 80]}

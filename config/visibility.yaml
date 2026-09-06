@@ -1,0 +1,5 @@
+# Null means uncalibrated, not zero or an implicit permissive threshold.
+minimum_visible_attackers: null
+minimum_visible_defenders: null
+minimum_visible_area_fraction: null
+exclude_edge_sensitive_frames: false
