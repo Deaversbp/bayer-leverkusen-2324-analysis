@@ -56,6 +56,57 @@ labeling attackers and defenders. Goalkeeper inclusion is not yet fixed.
 
 ## Decisions still open
 
+### Implemented observability definitions
+
+`leverkusen.data.observability` implements the inventory, event/frame integrity,
+visible-player counts, visible-area checks, actor consistency and grouped attrition.
+The CLI writes only the three derived Phase 1 CSVs. It fetches each match's events
+and 360 once per run without persisting raw responses.
+
+ID joins are match-local. Event rows and frame rows retain their original grain;
+duplicates do not expand a many-to-many join. Duplicate counts are excess records
+beyond the first occurrence, with duplicated-ID group counts also reported. IDs
+that are missing, blank or not strings never match. Ambiguous frame links retain
+their rows but have no arbitrarily selected event metadata or actor comparison.
+
+Missing 360 files have status `missing`; other HTTP/transport/payload failures have
+status `error`. Their frame inventories are unknown, not zero. Attrition's zero
+observed frame rows for such a match must be read alongside
+`events_360_load_unavailable` and the match load status. Failed event loading aborts
+the audit. An observed empty 360 list is distinct from an unavailable resource.
+
+An observed empty freeze-frame list has zero players. Missing/malformed containers
+have unknown counts. Non-dictionary entries and invalid player locations are
+reported. `teammate_true` and `teammate_false` count literal boolean flags; unknown
+flags are retained separately. No global attacker/defender labels are assigned.
+
+Visible areas must be flat lists of at least three finite x/y pairs. Absent/null
+areas are missing; structurally invalid lists (including empty lists) are malformed.
+Shapely validates topology; invalid polygons are not repaired. Both original polygon
+area and its pitch-intersection area are reported. `visible_area_fraction` is the
+intersection area divided by pitch length × width, not unbounded polygon area.
+Scalar coordinate count and paired vertex count are distinct; a supplied closing
+vertex is included in the count. These are observability checks, not team-shape
+metrics. See the [Shapely manual](https://shapely.readthedocs.io/en/stable/manual.html)
+for polygon validation and intersection operations.
+
+Actor distance uses original coordinates only, for one located actor and a uniquely
+linked event with a finite two-coordinate location. Unmeasurable distances are null,
+never zero. Counts, mean, median, maximum and 25/75/90/95/99 percentiles are reported.
+`actor_distance_review_rank` ranks measured distances descending; ties follow source
+order. The ten largest are presented for inspection, not designated threshold
+failures. Neither player coordinates nor event coordinates are transformed.
+
+Attrition first reports independent event/frame counts. Cumulative frame checks
+then require unique event and frame IDs, a nonempty freeze frame, valid visible area,
+and finally measurable actor distance plus valid locations for all player records.
+`frames_joint_checks` does **not** require a small actor discrepancy, sufficient
+visible players, sufficient area, known identities or calibrated sample eligibility.
+Scopes (season, match, event type, event team) are alternative partitions, not
+additive across scopes. Orphan/ambiguous/missing categories remain in the totals.
+
+### Calibration still pending
+
 All visibility and outcome thresholds are intentionally null. Before analysis is
 locked, calibrate minimum visible players/area, edge handling, local radius,
 defensive regimes, future outcome windows, valuable-space definitions and player

@@ -5,7 +5,8 @@ Analyze how Bayer Leverkusen created dangerous attacking space during the unbeat
 
 **Current phase: Phase 1 — Data & Observability Audit.** Model selection and
 tactical conclusions have NOT yet been performed. Existing event and passing EDA
-is preserved; it does not establish the usable spatial sample.
+is preserved. The implemented observability audit exposes coverage and integrity
+issues; it does not select final visibility thresholds or a final usable sample.
 
 ## Research objective and dataset
 
@@ -108,15 +109,47 @@ src/leverkusen/
   tactics/              Reserved defensive structures and attacking patterns
   models/               Reserved baselines and validation
   visualization/        Reserved pitch and sequence figures
-scripts/                Future audit/features/analysis CLI entry points
+scripts/                Working observability audit; future features/analysis CLIs
 tests/                  Offline regression tests and marked live checks
 outputs/                Ignored diagnostics, figures, tables
 report/                 Article and technical appendix scaffolds
 ```
 
-Reserved modules contain only explanatory docstrings. New script entry points
-support `--help` and exit with status 2 when invoked without it because no pipeline
-exists yet. They will call package functions once those functions are implemented.
+Spatial, sequence, tactical and model modules remain reserved. Feature and analysis
+script entry points still exit with status 2; the observability audit is implemented.
+
+## Phase 1 observability audit
+
+```powershell
+.\.venv\Scripts\python.exe scripts/audit_data.py
+```
+
+The command uses existing on-demand loaders, verifies 34 unique Leverkusen matches,
+and writes only these derived files under `outputs/diagnostics/`:
+
+- `phase1_match_summary.csv`: inventory, event/frame ID integrity, 360 load errors,
+  actor-distance statistics, retrieval time and upstream source URL.
+- `phase1_frame_summary.csv`: one row per original frame, including orphan and
+  ambiguous links, raw player flags, polygon checks, actor distance and review rank.
+- `phase1_attrition.csv`: season, match, event-type and event-team partitions, with
+  independent coverage counts and explicitly named cumulative mechanical checks.
+
+`notebooks/00_data_observability_audit.ipynb` presents these tables and diagnostic
+distributions. It reads existing derived CSVs first; when absent it runs the audit
+in memory. Re-run the CLI to refresh the outputs. Shapely is required specifically
+for visible-area polygon validity and intersection with the pitch.
+
+Missing 360 files and load failures are recorded separately; an event-load failure
+aborts because the season denominator cannot be inferred. Missing/invalid IDs never
+join. Duplicate event IDs leave linked frame metadata ambiguous, and duplicate
+frames retain separate rows. Missing frames are not represented as zero-player
+frames. Null calibration thresholds remain untouched.
+
+The first live audit found 108,394 linked events out of 137,765 (78.68%), with
+118,607 frames loaded across all 34 matches. Three matches have no event/frame UUID
+overlap, accounting for 10,213 orphan frames. Actor-coordinate discrepancies also
+require review before general spatial analysis. See the
+[Phase 1 results and limitations](report/technical_appendix.md#phase-1-live-observability-results).
 
 ## Verification and reproducibility
 
@@ -131,8 +164,8 @@ Keep raw data out of Git and write only derived diagnostics, tables and figures
 under `outputs/`. Record retrieval time, upstream revision, match IDs, software
 versions, missingness, exclusions and configuration with future analytical outputs.
 The loader uses upstream `master`, so a dependency freeze alone does not freeze the
-data release. Config files are research specifications; there is no configuration-
-driven pipeline yet. Null thresholds mean uncalibrated, not zero.
+data release. The audit reads project constants; visibility and analysis configs
+remain research specifications. Null thresholds mean uncalibrated, not zero.
 
 Keep reusable logic in the package and exploration in notebooks. Document source
 provenance and operational definitions before locking methods, and perform

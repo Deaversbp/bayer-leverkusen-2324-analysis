@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Bayer Leverkusen 2023/24 spatial sequence research"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["pandas", "requests"]
+dependencies = ["pandas", "requests", "shapely", "PyYAML"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,6 +1,8 @@
 # Runtime: preserve raw nested JSON with the existing requests dependency.
 pandas
 requests
+# Visible-area polygon validity and intersection with the pitch.
+shapely
 # Existing notebook and plotting environment.
 numpy
 scipy
