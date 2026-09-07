@@ -2,9 +2,11 @@
 
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
-**Current status: Phase 1 COMPLETE — preparing Phase 2A method lock.** Phase 1B
-revision pinning and coordinate diagnostics are also complete. Phase 2A is limited
-to proposed basic within-frame visible-player geometry. No Phase 2 metrics,
+**Current status: Phase 1/1B COMPLETE — Phase 2A basic geometry definitions LOCKED.**
+The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
+freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
+It supersedes earlier pending-definition wording for those eight measurements;
+visibility calibration and later methods remain open. No Phase 2 metrics,
 direction normalization, tactical classifier, pattern discovery or predictive
 model has been implemented or approved for implementation by this synchronization.
 
@@ -250,7 +252,8 @@ Before applying direction-dependent zones or naming attackers/defenders, justify
 event-specific orientation and interpret `teammate` relative to the event actor/team
 and possession team. A closer mirror or majority within an event type is not proof
 of attacking direction. The existing orientation test checks no mutation, not a
-future normalization rule. Goalkeeper inclusion remains unresolved.
+future normalization rule. Phase 2A uses both locked goalkeeper variants in the
+registry; no universally preferred inclusion convention has been selected.
 
 The planned canonical match clock must be monotonic across periods, preserve raw
 timestamps, and document stoppage/period handling. Sequence duration and delta-t
@@ -308,6 +311,12 @@ observed geometry and justified actor/event alignment where integration depends
 on the actor. The currently implemented mechanical checks do not constitute
 final analytical eligibility.
 
+For Phase 2A this is a later analytical-use gate, not a rule suppressing raw
+within-frame diagnostic measurements. The registry locks mathematical evaluability
+separately: retain calculable values with missing/invalid visibility or join
+context flagged, and do not determine final research eligibility in the geometry
+layer. Its point minima are not calibrated visibility thresholds.
+
 Use metric-specific flags rather than only global pass/fail. A small visible area
 may support some local proximity measurements while edge-censoring a width
 estimate; it never proves an unseen defender cannot be nearer. For extrema-based
@@ -364,18 +373,19 @@ scope. A formula in the original project PDF is not itself proof of academic ori
 | Centroid | Mean selected visible coordinates, collective location; S07/S08 |
 | Visible width / depth (length) | Lateral/longitudinal extrema spans; S07/S12; depth span is not centroid position/block height |
 | Length-to-width ratio | Depth divided by width; shape proportion, not universal compactness; S07; zero-width handling unresolved |
-| Convex hull / occupied surface | Visible footprint; nonzero polygon requires three non-collinear points; S07/S08; missing/degenerate policy not locked |
+| Convex hull / occupied surface | Visible footprint; S07/S08; Phase 2A registry now locks three distinct non-collinear points and NA for degenerate/error cases |
 | Mean pairwise/interpersonal distance | Mean over unordered selected pairs; S07 supports base distance, registry aggregation remains explicit PROJECT/DERIVE |
 | Stretch index | Mean observed-player distance from centroid; S07/S12; component choices require review |
-| Nearest-opponent distance / nearest-neighbor relationships | Visible proximity to actor/ball, receiver endpoint or zone center; S07 base distance, S21 proximity precedent; targets/roles require explicit adaptation |
+| Nearest-opponent distance (later) | Actor/ball, receiver-endpoint or zone-center proximity remains deferred; S07 base distance, S21 precedent. Phase 2A within-subset nearest-neighbor spacing is a separate PROJECT/DERIVE summary |
 | Local numerical balance / overload / density | Attacking minus defending presence around target/radius; neighborhood and radius are PROJECT, pre-registered sensitivity choices |
 | Zone occupation | Counts/shares in geometric central lane, half-spaces, wide lanes, penalty area and other declared zones; PROJECT boundaries fixed before outcomes |
 
-These are planned for visible attacking/defending subsets only after role semantics
-are justified. Current literal teammate/opponent flags must not be silently
-relabelled. Counts already exist as observability diagnostics; geometry does not.
-Median pairwise distance and nearest-neighbor spacing are additional Phase 2A
-method-lock candidates, without a new exact definition or adopted-source claim.
+This table retains the original broader plan. For the eight Phase 2A metrics,
+the registry now locks `all_visible`, literal `teammate=True` and `teammate=False`
+subsets with both keeper policies; no global attacker/defender mapping is required
+or inferred. Counts already exist as observability diagnostics; geometry does not.
+Median pairwise distance and mean within-subset nearest-neighbor spacing are now
+locked PROJECT/DERIVE aggregations without invented published attribution.
 The PDF's blanket ADOPT/DERIVE labels do not supersede current registry provenance,
 especially for aggregates, proximity selection and local balance.
 
@@ -693,10 +703,11 @@ analytical suite or remeasure the data.
 
 The original “Phase 0” means planned pre-outcome calibration, not an assertion
 that audit completion has resolved thresholds. Phase 1/1B established evidence;
-Phase 2A method lock and later stage-specific locks still require choices.
+Phase 2A research eligibility and later stage-specific locks still require choices.
 
 Before the relevant outcome analysis freeze and document: actor alignment policy
-and tolerance if justified; visibility/edge censoring; minimum points per metric;
+and tolerance if justified; visibility/edge censoring; observation sufficiency
+beyond Phase 2A's now-locked mathematical minima;
 tactical zones; overload radii; regime thresholds; line-clustering quality;
 eligible event family; primary action/time windows; and primary future horizon.
 Use pre-outcome diagnostics, geometry stability and explicit sensitivity plans.
@@ -716,7 +727,7 @@ No configuration values are resolved or changed here.
 | --- | --- |
 | 1: data and observability audit | **COMPLETE**: coverage, counts, joins, visible-player/area diagnostics, missingness and actor-coordinate checks |
 | 1B: revision pinning and coordinate semantics | **COMPLETE**: immutable source, compatible pinned joins, diagnostic hypotheses and multiple-actor findings; semantics are not universally resolved |
-| 2A: basic within-frame visible-player geometry | **Preparing method lock; not implemented.** Scope and conditions below |
+| 2A: basic within-frame visible-player geometry | **Definitions LOCKED; not implemented.** Registry controls formulas, record handling and metadata; research eligibility remains open |
 | Remaining Phase 2 geometry validation | Later: qualified zones and clipped Voronoi, representative-frame visual validation; separate method decisions required |
 | 3: defensive regime characterization | Later: define/validate high/mid/deep structure without outcome information |
 | 4: sequence construction | Later: possessions, event/spatial histories and action/time windows |
@@ -726,18 +737,20 @@ No configuration values are resolved or changed here.
 | 8: predictive incremental-value test | Later: spatial history versus current state and event/timing history |
 | 9: technical article synthesis | Later: pair statistical results with football-readable sequences and inference limits |
 
-Phase 2A candidates are visible player counts, centroid, visible width, visible
-depth, convex hull area, pairwise distance, median pairwise distance and
-nearest-neighbor spacing. Counts already exist as audit metadata; the proposed
-geometry measures are not implemented. Method lock must specify each subset,
-exact formula/source/status in the registry, units, required fields, and handling
-of empty sets, insufficient/non-collinear points, duplicate/coincident records,
-zero denominators and otherwise missing or degenerate measurements.
+Phase 2A locked metrics are visible player count, centroid, visible width, visible
+depth, convex hull area, mean pairwise distance, median pairwise distance and
+nearest-neighbor spacing (mean of each record's nearest other record in its subset).
+Counts already exist as audit metadata; these Phase 2A definitions are not an
+implemented geometry layer. The [locked registry](metric_registry.md#2-locked-phase-2a-metric-rows)
+specifies exact formulas/provenance, six subset/keeper combinations, native units,
+valid-point rules, minima, missing/degenerate outcomes and Shapely error handling.
 
-Require raw observability metadata with every metric, goalkeeper-inclusive versus
-exclusive sensitivity where appropriate, and an explicit policy for multiple-actor
-records in player-count-sensitive geometry. Preserve both raw actor records; do
-not silently select/deduplicate them. No direction-dependent tactical interpretation
+Require raw observability metadata with every metric and both goalkeeper variants.
+The registry retains record-based measurements and ambiguity flags, with a future
+primary-comparison exclusion and unchanged-record inclusion sensitivity for
+multiple/unknown actor status. This does not select a final research sample.
+Preserve all raw actor records; do not silently select/deduplicate them.
+No direction-dependent tactical interpretation
 is permitted until orientation and role semantics are justified. Scalar within-frame
 geometry must still disclose visibility/composition limitations and native axes.
 Metric-specific eligibility, not `frames_joint_checks` alone, controls later use.
@@ -761,9 +774,10 @@ A scientific version v1.1 or higher is required for a new primary question,
 materially changed study population, new primary outcome, threshold changes after
 viewing effectiveness, replacing a published metric with another proxy, adding
 external data to core inference, or making a high-capacity model primary.
-This document records the original v1.0 plus completed audit amendments explicitly;
-it does not retrospectively claim that calibration or analytical method lock has
-occurred. Future method changes must record trigger, rationale, provenance,
+This document records the original v1.0, completed audit amendments and the
+7 September 2026 Phase 2A measurement-definition lock; it does not claim that
+visibility calibration or later analytical method lock has occurred.
+Future method changes must record trigger, rationale, provenance,
 compatibility, validation/sensitivity and effect on prior results.
 
 Record upstream revision and retrieval time, match IDs, package environment,
@@ -827,8 +841,8 @@ Leverkusen action sequence + explicit timing + event-aligned visible-player geom
 This is a research workflow, not a causal diagram or completed result. State when
 the open data lack required information. Use a simpler published metric when it
 answers the question; name and validate necessary adaptations transparently.
-The current work ends with the methodology contract and Phase 2A method-lock
-requirements, not analytical implementation.
+The current work ends with the eight Phase 2A measurement definitions locked in
+the registry, not analytical implementation.
 
 ## 32. Completed Phase 1/1B contract and findings
 
