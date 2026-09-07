@@ -3,7 +3,7 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 1 — Data & Observability Audit.** Model selection and
+**Current phase: Phase 1B — StatsBomb Revision Pinning & Coordinate Semantics.** Model selection and
 tactical conclusions have NOT yet been performed. Existing event and passing EDA
 is preserved. The implemented observability audit exposes coverage and integrity
 issues; it does not select final visibility thresholds or a final usable sample.
@@ -80,6 +80,18 @@ notebook columns remain stable; statsbombpy is not required. There is no databas
 persistent raw-data storage or automatic disk cache. Reuse DataFrames in a session
 to avoid repeated requests.
 
+All four loaders use the original Leverkusen release revision
+`533862946a73608c134d18b78226b6371ce7173c` (May 21, 2024), configured once in
+`config/project.yaml`. Matches, events, lineups and 360 use that same immutable SHA;
+no match is special-cased. The revision is read when the loader is imported, so
+restart Python/notebook kernels after changing it. Branch names and short SHAs are
+rejected. The editable research package requires the repository's config file.
+
+Pinning addresses the observed incompatibility between event IDs and 360 UUIDs in
+three matches under later upstream `master`. It does not repair or heuristically
+relink identifiers. Existing local files have unverified revision provenance;
+`raw_data_dir` remains a separate legacy option and is never used by the pinned audit.
+
 Missing resources (including unavailable 360) raise `FileNotFoundError`; transport
 and other HTTP failures propagate from `requests`. Invalid match IDs raise
 `ValueError`. An absent frame is not evidence of zero visible players.
@@ -133,6 +145,17 @@ and writes only these derived files under `outputs/diagnostics/`:
   ambiguous links, raw player flags, polygon checks, actor distance and review rank.
 - `phase1_attrition.csv`: season, match, event-type and event-team partitions, with
   independent coverage counts and explicitly named cumulative mechanical checks.
+- `phase1_actor_distance_by_event_type.csv`: count, mean, median, p75/p90/p95/p99
+  and maximum direct distance for each event type with measurable pairs.
+- `phase1_coordinate_semantics_by_event_type.csv`: direct/mirrored medians, p95s
+  and percentages closer under each hypothesis, using measurable pairs only.
+- `phase1_multiple_actor_frames.csv`: all actor locations and the linked event
+  location for multiple-actor frames; no actor is chosen as correct.
+
+`actor_distance` remains the direct distance, also named `actor_distance_direct`.
+`actor_distance_mirrored` compares the actor with the diagnostic point
+`(120-x, 80-y)`. These comparisons never mutate coordinates, normalize direction,
+or create event-type rules. The closer hypothesis can still be a poor match.
 
 `notebooks/00_data_observability_audit.ipynb` presents these tables and diagnostic
 distributions. It reads existing derived CSVs first; when absent it runs the audit
@@ -145,11 +168,11 @@ join. Duplicate event IDs leave linked frame metadata ambiguous, and duplicate
 frames retain separate rows. Missing frames are not represented as zero-player
 frames. Null calibration thresholds remain untouched.
 
-The first live audit found 108,394 linked events out of 137,765 (78.68%), with
+The historical unpinned audit found 108,394 linked events out of 137,765 (78.68%), with
 118,607 frames loaded across all 34 matches. Three matches have no event/frame UUID
-overlap, accounting for 10,213 orphan frames. Actor-coordinate discrepancies also
-require review before general spatial analysis. See the
-[Phase 1 results and limitations](report/technical_appendix.md#phase-1-live-observability-results).
+overlap, accounting for 10,213 orphan frames. This is the baseline, not the pinned
+result. See the [Phase 1B rerun and coordinate findings](report/technical_appendix.md#phase-1b-pinned-revision-and-coordinate-semantics)
+for measured recovery, event-type behavior and readiness.
 
 ## Verification and reproducibility
 
@@ -163,8 +186,9 @@ Run optional live checks explicitly:
 Keep raw data out of Git and write only derived diagnostics, tables and figures
 under `outputs/`. Record retrieval time, upstream revision, match IDs, software
 versions, missingness, exclusions and configuration with future analytical outputs.
-The loader uses upstream `master`, so a dependency freeze alone does not freeze the
-data release. The audit reads project constants; visibility and analysis configs
+The loader pins the data release independently of the dependency lock. The match
+summary records the exact SHA, source URL and retrieval time. The audit reads
+project constants; visibility and analysis configs
 remain research specifications. Null thresholds mean uncalibrated, not zero.
 
 Keep reusable logic in the package and exploration in notebooks. Document source

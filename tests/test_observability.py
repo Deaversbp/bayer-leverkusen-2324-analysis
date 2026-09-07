@@ -1,6 +1,7 @@
 """Synthetic observability regressions: no network or real raw-data fixtures."""
 
 from copy import deepcopy
+import json
 from unittest.mock import Mock
 
 import pandas as pd
@@ -114,6 +115,7 @@ def test_raw_flags_and_single_actor_distance():
     assert result["teammate_false"] == result["keepers"] == result["actors"] == 1
     assert result["teammate_unknown"] == 0
     assert result["actor_distance"] == 5
+    assert result["actor_distance_direct"] == result["actor_distance"]
     assert result["actor_consistency_measurable"]
 
 
@@ -348,7 +350,7 @@ def test_event_load_failure_aborts_instead_of_inventing_denominator(monkeypatch)
         audit.audit_season(expected_matches=1)
 
 
-def test_writer_outputs_only_three_derived_csvs(tmp_path):
+def test_writer_outputs_only_six_derived_csvs(tmp_path):
     summary, frames, events = audit.audit_match(match(), [event()], [frame()])
     audit.write_audit_outputs(
         pd.DataFrame([summary]),
@@ -357,10 +359,131 @@ def test_writer_outputs_only_three_derived_csvs(tmp_path):
         tmp_path,
     )
     assert sorted(p.name for p in tmp_path.iterdir()) == [
+        "phase1_actor_distance_by_event_type.csv",
         "phase1_attrition.csv",
+        "phase1_coordinate_semantics_by_event_type.csv",
         "phase1_frame_summary.csv",
         "phase1_match_summary.csv",
+        "phase1_multiple_actor_frames.csv",
     ]
     written = pd.read_csv(tmp_path / "phase1_frame_summary.csv")
     assert len(written) == 1
     assert not {"freeze_frame", "visible_area", "location"} & set(written.columns)
+
+
+@pytest.mark.parametrize(
+    "actor,expected,direct,mirrored",
+    [
+        ([10, 20], "direct_closer", 0, (100**2 + 40**2) ** 0.5),
+        ([110, 60], "mirrored_closer", (100**2 + 40**2) ** 0.5, 0),
+        (
+            [60, 40],
+            "equal_or_indeterminate",
+            (50**2 + 20**2) ** 0.5,
+            (50**2 + 20**2) ** 0.5,
+        ),
+    ],
+)
+def test_coordinate_hypotheses_do_not_mutate_inputs(actor, expected, direct, mirrored):
+    location = [10, 20]
+    before = deepcopy((location, actor))
+    result = audit.coordinate_diagnostics(location, actor)
+    assert result["actor_distance_direct"] == pytest.approx(direct)
+    assert result["actor_distance_mirrored"] == pytest.approx(mirrored)
+    assert result["coordinate_comparison"] == expected
+    assert (location, actor) == before
+
+
+@pytest.mark.parametrize(
+    "point",
+    [
+        None,
+        [],
+        [10],
+        [10, 20, 30],
+        [float("nan"), 20],
+        [10, float("inf")],
+        [True, 20],
+        ["10", 20],
+    ],
+)
+@pytest.mark.parametrize("invalid_side", ["actor", "event"])
+def test_invalid_coordinate_hypotheses(point, invalid_side):
+    result = (
+        audit.coordinate_diagnostics(point, [10, 20])
+        if invalid_side == "event"
+        else audit.coordinate_diagnostics([10, 20], point)
+    )
+    assert result == {
+        "actor_distance_direct": None,
+        "actor_distance_mirrored": None,
+        "coordinate_comparison": "equal_or_indeterminate",
+    }
+
+
+def test_mirroring_uses_configured_dimensions():
+    result = audit.coordinate_diagnostics(
+        [10, 20], [90, 30], pitch_length=100, pitch_width=50
+    )
+    assert result["actor_distance_mirrored"] == 0
+    assert result["coordinate_comparison"] == "mirrored_closer"
+
+
+def test_event_type_coordinate_aggregation_keeps_mixed_semantics():
+    records = []
+    for actor in ([10, 20], [110, 60], [60, 40]):
+        record = frame()
+        record["freeze_frame"][0]["location"] = actor
+        records.append(record)
+    _, frames, _ = audit.audit_match(match(), [event()], records)
+    # Aggregations have frame grain, even when a UUID occurs more than once.
+    direct = audit.actor_distances_by_event_type(frames).iloc[0]
+    semantics = audit.coordinate_semantics_by_event_type(frames).iloc[0]
+    assert direct["event_type"] == "Pass" and direct["count"] == 3
+    assert direct["mean"] == pytest.approx(frames["actor_distance_direct"].mean())
+    for p in (75, 90, 95, 99):
+        assert direct[f"p{p}"] == pytest.approx(
+            frames["actor_distance_direct"].quantile(p / 100)
+        )
+    assert semantics["measurable_pairs"] == 3
+    for label in ("direct_closer", "mirrored_closer", "equal_or_indeterminate"):
+        assert semantics[f"percent_{label}"] == pytest.approx(100 / 3)
+    assert semantics["median_direct_distance"] == semantics["median_mirrored_distance"]
+    assert semantics["p95_mirrored_distance"] == pytest.approx(
+        frames["actor_distance_mirrored"].quantile(0.95)
+    )
+
+
+def test_aggregations_omit_unmeasurable_pairs_and_have_empty_schemas():
+    _, frames, _ = audit.audit_match(match(), [event()], [frame("orphan")])
+    assert audit.actor_distances_by_event_type(frames).empty
+    assert audit.coordinate_semantics_by_event_type(frames).empty
+    assert "count" in audit.actor_distances_by_event_type(frames).columns
+    assert (
+        "measurable_pairs" in audit.coordinate_semantics_by_event_type(frames).columns
+    )
+
+
+def test_multiple_actor_diagnostic_preserves_all_locations_and_input():
+    record, linked = frame(), event()
+    record["freeze_frame"][1]["actor"] = True
+    before = deepcopy((record, linked))
+    _, frames, _ = audit.audit_match(match(), [linked], [record])
+    result = audit.multiple_actor_frames(frames).iloc[0]
+    assert result["actor_count"] == 2
+    assert json.loads(result["actor_locations"]) == [[13, 24], [20, 10]]
+    assert json.loads(result["event_location"]) == [10, 20]
+    assert result["event_type"] == "Pass" and result["event_index"] == 7
+    assert pd.isna(frames.iloc[0]["actor_distance_direct"])
+    assert pd.isna(frames.iloc[0]["actor_distance_mirrored"])
+    assert (record, linked) == before
+
+
+def test_multiple_actor_orphan_retains_unknown_event_location():
+    record = frame("orphan")
+    record["freeze_frame"][1]["actor"] = True
+    record["freeze_frame"][1]["location"] = None
+    _, frames, _ = audit.audit_match(match(), [event()], [record])
+    result = audit.multiple_actor_frames(frames).iloc[0]
+    assert json.loads(result["actor_locations"]) == [[13, 24], None]
+    assert pd.isna(result["event_location"])

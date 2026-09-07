@@ -8,6 +8,7 @@ under a calibrated research visibility threshold.
 from collections import Counter
 from collections.abc import Callable
 from datetime import datetime, timezone
+import json
 from math import hypot, isfinite
 from numbers import Real
 from pathlib import Path
@@ -34,6 +35,43 @@ def _point(value: object) -> tuple[float, float] | None:
 
 def _identifier(value: object) -> str | None:
     return value if isinstance(value, str) and value.strip() else None
+
+
+def coordinate_diagnostics(
+    event_location: object,
+    actor_location: object,
+    *,
+    pitch_length: float = 120,
+    pitch_width: float = 80,
+) -> dict:
+    """Compare direct and mirrored distances without modifying either point.
+
+    The mirrored candidate is (length-x, width-y). Strict numerical comparison
+    ranks hypotheses; it is neither a coordinate correction nor an exclusion
+    threshold. Missing/invalid points and exact ties are indeterminate.
+    """
+    if not all(_finite_number(v) and v > 0 for v in (pitch_length, pitch_width)):
+        raise ValueError("Pitch dimensions must be positive finite numbers")
+    result = {
+        "actor_distance_direct": None,
+        "actor_distance_mirrored": None,
+        "coordinate_comparison": "equal_or_indeterminate",
+    }
+    event_point, actor_point = _point(event_location), _point(actor_location)
+    if event_point is None or actor_point is None:
+        return result
+    x, y = event_point
+    ax, ay = actor_point
+    direct = hypot(x - ax, y - ay)
+    mirrored = hypot((pitch_length - x) - ax, (pitch_width - y) - ay)
+    if not all(isfinite(distance) for distance in (direct, mirrored)):
+        return result
+    result.update(actor_distance_direct=direct, actor_distance_mirrored=mirrored)
+    if direct < mirrored:
+        result["coordinate_comparison"] = "direct_closer"
+    elif mirrored < direct:
+        result["coordinate_comparison"] = "mirrored_closer"
+    return result
 
 
 def inspect_visible_area(
@@ -140,7 +178,18 @@ def frame_observability(
         if valid_container
         else None,
         "actor_distance": None,
+        **coordinate_diagnostics(
+            None, None, pitch_length=pitch_length, pitch_width=pitch_width
+        ),
         "actor_consistency_measurable": False,
+        # Only exceptional multiple-actor rows retain coordinate excerpts.
+        # JSON strings preserve all actors, including absent/invalid locations.
+        "multiple_actor_locations": json.dumps([p.get("location") for p in actors])
+        if len(actors) > 1
+        else None,
+        "multiple_actor_event_location": json.dumps(event.get("location"))
+        if len(actors) > 1 and event is not None
+        else None,
     }
     actor_location = _point(actors[0].get("location")) if len(actors) == 1 else None
     event_location = _point(event.get("location")) if event is not None else None
@@ -156,10 +205,20 @@ def frame_observability(
         reason = "event location unavailable or invalid"
     else:
         reason = "measurable"
-        result["actor_consistency_measurable"] = True
-        result["actor_distance"] = hypot(
-            actor_location[0] - event_location[0], actor_location[1] - event_location[1]
+        result.update(
+            coordinate_diagnostics(
+                event_location,
+                actor_location,
+                pitch_length=pitch_length,
+                pitch_width=pitch_width,
+            )
         )
+        result["actor_distance"] = result["actor_distance_direct"]
+        result["actor_consistency_measurable"] = (
+            result["actor_distance_direct"] is not None
+        )
+        if not result["actor_consistency_measurable"]:
+            reason = "nonfinite coordinate distance"
     result["actor_consistency_reason"] = reason
     result.update(
         inspect_visible_area(frame.get("visible_area"), pitch_length, pitch_width)
@@ -180,6 +239,120 @@ def summarize_actor_distances(frames: pd.DataFrame) -> dict:
             distances.quantile(quantile) if len(distances) else None
         )
     return result
+
+
+def actor_distances_by_event_type(frames: pd.DataFrame) -> pd.DataFrame:
+    """Summarize direct-distance distributions for measurable pairs by event type."""
+    columns = [
+        "event_type",
+        "count",
+        "mean",
+        "median",
+        "p75",
+        "p90",
+        "p95",
+        "p99",
+        "max",
+    ]
+    rows = []
+    measurable = frames.loc[frames["actor_consistency_measurable"].eq(True)]
+    for event_type, group in measurable.groupby("event_type", dropna=False, sort=True):
+        distances = pd.to_numeric(
+            group["actor_distance_direct"], errors="coerce"
+        ).dropna()
+        if distances.empty:
+            continue
+        rows.append(
+            {
+                "event_type": event_type,
+                "count": len(distances),
+                "mean": distances.mean(),
+                "median": distances.median(),
+                "max": distances.max(),
+                **{f"p{p}": distances.quantile(p / 100) for p in (75, 90, 95, 99)},
+            }
+        )
+    return pd.DataFrame(rows, columns=columns)
+
+
+def coordinate_semantics_by_event_type(frames: pd.DataFrame) -> pd.DataFrame:
+    """Compare both hypotheses by type; percentages use measurable pairs only.
+
+    No event-type rule is inferred. Even the closer hypothesis can be a poor
+    coordinate match. Exact ties are reported separately from missing pairs.
+    """
+    columns = [
+        "event_type",
+        "measurable_pairs",
+        "median_direct_distance",
+        "median_mirrored_distance",
+        "percent_direct_closer",
+        "percent_mirrored_closer",
+        "percent_equal_or_indeterminate",
+        "p95_direct_distance",
+        "p95_mirrored_distance",
+    ]
+    rows = []
+    measurable = frames.loc[frames["actor_consistency_measurable"].eq(True)]
+    for event_type, group in measurable.groupby("event_type", dropna=False, sort=True):
+        direct = pd.to_numeric(group["actor_distance_direct"], errors="coerce")
+        mirrored = pd.to_numeric(group["actor_distance_mirrored"], errors="coerce")
+        valid = direct.notna() & mirrored.notna()
+        if not valid.any():
+            continue
+        direct, mirrored = direct[valid], mirrored[valid]
+        comparison = group.loc[valid, "coordinate_comparison"]
+        rows.append(
+            {
+                "event_type": event_type,
+                "measurable_pairs": len(direct),
+                "median_direct_distance": direct.median(),
+                "median_mirrored_distance": mirrored.median(),
+                "p95_direct_distance": direct.quantile(0.95),
+                "p95_mirrored_distance": mirrored.quantile(0.95),
+                **{
+                    f"percent_{label}": 100 * comparison.eq(label).mean()
+                    for label in (
+                        "direct_closer",
+                        "mirrored_closer",
+                        "equal_or_indeterminate",
+                    )
+                },
+            }
+        )
+    return pd.DataFrame(rows, columns=columns)
+
+
+def multiple_actor_frames(frames: pd.DataFrame) -> pd.DataFrame:
+    """Retain every flagged actor in exceptional frames; select no 'correct' actor.
+
+    Locations are JSON-encoded diagnostic excerpts, not complete raw frames.
+    Unmatched or ambiguous event locations remain unknown.
+    """
+    return (
+        frames.loc[
+            frames["actors"].gt(1),
+            [
+                "match_id",
+                "frame_ordinal",
+                "event_id",
+                "event_type",
+                "event_index",
+                "event_link_status",
+                "actors",
+                "multiple_actor_locations",
+                "multiple_actor_event_location",
+            ],
+        ]
+        .rename(
+            columns={
+                "actors": "actor_count",
+                "multiple_actor_locations": "actor_locations",
+                "multiple_actor_event_location": "event_location",
+            }
+        )
+        .copy()
+    )
 
 
 def _event_metadata(
@@ -491,6 +664,7 @@ def audit_season(
         )
         summary["retrieved_at_utc"] = datetime.now(timezone.utc).isoformat()
         summary["source_base_url"] = loader.BASE_URL
+        summary["statsbomb_revision"] = loader.STATSBOMB_REVISION
         summaries.append(summary)
         frame_tables.append(frame_table)
         event_tables.append(event_table)
@@ -511,12 +685,18 @@ def write_audit_outputs(
     attrition: pd.DataFrame,
     output_directory: Path,
 ) -> None:
-    """Write only the three derived Phase 1 CSV tables (never raw records)."""
+    """Write six Phase 1/1B diagnostic CSVs, never complete raw records."""
     output_directory = Path(output_directory)
     output_directory.mkdir(parents=True, exist_ok=True)
     for name, table in (
         ("match_summary", matches),
         ("frame_summary", frames),
         ("attrition", attrition),
+        ("actor_distance_by_event_type", actor_distances_by_event_type(frames)),
+        (
+            "coordinate_semantics_by_event_type",
+            coordinate_semantics_by_event_type(frames),
+        ),
+        ("multiple_actor_frames", multiple_actor_frames(frames)),
     ):
         table.to_csv(output_directory / f"phase1_{name}.csv", index=False)

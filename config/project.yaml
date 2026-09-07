@@ -1,8 +1,9 @@
 # IDs verified against existing repository match records and notebooks.
 competition_id: 9
 season_id: 281
+statsbomb_revision: 533862946a73608c134d18b78226b6371ce7173c
 team_name: Bayer Leverkusen
 team_id: 904
 coordinate_length: 120
 coordinate_width: 80
-# Descriptive configuration for future orchestration; loader retains 9/281.
+# The loader reads this immutable revision once when imported. Restart after edits.

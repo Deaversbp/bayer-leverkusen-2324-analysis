@@ -60,7 +60,7 @@ labeling attackers and defenders. Goalkeeper inclusion is not yet fixed.
 
 `leverkusen.data.observability` implements the inventory, event/frame integrity,
 visible-player counts, visible-area checks, actor consistency and grouped attrition.
-The CLI writes only the three derived Phase 1 CSVs. It fetches each match's events
+The CLI writes the three Phase 1 CSVs plus three Phase 1B diagnostic CSVs. It fetches each match's events
 and 360 once per run without persisting raw responses.
 
 ID joins are match-local. Event rows and frame rows retain their original grain;
@@ -105,7 +105,52 @@ visible players, sufficient area, known identities or calibrated sample eligibil
 Scopes (season, match, event type, event team) are alternative partitions, not
 additive across scopes. Orphan/ambiguous/missing categories remain in the totals.
 
-### Calibration still pending
+### Phase 1B revision and coordinate diagnostics
+
+The source revision is configured solely in `config/project.yaml` as
+`533862946a73608c134d18b78226b6371ce7173c`, the original Leverkusen release of
+May 21, 2024. All matches/events/lineups/360 URLs are built from that SHA. The
+loader reads it once per Python process and rejects mutable branch names; the CLI
+checks that its configuration agrees with the imported loader. Restart after a
+config change. The pinned audit never uses legacy local files or mixed revisions.
+
+This choice follows the project history investigation: later `master` returned
+event/360 identifiers that were not mutually compatible in matches 3895158,
+3895266 and 3895309. Pinning provides a consistent release for measurement, not
+proof that all upstream data are incorrect. Rerun results and residual issues are
+reported separately from the historical baseline in the technical appendix.
+
+For a uniquely linked event and exactly one located actor, the audit computes
+`actor_distance_direct = distance((x,y), actor)` and
+`actor_distance_mirrored = distance((length-x,width-y), actor)`. Pitch dimensions
+come from project config (120 × 80). `actor_distance` is the backward-compatible
+alias for direct distance; existing statistics and review ranks remain direct.
+Original coordinates are never changed, and no attacking direction is normalized.
+
+Strict numerical comparison gives `direct_closer`, `mirrored_closer`, or
+`equal_or_indeterminate`. Exact ties and missing/invalid pairs share the third
+label at frame level; `actor_consistency_measurable` distinguishes them. Event-type
+percentages include measurable pairs only, so their equal category contains ties.
+Percentages run from 0 to 100. A closer candidate is not necessarily close in
+absolute terms; neither this comparison nor an event-type majority establishes a
+coordinate rule or a universal exclusion threshold.
+
+`phase1_actor_distance_by_event_type.csv` reports direct-distance count, mean,
+median, p75/p90/p95/p99 and max. `phase1_coordinate_semantics_by_event_type.csv`
+reports measurable-pair counts, both medians and p95s, and percentages in the three
+comparison categories. Both retain frame grain (duplicate frames would count
+separately) and omit event types with no measurable pairs. No conclusions are
+hard-coded for any event type.
+
+`phase1_multiple_actor_frames.csv` retains all flagged actor locations in source
+order, event location, match/event IDs, event index/type and actor count. Locations
+are JSON-encoded excerpts for these exceptional frames only, not full raw event or
+360 records. Missing actor locations are retained as null entries. Missing or
+ambiguous event links leave event location unknown. No actor is chosen; these
+frames remain excluded from single-actor distance analysis and retained in general
+observability counts. Any later actor-specific use requires a justified resolution.
+
+### Remaining calibration
 
 All visibility and outcome thresholds are intentionally null. Before analysis is
 locked, calibrate minimum visible players/area, edge handling, local radius,
