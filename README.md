@@ -3,10 +3,12 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 1B — StatsBomb Revision Pinning & Coordinate Semantics.** Model selection and
-tactical conclusions have NOT yet been performed. Existing event and passing EDA
-is preserved. The implemented observability audit exposes coverage and integrity
-issues; it does not select final visibility thresholds or a final usable sample.
+**Current phase: Phase 1 complete — preparing Phase 2A method lock.** Phase 1B
+revision pinning and coordinate diagnostics are complete. Initial Phase 2A is
+limited to basic within-frame visible-player geometry; no Phase 2 metrics,
+model selection or tactical conclusions are implemented. Existing event/passing
+EDA is preserved. Final visibility thresholds and analytical eligibility remain
+open. See the [current methodology contract](docs/methods_specification.md).
 
 ## Research objective and dataset
 
@@ -16,8 +18,10 @@ against different defensive structures?
 
 The project uses [StatsBomb Open Data](https://github.com/hudl/open-data):
 competition 9, season 281, team Bayer Leverkusen (904), on a 120 × 80 coordinate
-grid. The existing release contains 34 Leverkusen matches. The first audit must
-reconfirm the match sample and qualify event/360 coverage before modeling.
+grid. The pinned audit confirmed 34 Leverkusen matches, 137,765 events and 118,581
+frames, all linked to events (86.074838% event coverage), with zero orphan frames
+or duplicate event/frame IDs. Metric-specific eligibility remains to be locked
+before analysis.
 See [research questions](docs/research_questions.md).
 
 ## Methodological scope
@@ -168,11 +172,14 @@ join. Duplicate event IDs leave linked frame metadata ambiguous, and duplicate
 frames retain separate rows. Missing frames are not represented as zero-player
 frames. Null calibration thresholds remain untouched.
 
-The historical unpinned audit found 108,394 linked events out of 137,765 (78.68%), with
-118,607 frames loaded across all 34 matches. Three matches have no event/frame UUID
-overlap, accounting for 10,213 orphan frames. This is the baseline, not the pinned
-result. See the [Phase 1B rerun and coordinate findings](report/technical_appendix.md#phase-1b-pinned-revision-and-coordinate-semantics)
-for measured recovery, event-type behavior and readiness.
+The historical unpinned audit found 108,394 linked events out of 137,765 (78.68%),
+with 118,607 frames and 10,213 orphans in three UUID-incompatible matches. The
+pinned rerun resolved those joins: all 118,581 frames link to events across all
+34 matches. Four frames retain two identical actor locations and are excluded
+from single-actor diagnostics. Coordinate hypotheses remain diagnostic; neither
+automatic mirroring nor direction-dependent tactical interpretation is justified
+by a closer distance alone. See the [Phase 1B findings](report/technical_appendix.md#phase-1b-pinned-revision-and-coordinate-semantics)
+and [Phase 2A scope](docs/methods_specification.md#28-analysis-phases-and-immediate-phase-2a-boundary).
 
 ## Verification and reproducibility
 
