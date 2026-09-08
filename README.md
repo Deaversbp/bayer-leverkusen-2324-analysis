@@ -3,10 +3,10 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 1 complete — preparing Phase 2A method lock.** Phase 1B
-revision pinning and coordinate diagnostics are complete. Initial Phase 2A is
-limited to basic within-frame visible-player geometry; no Phase 2 metrics,
-model selection or tactical conclusions are implemented. Existing event/passing
+**Current phase: Phase 2A basic geometry locked and implemented.** Phase 1/1B
+observability, revision pinning and coordinate diagnostics are complete. Phase 2A
+provides the eight locked within-frame geometry families and descriptive diagnostics;
+model selection and tactical interpretation remain deferred. Existing event/passing
 EDA is preserved. Final visibility thresholds and analytical eligibility remain
 open. See the [current methodology contract](docs/methods_specification.md).
 
@@ -120,19 +120,20 @@ notebooks/              00 observability audit through 07 effectiveness scaffold
                         Existing 00_data_audit and 01_pass_eda are preserved
 src/leverkusen/
   data/                 Loader and migrated normalization/context transforms
-  spatial/              Reserved geometry, visibility, zones, Voronoi modules
+  spatial/              Basic geometry and diagnostics; later spatial modules reserved
   sequences/            Reserved possessions, event states, outcomes
   tactics/              Reserved defensive structures and attacking patterns
   models/               Reserved baselines and validation
-  visualization/        Reserved pitch and sequence figures
-scripts/                Working observability audit; future features/analysis CLIs
+  visualization/        Geometry diagnostics; pitch and sequence figures reserved
+scripts/                Observability and geometry diagnostics; future analysis CLIs
 tests/                  Offline regression tests and marked live checks
 outputs/                Ignored diagnostics, figures, tables
 report/                 Article and technical appendix scaffolds
 ```
 
-Spatial, sequence, tactical and model modules remain reserved. Feature and analysis
-script entry points still exit with status 2; the observability audit is implemented.
+Basic geometry and its diagnostic plots are implemented; other spatial, sequence,
+tactical and model modules remain reserved. Feature and analysis script entry
+points still exit with status 2.
 
 ## Phase 1 observability audit
 
@@ -180,6 +181,31 @@ from single-actor diagnostics. Coordinate hypotheses remain diagnostic; neither
 automatic mirroring nor direction-dependent tactical interpretation is justified
 by a closer distance alone. See the [Phase 1B findings](report/technical_appendix.md#phase-1b-pinned-revision-and-coordinate-semantics)
 and [Phase 2A scope](docs/methods_specification.md#28-analysis-phases-and-immediate-phase-2a-boundary).
+
+## Phase 2A geometry diagnostics
+
+```powershell
+.\.venv\Scripts\python.exe scripts/geometry_diagnostics.py
+```
+
+The CLI fetches the pinned release in memory and writes nine derived CSVs under
+`outputs/diagnostics/`: `phase2a_frame_geometry.csv`, `phase2a_match_summary.csv`,
+`phase2a_inventory.csv`, `phase2a_metric_summary.csv`, `phase2a_metric_status.csv`,
+`phase2a_histograms.csv`, `phase2a_by_valid_points.csv`,
+`phase2a_goalkeeper_sensitivity.csv` and `phase2a_anomalies.csv`.
+These generated files are ignored by Git; no raw JSON or full frames are saved.
+
+`build_frame_geometry(match_id, events, frames, source_revision=...)` in
+`leverkusen.spatial.geometry` emits six rows per original frame: all-visible and
+literal teammate True/False subsets, each with keepers included/excluded. Each
+numeric field has its own status, with observability and record-quality metadata.
+Excluded retains only literal keeper False. Native coordinates and coincident
+record weights remain unchanged; there is no final eligibility filter.
+
+Open `notebooks/03_spatial_geometry.ipynb` after running the CLI. It reads compact
+derived summaries, validates their source revision and presents distributions,
+keeper sensitivity and exact point-count strata. See the
+[implementation results](report/technical_appendix.md#phase-2a-implementation-and-initial-diagnostics).
 
 ## Verification and reproducibility
 

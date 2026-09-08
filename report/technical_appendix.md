@@ -5,7 +5,9 @@ observability diagnostics, sample exclusions, metric definitions, calibrated
 configuration, sequence rules, validation and sensitivity analysis.
 
 Current implementation includes data loading, preserved event transforms and the
-Phase 1/1B observability audit. No Phase 2 spatial metrics are implemented.
+Phase 1/1B observability audit and the eight locked Phase 2A geometry families.
+Historical checks below retain their original phase-specific scope; the Phase 2A
+implementation and initial diagnostics are recorded in the final section.
 See `docs/methods_specification.md` for pending decisions and observational limits.
 
 ## Phase 1 migration verification
@@ -261,3 +263,162 @@ actors and no-coordinate-mutation tests. Ruff and the full pinned live CLI passe
 All six derived CSVs were generated; the existing raw-data inventory and null
 calibration files remain unchanged. The notebook presents the new diagnostics and
 rejects cached tables from an unknown or different source revision.
+
+## Phase 2A implementation and initial diagnostics
+
+Verified on **7 September 2026**, using the immutable StatsBomb revision
+`533862946a73608c134d18b78226b6371ce7173c`. The season CLI fetched events and 360
+once per match in memory; all 34 match resources loaded. It processed **118,581
+original frames**, producing **711,486 frame-variant rows**, exactly six per frame.
+The original match-local frame ordinal is retained, with no synthetic frames for
+events without 360. The match summary records retrieval timestamps and source URL.
+
+### Implementation and verification
+
+The reusable APIs in `leverkusen.spatial.geometry` are `valid_point`,
+`measure_points`, `frame_geometry` and `build_frame_geometry`. Nine numeric
+outputs implement the eight locked metric families; centroid has two components.
+Every numeric output has its own status; centroid component statuses agree.
+The registry implementation section maps all context fields, including separate
+raw-list inventory, valid points, invalid entries, unknown flags, keeper removals,
+actor status, polygon validity, coincidences and out-of-bounds records.
+
+`leverkusen.spatial.diagnostics` provides the pinned CLI's summaries and paired
+keeper deltas; `leverkusen.visualization.geometry` produces the diagnostic plots.
+`notebooks/03_spatial_geometry.ipynb` executed **all five code cells**, with three
+saved figures covering distributions, goalkeeper sensitivity and exact-n strata.
+Calculations reside in the package. The notebook reads compact derived summaries
+and verifies source revision; it does not persist raw frames.
+
+**194 offline tests passed; two optional network tests were deselected.**
+`python -m ruff check .`, CLI help, notebook schema validation and full-table
+checks passed. Tests cover valid/invalid coordinates, exact literal flags,
+empty/unavailable inputs, record multiplicity, hand-computable distance aggregates,
+nearest-neighbor ties/self exclusion, hull degeneracy and expected failures,
+unexpected errors, actor ambiguity, observability context, duplicate joins,
+six-row grain, keeper pairing and raw-free outputs.
+
+Full CSV verification confirmed unique original-frame variant keys, six variants
+per frame, the current API schema, finite successful values, positive measured
+hulls, and exact status/NA correspondence. IDs, raw record counts, actor counts
+and visible-area fractions agree exactly with the Phase 1 derived frame table.
+The implementation also preserves diagnostic information for invalid scalar event
+IDs; none occurred in this pinned run.
+
+Environment: Windows, Python 3.14.0, pandas 3.0.5, NumPy 2.5.2, Shapely 2.1.2,
+Matplotlib 3.11.1 and nbclient 0.11.0. The existing dependency configuration was
+retained. Raw-data and all configuration SHA-256 inventories were unchanged.
+
+### Metric availability
+
+Denominator is **711,486 variant rows per output**, including all record-quality
+flags. The six variants are repeated measurements of original frames, not
+independent observations for statistical inference.
+
+| Output(s) | Available per output | NA per output | NA rate |
+| --- | ---: | ---: | ---: |
+| Visible player count | 711,486 | 0 | 0.000000% |
+| Centroid x; centroid y; visible width; visible depth | 711,460 | 26 | 0.003654% |
+| Convex hull area | 709,524 | 1,962 | 0.275761% |
+| Mean pairwise; median pairwise; mean nearest-neighbor distance | 711,019 | 467 | 0.065637% |
+
+The 26 missing centroid/span measurements per output were `empty_points`.
+All missing distances and hulls were `insufficient_points`. There were **zero**
+observed `geometry_error`, `numeric_error`, `degenerate_hull` or
+`insufficient_unique_points` statuses; their behavior is covered offline.
+Count remains zero for known-empty selected subsets. All raw frame lists loaded.
+
+Each subset/keeper variant has 118,581 rows. Count is available for every row;
+the remaining NA rates vary by selected point count:
+
+| Subset | Keepers | Centroid/spans NA % | Hull NA % | Each distance NA % |
+| --- | --- | ---: | ---: | ---: |
+| all_visible | included | 0.000000 | 0.005903 | 0.000843 |
+| all_visible | excluded | 0.000843 | 0.016023 | 0.005903 |
+| teammate_true | included | 0.000000 | 0.167818 | 0.042165 |
+| teammate_true | excluded | 0.002530 | 0.238655 | 0.051442 |
+| teammate_false | included | 0.008433 | 0.604650 | 0.146735 |
+| teammate_false | excluded | 0.010120 | 0.621516 | 0.146735 |
+
+All-visible included counts range from 1 to 22 (median 17); excluded counts range
+from 0 to 21 (median 17). Both literal teammate subsets reach 11 records;
+their medians are 8 for teammate_true and 9 for teammate_false under both keeper
+policies. These are visible record counts, without inferred player identity.
+Exact-n summaries retain denominators and NA rates rather than selecting a cutoff.
+
+### Goalkeeper sensitivity
+
+Differences are **excluded minus included**, paired on original frame and literal
+subset. There were no unknown keeper flags in the pinned records. Keeper removal
+affected **47,394 all-visible frames**, **23,020 teammate_true subsets** and
+**24,374 teammate_false subsets**. Four all-visible frames contained two keeper
+records. The tables retain both the all-pairs and records-removed summaries.
+
+The following are mean paired deltas **among affected subsets**, using jointly
+defined results for each metric. These are descriptive composition effects, without
+a preferred keeper convention or tactical interpretation.
+
+| Output | all_visible | teammate_true | teammate_false |
+| --- | ---: | ---: | ---: |
+| Visible count (records) | -1.000084 | -1.000130 | -1.000041 |
+| Centroid x | 0.114428 | 2.349380 | -1.914999 |
+| Centroid y | 0.006411 | -0.045508 | 0.067619 |
+| Width | -0.041751 | -0.076058 | -0.043144 |
+| Depth | -10.426598 | -9.992064 | -11.780091 |
+| Hull area | -219.621707 | -190.248580 | -199.587353 |
+| Mean pairwise distance | -0.838901 | -0.835709 | -1.304203 |
+| Median pairwise distance | -0.859980 | -0.964069 | -1.319484 |
+| Mean nearest-neighbor distance | -0.405916 | -0.028279 | -0.543254 |
+
+Units are native coordinate units, except record counts and squared units for
+hull area. Paired denominators differ: centroid/spans use 47,393 / 23,017 / 24,372
+affected pairs in column order; hulls use 47,375 / 22,922 / 24,352; distances use
+47,387 / 23,006 / 24,372. Count uses all affected subsets. The CSV also records
+medians, quantiles, absolute deltas, changed-pair counts and missingness.
+
+### Geometry and data-quality anomalies
+
+| Flag | Original frames with flag | Variant rows with flag |
+| --- | ---: | ---: |
+| Coincident records | 50 | 198 |
+| Multiple actors | 4 | 24 |
+| Finite out-of-bounds points | 11,508 | 45,565 |
+
+The all-visible included observations contain **52 coincident excess records**
+across those 50 frames and **13,812 out-of-bounds record observations** across
+11,508 frames. These are frame-local record observations, not unique people.
+The four previously known multiple-actor frames remain unchanged; the generic
+actor rule flags every one of their six variants. The other 118,577 frames have
+single-actor status; none have unknown actor status.
+
+There were no non-dictionary player entries, invalid locations, unknown teammate
+or keeper flags, ambiguous/unmatched event joins, or invalid visible polygons.
+Finite out-of-bounds coordinates remain measured in native units and flagged,
+without clipping or exclusions. Coincidence is retained without deduplication
+or a claim that each coincidence represents the same person.
+
+### Artifacts and validation boundary
+
+Nine ignored derived CSVs were generated under `outputs/diagnostics/`:
+`phase2a_frame_geometry.csv`, `phase2a_match_summary.csv`,
+`phase2a_inventory.csv`, `phase2a_metric_summary.csv`,
+`phase2a_metric_status.csv`, `phase2a_histograms.csv`,
+`phase2a_by_valid_points.csv`, `phase2a_goalkeeper_sensitivity.csv` and
+`phase2a_anomalies.csv`. Three diagnostic PNGs were exported under
+`outputs/figures/`; the notebook also embeds them. No raw StatsBomb JSON or full
+freeze frames were saved, and generated diagnostics were not added to Git.
+
+**Formulas remained identical to the method lock.** The eight complete registry
+rows were compared with their pre-implementation versions, allowing only the
+implementation-status change; numerical rules, actor policy and later candidates
+also matched exactly. No coordinate transformation, calibration change, tactical
+role mapping, final eligibility filter, sequence or later metric was introduced.
+
+**Ready for empirical geometry validation.** Initial descriptive execution is
+complete; representative-frame review and visibility/edge calibration remain
+future work. Out-of-bounds placement, incomplete visibility and record identity
+still require interpretation. The locked later primary-comparison exclusion for
+multiple/unknown actors remains in force when those comparisons are undertaken;
+it was not applied to this all-row diagnostic inventory. Direction-dependent
+semantics and every later tactical/outcome method remain unresolved and deferred.
+No unresolved implementation conflict with the Phase 2A lock was identified.

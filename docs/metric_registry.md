@@ -1,8 +1,9 @@
-# Metric registry — Phase 2A definitions locked; geometry not implemented
+# Metric registry — Phase 2A definitions locked and implemented
 
 **Phase 2A method lock: 7 September 2026.** This contract freezes the eight basic
-within-frame measurement definitions below. It does not implement them, select a
-final research sample, or advance later metrics. Existing Phase 1 raw-record
+within-frame measurement definitions below. Implementation was verified on
+7 September 2026 without changing the lock. It does not select a final research
+sample or advance later metrics. Existing Phase 1 raw-record
 counts remain audit outputs; the Phase 2A valid-point count has the explicit
 definition below and must not silently replace those audit fields.
 
@@ -132,7 +133,7 @@ cross-frame pooling or interpolation is part of the definition.
 | Coincidence / multiple-actor flags | `n-u` coincident excess records for selected P and whole-frame ambiguity status; these are warnings about records, not deduplication instructions |
 | `metric_status`, `measurement_flags` | Numerical status and all applicable context flags (partial invalid input, unknown role/keeper, out-of-bounds, missing/invalid visible area, ambiguous join, coincidence, actor ambiguity); flags never silently disappear when a metric is computable |
 
-Metadata names above define a data contract, not newly implemented fields.
+Metadata names above define the implemented data contract.
 Existing audit fields may be mapped explicitly without changing their meaning.
 For invalid raw event IDs, retain diagnostic raw-ID information separately if
 available; `frame_index` preserves grain even when `event_id` is missing/duplicated.
@@ -148,20 +149,20 @@ specification's observation gate.
 
 ## 2. Locked Phase 2A metric rows
 
-Every row is `LOCKED / NOT IMPLEMENTED` under this contract. **All six** means the
+Every row is `LOCKED / IMPLEMENTED` under this contract. **All six** means the
 three literal subsets × included/excluded goalkeeper variants from section 1.2;
 F and G expand to the complete fields/context and observation grain above.
 
 | Metric / output | Exact formula | Source / provenance | Definition / implementation status | Required raw fields | Valid subsets / goalkeeper policy | Minimum valid points | Units | Grain | Missing / degenerate behavior | Visibility limitation | Research question |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Visible player count: `visible_player_count` | `n = len(P)` | SOURCE: S01, S02 records/flags; DERIVE count; PROJECT validity/subset policy | LOCKED / NOT IMPLEMENTED | F | All six | 0 for a known list | Integer valid records | G | Known empty selection yields 0; unavailable/non-list frame yields NA; coincident records each count | Partial/unknown flags and invalid points can lower selected n; duplicate records can overstate people; never full-team count | 2, 9 |
-| Centroid: `centroid_x`, `centroid_y` | `centroid_x = sum_i(x_i)/n`; `centroid_y = sum_i(y_i)/n` | S07, S08: ADOPT arithmetic centroid; DERIVE coordinates; ADAPT visible subset; PROJECT record policy | LOCKED / NOT IMPLEMENTED | F | All six | 1 | Native coordinate units per component | G | n=0: both NA; n=1: that point; duplicates retain equal record weights; no unique-point requirement | Visibility/subset composition and duplicate weights affect centroid; no direction-dependent interpretation | 2, 5, 7, 9 |
-| Visible width: `visible_width` | `max_i(y_i) - min_i(y_i)` | S07, S12: ADOPT base width/range; DERIVE span; ADAPT visible subset/native-axis reporting | LOCKED / NOT IMPLEMENTED | F | All six | 1 | Native coordinate units | G | n=0: NA; n=1: 0; all equal y: 0; duplicates do not change extrema | Unseen extreme players/edge censoring bias observed span; not a full-team or attacking-direction measure | 2, 5, 6, 9 |
-| Visible depth: `visible_depth` | `max_i(x_i) - min_i(x_i)` | S07, S12: ADOPT base length/range; DERIVE span; ADAPT visible subset/native-axis reporting | LOCKED / NOT IMPLEMENTED | F | All six | 1 | Native coordinate units | G | n=0: NA; n=1: 0; all equal x: 0; duplicates do not change extrema | Native x-span, not block height or attacking direction; unseen extreme points can increase full span | 2, 5, 6, 9 |
-| Convex hull area: `convex_hull_area` | `Area(ConvexHull(P))` only for a valid nonempty Polygon with finite positive area | S07, S08: ADOPT hull/surface construction; DERIVE area; ADAPT visible subset; PROJECT degeneracy/error policy | LOCKED / NOT IMPLEMENTED | F | All six | n>=3 AND u>=3 AND non-collinear | Squared native coordinate units | G | n<3, u<3, collinear/empty/nonpolygon/zero-area hull: NA; repeated points allowed if valid polygon remains; Shapely/GEOS error or invalid polygon: NA with error status | Observed footprint only, not space controlled; duplicates leave hull unchanged but can disguise insufficient unique points | 2, 3, 7, 9 |
-| Mean pairwise distance: `mean_pairwise_distance` | `sum_{i<j} d(i,j) / (n(n-1)/2)` | S07: ADOPT base Euclidean distance; DERIVE arithmetic; PROJECT all-pairs mean; ADAPT visible subset; exact aggregation not attributed to S07 | LOCKED / NOT IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; coincident-pair zeros retained; n=2: the sole pair distance, including 0 | Record multiplicity/visibility alter pair weights and spacing; no inferred line spacing or motion | 2, 7, 9 |
-| Median pairwise distance: `median_pairwise_distance` | `median(D)` using section 1.3 odd/even rule | S07: ADOPT base Euclidean distance only; DERIVE median; PROJECT all-pairs aggregation; ADAPT visible subset | LOCKED / NOT IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; preserve zero/repeated distances; n=2: sole pair distance; even k: mean of central two | Describes observed record pairs; missing players/duplicates change distribution; not a published median metric claimed here | 2, 7, 9 |
-| Nearest-neighbor spacing: `mean_nearest_neighbor_distance` | `NN_i = min_{j!=i} d(i,j)`; `mean_nearest_neighbor_distance = sum_i(NN_i)/n` | S07: ADOPT base Euclidean distance only; DERIVE minima/mean; PROJECT within-subset NN summary; ADAPT visible observations | LOCKED / NOT IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; exclude self by record index, not coordinate equality; coincident distinct records give NN=0; n=2: mean of two equal sole-neighbor distances | Neighbor restricted to selected P; unseen players can be closer, duplicates force artificial zeros; not actor-to-nearest-defender distance | 2, 7, 9 |
+| Visible player count: `visible_player_count` | `n = len(P)` | SOURCE: S01, S02 records/flags; DERIVE count; PROJECT validity/subset policy | LOCKED / IMPLEMENTED | F | All six | 0 for a known list | Integer valid records | G | Known empty selection yields 0; unavailable/non-list frame yields NA; coincident records each count | Partial/unknown flags and invalid points can lower selected n; duplicate records can overstate people; never full-team count | 2, 9 |
+| Centroid: `centroid_x`, `centroid_y` | `centroid_x = sum_i(x_i)/n`; `centroid_y = sum_i(y_i)/n` | S07, S08: ADOPT arithmetic centroid; DERIVE coordinates; ADAPT visible subset; PROJECT record policy | LOCKED / IMPLEMENTED | F | All six | 1 | Native coordinate units per component | G | n=0: both NA; n=1: that point; duplicates retain equal record weights; no unique-point requirement | Visibility/subset composition and duplicate weights affect centroid; no direction-dependent interpretation | 2, 5, 7, 9 |
+| Visible width: `visible_width` | `max_i(y_i) - min_i(y_i)` | S07, S12: ADOPT base width/range; DERIVE span; ADAPT visible subset/native-axis reporting | LOCKED / IMPLEMENTED | F | All six | 1 | Native coordinate units | G | n=0: NA; n=1: 0; all equal y: 0; duplicates do not change extrema | Unseen extreme players/edge censoring bias observed span; not a full-team or attacking-direction measure | 2, 5, 6, 9 |
+| Visible depth: `visible_depth` | `max_i(x_i) - min_i(x_i)` | S07, S12: ADOPT base length/range; DERIVE span; ADAPT visible subset/native-axis reporting | LOCKED / IMPLEMENTED | F | All six | 1 | Native coordinate units | G | n=0: NA; n=1: 0; all equal x: 0; duplicates do not change extrema | Native x-span, not block height or attacking direction; unseen extreme points can increase full span | 2, 5, 6, 9 |
+| Convex hull area: `convex_hull_area` | `Area(ConvexHull(P))` only for a valid nonempty Polygon with finite positive area | S07, S08: ADOPT hull/surface construction; DERIVE area; ADAPT visible subset; PROJECT degeneracy/error policy | LOCKED / IMPLEMENTED | F | All six | n>=3 AND u>=3 AND non-collinear | Squared native coordinate units | G | n<3, u<3, collinear/empty/nonpolygon/zero-area hull: NA; repeated points allowed if valid polygon remains; Shapely/GEOS error or invalid polygon: NA with error status | Observed footprint only, not space controlled; duplicates leave hull unchanged but can disguise insufficient unique points | 2, 3, 7, 9 |
+| Mean pairwise distance: `mean_pairwise_distance` | `sum_{i<j} d(i,j) / (n(n-1)/2)` | S07: ADOPT base Euclidean distance; DERIVE arithmetic; PROJECT all-pairs mean; ADAPT visible subset; exact aggregation not attributed to S07 | LOCKED / IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; coincident-pair zeros retained; n=2: the sole pair distance, including 0 | Record multiplicity/visibility alter pair weights and spacing; no inferred line spacing or motion | 2, 7, 9 |
+| Median pairwise distance: `median_pairwise_distance` | `median(D)` using section 1.3 odd/even rule | S07: ADOPT base Euclidean distance only; DERIVE median; PROJECT all-pairs aggregation; ADAPT visible subset | LOCKED / IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; preserve zero/repeated distances; n=2: sole pair distance; even k: mean of central two | Describes observed record pairs; missing players/duplicates change distribution; not a published median metric claimed here | 2, 7, 9 |
+| Nearest-neighbor spacing: `mean_nearest_neighbor_distance` | `NN_i = min_{j!=i} d(i,j)`; `mean_nearest_neighbor_distance = sum_i(NN_i)/n` | S07: ADOPT base Euclidean distance only; DERIVE minima/mean; PROJECT within-subset NN summary; ADAPT visible observations | LOCKED / IMPLEMENTED | F | All six | 2 records, not 2 unique locations | Native coordinate units | G | n<2: NA; exclude self by record index, not coordinate equality; coincident distinct records give NN=0; n=2: mean of two equal sole-neighbor distances | Neighbor restricted to selected P; unseen players can be closer, duplicates force artificial zeros; not actor-to-nearest-defender distance | 2, 7, 9 |
 
 The prior basic rows “Defensive width,” “Defensive depth,” “Team centroid” and
 “Mean pairwise/interpersonal distance” are represented by the literal-subset rows
@@ -249,7 +250,7 @@ requires an explicit method revision; unknown person identity remains unresolved
 ## 4. Remaining calibration and interpretation decisions
 
 The eight formulas, minima, record/flag filters, units, numerical missing rules
-and ambiguity treatment are locked for implementation planning. Remaining choices
+and ambiguity treatment are locked and implemented for descriptive diagnostics. Remaining choices
 are research eligibility/visibility thresholds (including edge censoring), a
 preferred goalkeeper convention if later justified, resolution of actual identity
 in multiple-actor records, and event/team/coordinate semantics for football
@@ -282,3 +283,45 @@ definition maturity, not completed code.
 Line spacing, sequence aggregation, actor attribution and later sensitivity
 variants require further specification. Continuous velocity, acceleration, dynamic
 pitch control and tracking EPV remain REJECT for faithful reconstruction here.
+
+## 6. Phase 2A implementation record — 7 September 2026
+
+The eight locked families are implemented in `src/leverkusen/spatial/geometry.py`:
+`valid_point`, `measure_points`, `frame_geometry` and `build_frame_geometry`.
+The wide output has nine numeric fields and a `<output>_status` for each;
+`centroid_x_status` and `centroid_y_status` always agree. Missing numeric values
+are Python None / tabular NA. `hull_error_category` retains the expected failure
+category. Unexpected programming/schema errors propagate.
+
+Metadata mappings are explicit: `n_non_dictionary_records`, `n_invalid_locations`,
+`n_unknown_teammate` (valid, unassigned whole-frame points),
+`n_keeper_true_before_filter`, `n_keeper_unknown_before_filter`, their corresponding
+`n_keeper_true_excluded` / `n_keeper_unknown_excluded` counts, and
+`n_coincident_records` implement section 1.4. `actor_count`,
+`n_unknown_actor_flags`, `actor_status` and `freeze_frame_status` retain whole-frame
+context; non-dictionary and invalid-location records count as malformed for the
+locked actor-status rule. This does not invalidate their other finite selected
+points. `measurement_flags` is a deterministic pipe-separated list of all
+applicable warnings. An empty list of flags is stored as an empty string.
+
+`visible_area_status` is missing, malformed, invalid or valid; the existing
+Phase 1 polygon fields and reason are retained. Expected polygon evaluation
+failures carry an invalid status, NA fraction and error category in the reason;
+player geometry remains evaluable. The Phase 1 inspector is unchanged.
+`statsbomb_revision` supplies immutable source provenance. Original invalid event
+IDs are represented by NA and remain distinguishable through `frame_index`.
+`event_id_raw_type` retains the original ID type; `invalid_event_id_scalar`
+retains the representation of an invalid scalar ID (including blank strings).
+Malformed nested ID payloads are described by type without serializing them.
+
+`src/leverkusen/spatial/diagnostics.py` supplies derived season summaries and
+paired keeper deltas; `scripts/geometry_diagnostics.py` runs the pinned release.
+`notebooks/03_spatial_geometry.ipynb` presents compact derived distributions,
+availability, statuses, keeper sensitivity and exact-n strata. All rows are
+retained in these descriptive implementation diagnostics; no primary analytical
+comparison sample is selected. The later ambiguity policy in section 3 is unchanged.
+
+Offline tests passed before these rows were marked implemented. The
+[technical appendix](../report/technical_appendix.md#phase-2a-implementation-and-initial-diagnostics)
+records the full verification and empirical execution. All formulas, minima,
+filters, native units and numerical statuses above remain identical to the lock.

@@ -2,20 +2,22 @@
 
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
-**Current status: Phase 1/1B COMPLETE — Phase 2A basic geometry definitions LOCKED.**
+**Current status: Phase 1/1B COMPLETE — Phase 2A basic geometry LOCKED / IMPLEMENTED.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
-visibility calibration and later methods remain open. No Phase 2 metrics,
-direction normalization, tactical classifier, pattern discovery or predictive
-model has been implemented or approved for implementation by this synchronization.
+visibility calibration and later methods remain open. The eight locked geometry
+families are now implemented and tested without a method change. Direction
+normalization, tactical classifiers, pattern discovery and predictive models remain
+deferred. Section 33 records the implementation boundary.
 
 Document lineage: original *Methods & Data Specification v1.0*, September 2026
 (26-page supplied PDF), merged with the repository's completed Phase 1/1B work and
 current source foundation on 7 September 2026. This is the current methodology
 contract, with the original 31 major section numbers retained for traceability.
 Statements marked proposed, candidate, optional or deferred describe future work.
-Results below are transferred from the technical appendix, not a new audit run.
+Phase 1/1B results below are preserved from the technical appendix; Phase 2A
+implementation diagnostics are recorded separately in section 33 and the appendix.
 
 ## 1. Purpose of this specification
 
@@ -50,7 +52,7 @@ interfaces govern where the original proposal differs.
 | One canonical row per 360 event in analytical tables | Audit retains original frame records, including duplicates/ambiguous links; analytical event-grain uniqueness requires an explicit eligibility contract |
 | Phase 1 audit still pending / UUID cause unresolved | Phase 1/1B complete; pinned release has zero orphan frames. Coordinate, actor, visibility and metric eligibility questions remain open |
 | Academic sources unavailable at migration | S01–S35 are synchronized in the source foundation; exact adaptations still require method review |
-| Broad Phase 2 included zones and clipped Voronoi | Initial Phase 2A is restricted to basic within-frame geometry method lock; zones/Voronoi and tactical interpretation remain later work |
+| Broad Phase 2 included zones and clipped Voronoi | Initial Phase 2A implements the locked basic within-frame geometry; zones/Voronoi and tactical interpretation remain later work |
 | PDF ADOPT labels for all-pairs mean, and DERIVE labels for proximity/overload | Current registry preserves published base geometry versus PROJECT aggregation/eligibility/radius; PDF labels alone do not establish an exact published formula |
 | PDF “Phase 0” calibration and example windows | Calibration remains pending before each relevant method lock; candidate values are not current defaults and all null thresholds remain null |
 
@@ -163,7 +165,7 @@ installation; reusable imports should not require notebook path hacks.
 | `requests` | Implemented public, revision-pinned retrieval; replaces PDF's `statsbombpy` choice |
 | pandas / NumPy | DataFrames and vectorized numerical work |
 | SciPy | Planned geometry/distances/statistical utilities; present in notebook dependencies |
-| Shapely | Now required for implemented visible-polygon validity and pitch intersection; future clipping |
+| Shapely | Implemented visible-polygon validity, pitch intersection and Phase 2A convex hulls; future clipping |
 | matplotlib / seaborn / mplsoccer | Core plots, statistical graphics and StatsBomb-aware pitch/sequence visualization |
 | scikit-learn | Planned scaling, PCA, clustering, regression/classification and validation; not added by this merge |
 | statsmodels | Planned interpretable statistical models/inference; not added by this merge |
@@ -272,7 +274,7 @@ claim that all tables exist. Avoid one giant denormalized DataFrame for every ta
 | `event_actions` | One row per source event | IDs, order/time, possession/team/player, action type/location and attributes; existing event normalization preserves source order |
 | `frame_points` | One row per observed player record per frame | Match/event plus original frame/point ordinal, native location, actor-relative team/actor/keeper flags; metre position and edge distance are future; PDF correction flag is replaced by diagnostic orientation status until a correction method exists |
 | `frame_quality` | Planned one row per eligible 360 event; audit currently one row per original frame | Visible team counts, polygon area, actor error/orientation diagnostics; target-zone visibility, edge censoring and quality tier are pending; duplicates remain distinct in the audit |
-| `frame_geometry` | One row per eligible event-aligned state and declared subset/variant | Future metric source, retaining frame-quality metadata and eligibility/missingness; subset/keeper variants require explicit keys |
+| `frame_geometry` | One original frame record × literal subset × goalkeeper policy | Implemented Phase 2A diagnostic source with original frame ordinal, quality metadata and per-metric statuses; no final eligibility decision |
 | `sequence_steps` | One eligible event in a Leverkusen possession | Event context, geometry, previous-state deltas and separately marked future targets; not implemented |
 | `possession_sequences` | One possession or analytical sub-sequence | Start/end context, event/spatial-history summaries, later pattern labels and aggregate outcomes |
 | Future outcome (explicit target view) | Anchor state × declared horizon/outcome | Future xG/shot/box-entry, team/possession boundary and censoring metadata; never predictor inputs |
@@ -383,7 +385,8 @@ scope. A formula in the original project PDF is not itself proof of academic ori
 This table retains the original broader plan. For the eight Phase 2A metrics,
 the registry now locks `all_visible`, literal `teammate=True` and `teammate=False`
 subsets with both keeper policies; no global attacker/defender mapping is required
-or inferred. Counts already exist as observability diagnostics; geometry does not.
+or inferred. Audit record counts remain separate from the implemented Phase 2A
+valid-point count and geometry outputs.
 Median pairwise distance and mean within-subset nearest-neighbor spacing are now
 locked PROJECT/DERIVE aggregations without invented published attribution.
 The PDF's blanket ADOPT/DERIVE labels do not supersede current registry provenance,
@@ -626,12 +629,12 @@ existing package layout. Do not create duplicate flat modules or proposed tables
 | Project constants and calibration | `config/project.yaml`, `zones.yaml`, `visibility.yaml`, `analysis_thresholds.yaml`; replaces PDF `project.yml`, `zones.yml`, `quality_thresholds.yml`, `analysis_windows.yml` |
 | Method/evidence/metrics | `docs/methods_specification.md`, `source_foundation.md`, `metric_registry.md`; canonical Markdown replaces PDF-era filename suggestions |
 | Loading/schema/quality | `src/leverkusen/data/loader.py`, `schemas.py`, `validation.py`, `observability.py`, `transforms.py` |
-| Future coordinates/geometry/visibility/zones/Voronoi | `src/leverkusen/spatial/`; normalization is not yet implemented |
+| Basic geometry and descriptive diagnostics; future visibility/zones/Voronoi | `src/leverkusen/spatial/geometry.py` and `diagnostics.py` implemented; normalization and later spatial metrics remain deferred |
 | Future possessions/trajectories/outcomes | `src/leverkusen/sequences/` |
 | Future regimes/patterns/clustering | `src/leverkusen/tactics/` |
 | Future modeling/validation | `src/leverkusen/models/` |
 | Future pitch/sequence/results figures | `src/leverkusen/visualization/` |
-| Tests | Existing loader/transform/observability/orientation tests; geometry/sequence files remain scaffolds |
+| Tests | Offline loader/transform/observability/orientation and Phase 2A geometry/integration tests; sequence tests remain a scaffold |
 | Notebooks | `00_data_observability_audit`, `01_event_eda`, `02_360_frame_audit`, `03_spatial_geometry`, `04_defensive_structures`, `05_sequence_construction`, `06_pattern_discovery`, `07_effectiveness_analysis` (`.ipynb`); existing `00_data_audit`/`01_pass_eda` preserved |
 | Outputs/article | Ignored `outputs/diagnostics/`, figures/tables; `report/` article/appendix documents, replacing the PDF's suggested `outputs/article/` convention |
 
@@ -690,8 +693,8 @@ The PDF's pre-analysis contracts remain requirements at the relevant method gate
 
 Required schema failure should stop dependent analytical work early. The existing
 audit itself retains malformed/ambiguous inputs as diagnostics where possible;
-that is not permission to pass them into metrics. Future geometry/sequence tests
-must be meaningful rather than treating current scaffolds as implemented methods.
+that is not permission to coerce them into geometry. Phase 2A geometry tests now
+exercise these boundaries; future sequence tests must test their actual implementation.
 
 The appendix records 119 offline tests, Ruff and the full pinned live CLI passing
 for Phase 1B, with all six derived CSVs and unchanged raw inventory/null calibration.
@@ -727,7 +730,7 @@ No configuration values are resolved or changed here.
 | --- | --- |
 | 1: data and observability audit | **COMPLETE**: coverage, counts, joins, visible-player/area diagnostics, missingness and actor-coordinate checks |
 | 1B: revision pinning and coordinate semantics | **COMPLETE**: immutable source, compatible pinned joins, diagnostic hypotheses and multiple-actor findings; semantics are not universally resolved |
-| 2A: basic within-frame visible-player geometry | **Definitions LOCKED; not implemented.** Registry controls formulas, record handling and metadata; research eligibility remains open |
+| 2A: basic within-frame visible-player geometry | **LOCKED / IMPLEMENTED.** Offline tests and descriptive diagnostics verify the registry formulas, record handling and metadata; research eligibility remains open |
 | Remaining Phase 2 geometry validation | Later: qualified zones and clipped Voronoi, representative-frame visual validation; separate method decisions required |
 | 3: defensive regime characterization | Later: define/validate high/mid/deep structure without outcome information |
 | 4: sequence construction | Later: possessions, event/spatial histories and action/time windows |
@@ -740,8 +743,8 @@ No configuration values are resolved or changed here.
 Phase 2A locked metrics are visible player count, centroid, visible width, visible
 depth, convex hull area, mean pairwise distance, median pairwise distance and
 nearest-neighbor spacing (mean of each record's nearest other record in its subset).
-Counts already exist as audit metadata; these Phase 2A definitions are not an
-implemented geometry layer. The [locked registry](metric_registry.md#2-locked-phase-2a-metric-rows)
+Audit counts retain their original semantics; the Phase 2A geometry layer now
+implements the [locked registry](metric_registry.md#2-locked-phase-2a-metric-rows), which
 specifies exact formulas/provenance, six subset/keeper combinations, native units,
 valid-point rules, minima, missing/degenerate outcomes and Shapely error handling.
 
@@ -760,7 +763,8 @@ low-block classification, dangerous-space composites, full-pitch naive Voronoi,
 pitch control, EPV tracking reconstruction, sequence clustering, future-xG
 predictive models, Transformer, LSTM, GNN and causal claims. Faithful tracking
 reconstructions and naive full-pitch control claims remain REJECT under this data
-model, not merely waiting for a later phase. This task stops at documentation.
+model, not merely waiting for a later phase. Current implementation stops at the
+eight basic geometry families and descriptive diagnostics.
 
 ## 29. Change-control policy
 
@@ -775,7 +779,8 @@ materially changed study population, new primary outcome, threshold changes afte
 viewing effectiveness, replacing a published metric with another proxy, adding
 external data to core inference, or making a high-capacity model primary.
 This document records the original v1.0, completed audit amendments and the
-7 September 2026 Phase 2A measurement-definition lock; it does not claim that
+7 September 2026 Phase 2A measurement-definition lock and its tested implementation;
+it does not claim that
 visibility calibration or later analytical method lock has occurred.
 Future method changes must record trigger, rationale, provenance,
 compatibility, validation/sensitivity and effect on prior results.
@@ -841,8 +846,8 @@ Leverkusen action sequence + explicit timing + event-aligned visible-player geom
 This is a research workflow, not a causal diagram or completed result. State when
 the open data lack required information. Use a simpler published metric when it
 answers the question; name and validate necessary adaptations transparently.
-The current work ends with the eight Phase 2A measurement definitions locked in
-the registry, not analytical implementation.
+The current implementation ends with the eight locked Phase 2A measurement
+families and descriptive validation, with later analytical methods still deferred.
 
 ## 32. Completed Phase 1/1B contract and findings
 
@@ -1034,3 +1039,43 @@ remain limitations. Event-specific coordinate/actor/role semantics must be
 justified before combining direction-dependent event and frame geometry. No
 universal actor-distance or visibility threshold, normalized direction, final
 usable sample or Phase 2 metric is established by the audit.
+
+## 33. Phase 2A implementation and descriptive execution
+
+Implemented on 7 September 2026 against the frozen registry, with no change to its
+eight metric rows beyond implementation status. The complete formulas, units,
+minima, subset/keeper filters, numerical status rules and actor ambiguity policy
+were compared with the pre-implementation Git version and remained identical.
+No scientific method revision or calibration threshold was introduced.
+
+`src/leverkusen/spatial/geometry.py` provides `valid_point`, `measure_points`,
+`frame_geometry` and `build_frame_geometry`. The frame builder uses unique
+match-local event metadata and preserves the zero-based original frame ordinal.
+It returns six wide rows per original frame, including known-empty and unavailable
+containers, with nine numeric outputs, per-output status and mandatory context.
+No frames are invented for missing 360 resources or events without frames.
+Phase 1 observability semantics remain unchanged; polygon inspection is reused.
+
+`src/leverkusen/spatial/diagnostics.py` and `scripts/geometry_diagnostics.py`
+produce the derived frame table, match inventory, availability/status summaries,
+histograms, exact-n strata, paired keeper sensitivity and anomaly counts.
+`src/leverkusen/visualization/geometry.py` renders the three diagnostic figures;
+`notebooks/03_spatial_geometry.ipynb` presents those package results.
+
+The pinned execution loaded all 34 matches and measured 118,581 original frames,
+producing **711,486 rows**, exactly six per frame. All Phase 1 frame IDs, raw record
+counts, actor counts and visible-area fractions agreed exactly. The notebook
+executed all five code cells and saved three figures. Verification passed
+**194 offline tests** (two network tests deselected), Ruff and full-table
+grain/schema/status checks. Raw-file and configuration hashes remained unchanged.
+
+These are all-row descriptive implementation diagnostics, retaining multiple actors,
+coincidences and finite out-of-bounds points with flags. They do not constitute a
+primary analytical comparison or final eligible research sample. The appendix
+records availability, keeper effects and anomalies:
+[Phase 2A implementation and initial diagnostics](../report/technical_appendix.md#phase-2a-implementation-and-initial-diagnostics).
+
+The implementation is ready for empirical geometry validation. Representative-frame
+review, visibility/edge calibration, unresolved record identity and direction/role
+semantics remain open. Later geometry, sequences, outcome models and tactical
+interpretation are not implemented by this phase.
