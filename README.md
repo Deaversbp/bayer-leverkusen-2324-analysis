@@ -3,12 +3,16 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 2A basic geometry locked and implemented.** Phase 1/1B
+**Current phase: Phase 2B-2 observation quality and edge validation complete.**
+Phase 2A basic geometry remains locked and implemented. Phase 1/1B
 observability, revision pinning and coordinate diagnostics are complete. Phase 2A
 provides the eight locked within-frame geometry families and descriptive diagnostics;
 model selection and tactical interpretation remain deferred. Existing event/passing
 EDA is preserved. Final visibility thresholds and analytical eligibility remain
-open. See the [current methodology contract](docs/methods_specification.md).
+open. Phase 2B-1/2B-2 provide empirical count, coverage, keeper, boundary and
+record-quality diagnostics, including 28 representative frames. Evidence is ready
+for human-reviewed Phase 2B-3 calibration; no rules have been selected. See the
+[current methodology contract](docs/methods_specification.md).
 
 ## Research objective and dataset
 
@@ -229,3 +233,13 @@ provenance and operational definitions before locking methods, and perform
 sensitivity analysis before conclusions. Credit StatsBomb and follow the
 [Open Data attribution guidance](https://github.com/hudl/open-data#terms--conditions)
 when sharing work.
+
+## Phase 2B-2 observation quality and edge review
+
+Run `python scripts/observation_quality.py` in the existing virtual environment
+after Phase 2A diagnostics exist. It reads the pinned derived geometry, retrieves
+360 records in memory, and writes 18 compact CSVs plus three diagnostic figures
+and seven representative contact sheets. Raw records are never persisted. Review
+the Phase 2B-2 section of [notebook 03](notebooks/03_spatial_geometry.ipynb) and the
+[technical appendix](report/technical_appendix.md#phase-2b-2--observation-quality-and-edge-validation)
+for empirical findings, limitations and calibration readiness.

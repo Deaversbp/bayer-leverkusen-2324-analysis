@@ -2,7 +2,7 @@
 
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
-**Current status: Phase 1/1B COMPLETE — Phase 2A basic geometry LOCKED / IMPLEMENTED.**
+**Current status: Phase 2B-2 COMPLETE — Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
@@ -1102,3 +1102,90 @@ The evidence is ready for human review before calibration. No formula, provenanc
 visibility threshold, keeper convention or configuration value changed. Detailed
 boundary/edge, out-of-bounds, coincidence, representative-frame and orientation
 work remains deferred, as do all tactical and later analytical methods.
+
+## 35. Phase 2B-2 observation quality and edge validation
+
+This empirical diagnostic phase adds point/polygon boundary checks and deterministic
+frame review to the locked Phase 2A observations. It uses the existing derived
+geometry CSV and retrieves each match's 360 records once, in memory, through the
+unchanged revision-pinned loader. Original frame ordinals, event IDs, selected
+counts and visible-area fractions must agree with Phase 2A. The source CSV hash,
+revision and retrieval inventory accompany the outputs. No raw frame/JSON cache
+is created; a bounded representative candidate pool stays in memory for plotting.
+
+The reusable implementation is `src/leverkusen/spatial/observation_quality.py`;
+run `python scripts/observation_quality.py` and review the Phase 2B-2 notebook
+section, compact `outputs/diagnostics/phase2b2_*.csv` tables and
+`outputs/figures/phase2b2_*.png` figures. Generated outputs remain ignored by Git.
+
+### Diagnostic definitions and denominators
+
+- Out-of-bounds means any strict violation of x=0, x=120, y=0 or y=80 by a finite
+  supplied point. Axis excursions are `max(0,-x,x-120)` and `max(0,-y,y-80)`;
+  distance to the nominal rectangle is their Euclidean norm. Exact boundary
+  points have zero excursion. No tolerance, rounding or coordinate change applies.
+  Record-weighted excursion quantiles describe severity; affected frame/match
+  counts are separately deduplicated by identifiers, never by player coordinates.
+- Valid polygons reuse the Phase 1 inspector without repair. Report pitch coverage,
+  intersection with the pitch boundary, containment, original area inside/outside
+  the pitch and outside area divided by original polygon area. Existing
+  `visible_area_fraction` remains intersection area divided by 9,600. Intersection
+  and difference are diagnostic geometries, not replacement polygons.
+- Point statuses are mutually exclusive `inside` (strict), `boundary` (covered
+  but not inside) and `outside`; `polygon_covered` includes inside and boundary.
+  Invalid/missing polygons have unavailable statuses/distances, not zero distances.
+  Boundary distances are unsigned Euclidean distances in native units, including
+  points outside the polygon; those points are counted separately.
+- For every variant, retain all indices tied at min/max x/y. The named scalar
+  extreme-edge measure is the minimum boundary distance among tied defining
+  records; a supplemental table preserves every tied record's distance. This
+  avoids silently choosing a record. Minimum/median selected distances retain
+  record multiplicity. Empty selected sets have unavailable edge measures.
+- Metric/edge relationships use five empirical quantile bins separately for each
+  variant and edge measure. Intervals are right closed with the minimum included;
+  duplicate edges collapse, equal values stay together and missing distances are
+  reported separately. Bin edges, inventories, defined metric denominators,
+  metric summaries, median n and median coverage are explicit. Quantiles use
+  pandas linear interpolation. No bin is an eligibility rule or censoring label.
+- Extreme-tail tables use observed lower/upper one-percent metric quantiles within
+  each variant, retaining all ties. All-defined baselines allow comparison of n,
+  coverage, continuous edge distances, out-of-bounds, keeper presence, coincident
+  records, multiple actors and points outside the supplied polygon. These are
+  marginal descriptions, without causal or independently adjusted interpretation.
+
+### Record multiplicity and deterministic visual review
+
+Exact-coordinate coincidence groups preserve original record indices, flag
+inventories and excess-record counts. To empirically test metric sensitivity
+without deduplicating anything, a separate counterfactual adds one record at each
+already-coincident selected location in turn. It applies the unchanged locked
+measurement function and reports added-minus-original values/statuses for all
+nine numeric outputs. It is a local multiplicity perturbation, not an estimate
+of actual identity error or a replacement for any Phase 2A observation. All four
+multiple-actor frames retain every record; actor-coordinate pair distances and
+literal teammate/keeper flags are reviewed without resolving identity. Actor flags
+alone are not a numerical input to these geometry formulas.
+
+Representative selection is deterministic: largest axis excursions, smallest
+positive excursion, largest excursion on each observed pitch side, minimum/median/
+maximum coverage, minimum/maximum all-visible count, minimum/maximum of five major
+metrics among defined-hull observations, largest absolute paired keeper changes
+in depth/hull/centroid x, every multiple-actor frame, and the first three distinct
+event-type examples with coincidence and at most one actor. Ties resolve by match
+ID, original frame ordinal, literal subset and keeper policy. A frame can satisfy
+several rules. The defined-hull preference applies only to representative metric
+plots; low-count/undefined geometry remains in the summaries and count examples.
+
+Contact sheets show native provider x/y axes, the nominal pitch, unmodified visible
+polygon, every finite player point, literal teammate flags, keeper/actor markers,
+out-of-bounds rings, multiplicity labels and the selected convex hull. Axis limits
+include outside points and polygon vertices. No mirroring, direction inference,
+identity mapping, tactical zones or formation interpretation is introduced.
+
+**EMPIRICAL FINDING:** Results and visual-review observations are recorded in the
+[Phase 2B-2 appendix](../report/technical_appendix.md#phase-2b-2--observation-quality-and-edge-validation).
+
+**METHODOLOGICAL DECISION:** None selected. Phase 2A formulas/provenance, source
+revision, raw-loading behavior, all calibration YAML values, goalkeeper preference
+and eligibility rules remain unchanged. Human review of calibration is the next
+permitted phase; orientation and all later analytical methods remain deferred.

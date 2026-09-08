@@ -615,3 +615,263 @@ No thresholds, eligibility rules, keeper preference, geometry formulas or metric
 provenance changed. No tactical interpretation or later metric was introduced.
 Detailed out-of-bounds, polygon-boundary/edge, coincidence, representative-frame
 and orientation investigations remain explicitly deferred.
+
+## Phase 2B-2 — Observation quality and edge validation
+
+Executed on **8 September 2026** using revision
+`533862946a73608c134d18b78226b6371ce7173c`. Raw 360 was loaded through the unchanged
+loader, match by match in memory, and joined to existing Phase 2A geometry by
+match and original frame ordinal. Event IDs, selected counts and coverage agreed.
+The geometry CSV SHA-256 remains
+`a6af9ceb6182c02159de78c8e57ad5ecda635d47e282eec610baf9daa45d5216`, identical to
+the Phase 2B-1 input. CSV numeric reads use round-trip precision so parser rounding
+does not masquerade as an exact multiplicity effect. No geometry formula changed.
+
+The run reconfirmed **118,581 frames, 711,486 variants, exactly six per frame,
+34 matches, 11,508 out-of-bounds frames, 50 coincident-record frames and four
+multiple-actor frames**. Unknown keeper flags and geometry/numeric implementation
+error rows remain zero. The Phase 2B-1 count, coverage and keeper findings stand;
+this phase adds boundary/quality evidence rather than repeating those analyses.
+
+### A. Out-of-bounds coordinates
+
+**EMPIRICAL FINDING:** There are **13,812 finite out-of-bounds player records**
+in 11,508 frames (9.7048% of original frames), spread across all 34 matches.
+The distribution is mixed, ranging from tiny excursions to deviations of several
+native units. It cannot be described as only floating-point boundary noise.
+
+| Distance to nominal pitch rectangle | Native units |
+| --- | ---: |
+| Minimum | 0.00009865 |
+| p05 | 0.102619 |
+| p25 | 0.557954 |
+| Median | 1.380061 |
+| p75 | 2.644052 |
+| p90 | 4.093298 |
+| p95 | 5.048831 |
+| p99 | 6.782837 |
+| Maximum | 10.662860 |
+
+The five empirical severity bins retain equal values; their exact bounds are in
+`phase2b2_excursion_quantile_bins.csv`. They are descriptive groups, not tolerances.
+Axis maxima are 6.775173 for x and 10.662860 for y. Of the records, 13,806 violate
+one side and six violate two sides. Side counts therefore sum to 13,818:
+
+| Side violated | Records |
+| --- | ---: |
+| x < 0 | 776 |
+| x > 120 | 979 |
+| y < 0 | 6,096 |
+| y > 80 | 5,967 |
+
+Literal teammate=True/False counts are 9,934/3,878; keeper=True/False counts are
+1,350/12,462; actor=True/False counts are 16/13,796. Pass, Ball Receipt*, Carry and
+Pressure account for 3,829, 3,785, 3,306 and 1,721 records respectively. These are
+event-population counts, not event-specific risk estimates; the event table also
+provides original-frame denominators. Match totals range from 205 records in
+3895134 to 722 in 3895210. The by-match and by-event tables retain the complete
+distributions, including event types with zero affected records. No cause is inferred.
+
+### B–C. Polygon bounds and player/polygon consistency
+
+**EMPIRICAL FINDING:** All **118,581 supplied polygons are valid and fully
+contained in the nominal pitch**. None extends outside it; every measured outside
+area and outside-area fraction is exactly zero. **118,185 polygons (99.6661%)**
+intersect the nominal pitch boundary; 396 do not. On-pitch polygon area ranges
+from 434.112653 to 8,270.029316 squared native units. Coverage remains the original
+pitch-intersection area / 9,600, with range 0.045220–0.861461 and median 0.290810.
+
+**Every one of the 13,812 out-of-bounds player records is outside its supplied
+visible polygon**: zero strictly inside, zero on the boundary and zero covered.
+Thus larger provider polygons do not explain these nominal-pitch excursions.
+All five excursion quantiles have 100% outside status, so there is no status-group
+contrast to estimate. Distance to the visible boundary has median 1.385617,
+p95 5.101008, p99 7.022613 and maximum **74.146048**. That long maximum shows that
+some inconsistencies extend far beyond a small nominal-pitch excursion.
+
+There are **20,582 frames (17.3569%)** with at least one selected point outside
+the polygon under all_visible/included. Because every out-of-bounds frame is in
+that set, 9,074 additional frames have polygon-inconsistent points despite having
+no nominal-pitch violation. This is an exact geometric inconsistency with the
+supplied observation window, not proof of its origin or a rule to remove records.
+
+### D. Defining players and visible-boundary proximity
+
+**EMPIRICAL FINDING:** For all_visible/included, all 118,581 edge observations
+are defined. The following distances retain exact extreme ties; scalar values
+use the smallest boundary distance among tied defining records.
+
+| Defining point / measure | p05 | p25 | Median | Exact zero frames |
+| --- | ---: | ---: | ---: | ---: |
+| Minimum x | 0.391126 | 2.098020 | 4.419601 | 3 |
+| Maximum x | 0.266168 | 1.500653 | 3.518131 | 266 |
+| Minimum y | 0.295280 | 2.562087 | 5.572777 | 116 |
+| Maximum y | 0.289216 | 2.594434 | 5.750905 | 377 |
+| Minimum across selected players | 0.061858 | 0.389378 | 1.016352 | 509 |
+| Median across selected players | 5.786921 | 8.523550 | 10.496467 | 0 |
+
+Thus the lowest five percent of each defining-extreme distribution reach roughly
+0.27–0.39 native units, while half of frames have some selected player within the
+empirical median minimum distance of 1.016352. These quantify proximity without
+choosing what should count as “close.” The 36-row edge table gives every variant's
+denominator and distribution. Empty selections remain NA: edge denominators range
+from 118,569 to 118,581. The tie table has 597 tied-extreme record entries across
+107 original frames; one record can enter more than one extreme or variant.
+
+For all_visible/included, endpoint metric medians behave as follows:
+
+| Metric / associated edge measure | Nearest-distance quintile median | Farthest-distance quintile median |
+| --- | ---: | ---: |
+| Width / minimum-y edge distance | 51.0345 | 44.5636 |
+| Width / maximum-y edge distance | 51.0147 | 44.6490 |
+| Depth / minimum-x edge distance | 34.5667 | 31.6433 |
+| Depth / maximum-x edge distance | 34.5045 | 30.8122 |
+| Hull area / minimum selected edge distance | 1,065.9254 | 923.6264 |
+
+Every one of these endpoint comparisons is lower in the farthest-distance
+quintile across all six variants. Interior quintiles need not be monotonic.
+For the hull comparison, median minimum distance is 0.135427 versus 3.456104;
+median n is 17 in both groups, while median coverage is 0.265977 versus 0.321168.
+Equal median n does not constitute adjustment for the count distribution.
+
+These associations are compatible with observation-sensitive extent, but cannot
+establish which unseen players exist or how large the full-team geometry is.
+The supplied polygon boundary often includes the actual pitch boundary; proximity
+to that boundary is not automatically proximity to an interior camera limit.
+Distances are unsigned, and outside-polygon points remain included. No observation
+is labeled censored and no cutoff is selected.
+
+### E. Extreme-value sanity review
+
+**EMPIRICAL FINDING:** Extreme geometry does concentrate in some observation-
+sensitive contexts, with different patterns by metric. All-visible/included
+upper one-percent tails have these characteristics (ties retained):
+
+| Metric | Tail frames | Median n | Median coverage | OOB frames | Outside-polygon frames | Keeper present |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Width | 1,186 | 19 | 0.4100 | 29.93% | 41.91% | 42.24% |
+| Depth | 1,186 | 20 | 0.4865 | 9.36% | 31.53% | 98.65% |
+| Hull area | 1,186 | 20 | 0.4631 | 16.53% | 36.59% | 89.88% |
+| Mean pairwise distance | 1,186 | 17 | 0.4143 | 19.31% | 37.44% | 77.32% |
+| Mean nearest-neighbor distance | 1,187 | 10 | 0.3204 | 10.03% | 21.23% | 88.71% |
+
+The all-frame baseline is median n=17, coverage=0.2908, OOB=9.70%,
+outside-polygon=17.36% and keeper presence=39.97% (defined-metric denominators
+vary slightly and are provided in the table). Upper width/hull/mean-pairwise tails
+have median minimum edge distances 0.8041/0.7494/0.6315, versus about 1.0163 overall.
+Upper nearest-neighbor spacing instead has median n=10 and minimum edge distance
+1.0320; it does not show the same edge pattern. A single observation-quality
+explanation would be inadequate.
+
+Lower width/depth/hull tails have median n=12/11/11 and coverage
+0.1757/0.1656/0.1555. Their median minimum edge distances are 1.7263/2.2767/2.0638,
+farther from the polygon boundary than the baseline. Sparse or narrow observed
+windows can yield small geometry even when defining players are not near an edge.
+Low mean-pairwise and nearest-neighbor tails have median n=16/18 and coverage
+0.1567/0.1668, reflecting a different observed composition.
+
+Coincident records remain rare overall (50/118,581 = 0.0422%). Four coincident
+frames occur in the upper depth tail and two in the upper hull tail; none of the
+four multiple-actor frames enters any all-visible/included one-percent tail of
+these five metrics. The 90-row tail table and 60 exact-extreme observations retain
+all variants and mathematical low-count extremes. No hard plausibility or anomaly
+classification is imposed on the population.
+
+### F. Coincidence, multiple actors and representative visual review
+
+**EMPIRICAL FINDING:** The 50 coincident frames contain **52 exact-coordinate
+groups, all of size two: 104 participating records and 52 excess records**.
+They occur in five matches: 3895060 (4 frames), 3895139 (42), 3895275 (2),
+3895286 (1) and 3895292 (1). Two frames contain two coincidence groups.
+Grouped record flags are teammate=True/False 60/44, keeper=True/False 2/102,
+and actor=True/False 8/96, with no unknown flags. Event counts and flags are in
+the group and summary tables. Identical coordinates do not establish player identity.
+
+There are **206 variant/location perturbations**, each adding one record at an
+already-coincident selected location and retaining all original records. In all
+206, width, depth and hull area are exactly unchanged; no metric status changes.
+Count increases by one. Both centroid components, mean pairwise and mean nearest-
+neighbor distance change in all 206, while median pairwise distance changes in
+165. Across variants, maximum absolute perturbations are centroid x=2.052918,
+centroid y=3.235926, mean pairwise=3.638268, median pairwise=3.441697 and mean
+nearest-neighbor=2.262228 native units. These are diagnostic local sensitivities,
+not estimated errors in the retained observations. Their low prevalence limits
+population exposure but does not make individual spacing/count effects negligible.
+
+All four multiple-actor frames are in match **3895139**, at zero-based frame
+indices **472, 693, 1689 and 1733** (Pass, Dispossessed, Pass, Ball Receipt*).
+Each has two actor=True records with exactly the same coordinates, both
+teammate=True and keeper=False. Actor pair distance is exactly zero. All-visible
+counts are 8, 15, 19 and 17. Actor flags alone do not enter the Phase 2A formulas;
+retaining both records preserves their count and distance weights. Adding another
+coincident actor-location record in the diagnostic comparison changes all-visible
+mean NN by -0.992914, -0.347876, -0.353331 and -0.321829 respectively, while all
+spans and hulls remain unchanged. The Phase 1 actor-ambiguity policy is preserved.
+
+**28 unique frames were visually reviewed on seven four-panel contact sheets**,
+selected by 32 documented rules. They cover all four pitch sides, multiple matches
+and event types, low/typical/high coverage, low/high counts, the five major metrics,
+keeper sensitivity, all four multiple actors and three other coincident examples.
+The CSV retains full UUIDs, source ordinal, selected variant, counts, coverage,
+quality flags, edge distances and selection values. Key visual observations:
+
+| Match / frame | Selection and observed geometry |
+| --- | --- |
+| 3895060 / 124 | Largest hull (4,304.40); several points extend far beyond the supplied polygon, including a distant keeper. Keeper removal changes depth by 54.65 and hull by 1,679.01. Polygon inconsistency is visible despite n=19. |
+| 3895060 / 1381 | n=22 does not ensure polygon consistency: the point cloud extends far beyond a relatively narrow visible polygon (coverage 0.2504). |
+| 3895244 / 2747 | Maximum depth 110.97 includes a distant actor outside the supplied polygon, although every point is inside the nominal pitch. |
+| 3895244 / 1609 | Width 81.29 exceeds nominal pitch width because an out-of-bounds defining point remains measured. |
+| 3895232 / 1520 | The smallest positive excursion is visually almost on the pitch boundary; the same frame also contains a more visible excursion. No display jitter is used. |
+| 3895250 / 1969; 3895309 / 2436 | Largest x and y excursions visibly cross the nominal boundary; records remain plotted at their supplied coordinates. |
+| 3895167 / 645 | One visible record gives zero spans and unavailable hull/pairwise/NN geometry. |
+| 3895180 / 3837; 3895244 / 501 | Tiny width/depth among defined hulls comes from nearly aligned three-record selections. |
+| 3895348 / 2256 | Hull area 0.0923 is a nearly collinear three-point selection with substantial y-span, not a numeric implementation failure. |
+| 3895340 / 1380–1381 | Low pairwise spacing and the minimum-coverage example show a small observed cluster; coverage alone does not identify a full-team shape. |
+| 3895194 / 1600; 3895258 / 1850 | Low NN shows a dense observed cluster (n=16); high NN in the selected literal subset uses just three points. |
+| 3895074 / 3720 | Maximum keeper centroid-x change (15.69) compares two versus one selected records; this is a sparse-denominator sensitivity. |
+| 3895167 / 2998; 3895194 / 3257 | Typical/high coverage show broader internally plausible point arrangements; they remain partial observations, not verified full-team measurements. |
+| 3895139 / 472, 693, 1689, 1733 | Coincident actor markers are explicitly labeled x2. Their geometry remains evaluable; actor identity remains unresolved. |
+| 3895060 / 205, 1222, 1223 | Other coincidence examples show x2 locations within otherwise ordinary observed point clouds. Adjacent Ball Recovery/Carry frames repeat the pattern; this is not independent identity evidence. |
+
+These panels distinguish mathematically evaluable geometry from visible observation
+sensitivity and concrete point/polygon inconsistencies. They do not certify true
+football positions, infer identities or establish the cause of any inconsistency.
+
+### G. Artifacts, checks and readiness for calibration
+
+Eighteen compact CSVs were generated under `outputs/diagnostics/`: the requested
+out-of-bounds summaries/by-match/by-event, polygon-bounds summary, edge summary,
+metric-edge relationships, coincident summary, multiple-actor review,
+representative frames and extreme review; plus excursion bins, coincident groups,
+multiplicity impacts and sensitivity, tied-extreme distances, extreme-tail summary,
+match inventory and run summary. No raw point lists, freeze frames or JSON were
+persisted. Ten PNGs comprise three population figures and seven contact sheets.
+The representative frames were retrieved again in memory only for a layout review;
+the final CLI reproduces the layout in its normal single retrieval pass.
+
+`notebooks/03_spatial_geometry.ipynb` adds the eight-part Phase 2B-2 narrative,
+supporting tables and embedded figures. Reusable transformations remain outside
+the notebook. The focused offline tests cover excursions/corner distances,
+polygon containment/intersection, point status and boundary distance, all extreme
+ties, coincidence/multiplicity, deterministic selection, invalid polygons,
+unchanged inputs, no clipping/filtering, source-key mismatch and derived-only
+runner persistence. **228 offline tests passed** (25 new focused tests; two
+optional network tests deselected). `python -m ruff check .` passed. All eight
+new notebook code cells executed successfully, figures were embedded, and notebook
+schema validation passed. Earlier notebook cells were preserved. Locked code,
+metric registry, source foundation and all configuration files remain unchanged.
+
+**EMPIRICAL FINDING — readiness:** The evidence is sufficient to **begin human-
+reviewed Phase 2B-3 visibility/eligibility calibration**. It is not sufficient to
+automatically finalize a sample. In particular, polygon validity and even n=22
+do not ensure point/polygon agreement; out-of-bounds magnitude is heterogeneous;
+boundary proximity combines actual pitch boundaries with observation-window
+boundaries; and count, coverage, event context and goalkeeper composition co-vary.
+Missing full-team positions remain unobserved, and actor/coordinate semantics
+remain unresolved for actor-specific or direction-dependent work.
+
+**METHODOLOGICAL DECISION:** None selected. No visibility, count or edge threshold,
+eligibility rule, goalkeeper convention, source revision, geometry formula or
+metric provenance changed. No coordinates were clipped, mirrored, repaired or
+deduplicated. Defensive regimes, orientation normalization, Voronoi, zones,
+sequences, clustering, modeling and causal interpretation remain out of scope.
