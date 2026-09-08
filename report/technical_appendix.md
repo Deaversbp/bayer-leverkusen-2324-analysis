@@ -422,3 +422,196 @@ multiple/unknown actors remains in force when those comparisons are undertaken;
 it was not applied to this all-row diagnostic inventory. Direction-dependent
 semantics and every later tactical/outcome method remain unresolved and deferred.
 No unresolved implementation conflict with the Phase 2A lock was identified.
+
+## Phase 2B-1 — observation sensitivity diagnostics
+
+Completed **7 September 2026** as bounded descriptive sensitivity analysis of the
+existing Phase 2A table: **118,581 original frames, 711,486 variants, 34 matches**.
+No raw resource was fetched and no geometry was recomputed. The input SHA-256 was
+`a6af9ceb6182c02159de78c8e57ad5ecda635d47e282eec610baf9daa45d5216`;
+the upstream revision remains
+`533862946a73608c134d18b78226b6371ce7173c`.
+
+Six existing metrics are summarized: width, depth, hull area, mean pairwise
+distance, median pairwise distance and mean nearest-neighbor distance. Every
+literal subset and keeper policy is reported separately. All recorded quality
+flags remain in the diagnostic population. No primary analytical sample is selected.
+
+### Summary conventions and reproducibility
+
+Run `python scripts/observation_sensitivity.py` from the repository root.
+Reusable summaries are in `leverkusen.spatial.observation_sensitivity`; the
+three requested figures are in `leverkusen.visualization.observation_sensitivity`.
+The clearly labeled Phase 2B-1 notebook section loads their compact derived tables.
+
+For exact-n and coverage summaries, `frame_count` is the group inventory,
+`denominator` counts defined values used for that metric, and `na_count` is the
+difference. Undefined hull groups retain denominator-only rows with NA statistics.
+Standard deviation uses ddof=1; p05/p25/p75/p95 use pandas linear interpolation.
+All exact-n strata are retained. The joint coverage/count table uses the same
+statistic columns to describe n, with its own observed-count denominator.
+
+Visible-area quintiles are computed once from original frames, with equal weight
+per frame and shared boundaries across all six variants. Bins are right closed;
+the first includes the minimum. Tied values remain together, duplicate edges
+collapse, and missing coverage has a separate unavailable category if present.
+There was no missing coverage in this input. These grouping boundaries are solely
+descriptive and are not proposed eligibility thresholds.
+
+| Coverage bin | Lower fraction | Upper fraction | Original frames / rows in each variant |
+| --- | ---: | ---: | ---: |
+| B1 | 0.045220068008 | 0.216822584412 | 23,718 |
+| B2 | 0.216822584412 | 0.265017325037 | 23,715 |
+| B3 | 0.265017325037 | 0.318401586888 | 23,717 |
+| B4 | 0.318401586888 | 0.383158787876 | 23,716 |
+| B5 | 0.383158787876 | 0.861461387123 | 23,715 |
+
+Bounds above are rounded for display; the CSV retains numeric precision.
+Each bin's metric denominator can be smaller when that metric is undefined.
+
+### A. Dependence on selected valid-player count
+
+To give a compact quantitative comparison, the table below uses exact-n strata
+at each variant's observed 25th- and 75th-percentile player counts. This reporting
+comparison does not remove other n values or establish a reliable range. The
+546-row exact-n table contains every observed stratum and all requested statistics.
+
+Values are **median at lower n → median at higher n**. All six metrics are defined
+for every frame in these particular endpoint strata. Units are native StatsBomb
+coordinate units, with squared units for hull area. Mean PD and median PD denote
+the existing pairwise summaries; mean NN is the existing nearest-neighbor summary.
+
+| Subset / keepers | n comparison; frame counts | Width | Depth | Hull | Mean PD | Median PD | Mean NN |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| all_visible / included | 14 → 19; 8,493 → 15,263 | 45.62 → 50.28 | 31.60 → 33.91 | 893.32 → 1,150.46 | 21.14 → 21.78 | 19.92 → 20.65 | 6.67 → 6.07 |
+| all_visible / excluded | 14 → 19; 8,911 → 14,654 | 45.19 → 50.79 | 28.69 → 31.53 | 820.46 → 1,107.74 | 20.62 → 21.74 | 19.42 → 20.63 | 6.32 → 5.99 |
+| teammate_true / included | 7 → 10; 17,795 → 25,571 | 43.30 → 48.57 | 25.66 → 30.80 | 615.45 → 973.99 | 23.56 → 24.46 | 21.90 → 23.23 | 11.79 → 10.69 |
+| teammate_true / excluded | 7 → 9; 18,304 → 28,730 | 42.87 → 46.29 | 24.55 → 29.02 | 590.75 → 848.68 | 23.10 → 23.81 | 21.48 → 22.45 | 11.52 → 10.93 |
+| teammate_false / included | 7 → 10; 14,664 → 30,268 | 36.76 → 39.98 | 24.38 → 27.35 | 481.62 → 678.71 | 20.40 → 20.56 | 19.07 → 19.53 | 10.41 → 9.18 |
+| teammate_false / excluded | 7 → 10; 15,721 → 33,770 | 36.41 → 39.93 | 23.64 → 25.42 | 465.03 → 638.80 | 20.14 → 20.19 | 18.80 → 19.17 | 10.23 → 8.95 |
+
+Across these comparisons, median hull area rises **28.78–58.26%**, width rises
+**7.98–12.41%**, and depth rises **7.30–20.03%**. Median mean pairwise distance
+changes **+0.23–5.46%** and median median-pairwise distance **+1.99–6.24%**;
+median mean NN falls **5.09–12.48%**. These are differences between observed
+strata, without an independent player-count effect estimate. Figure A also shows
+departures from simple monotonic patterns at some endpoints; their denominators
+remain available without a cutoff or detailed frame investigation.
+
+### B. Dependence on visible-area fraction
+
+Across B1 and B5, all six summarized metric medians increase under every variant.
+The following table gives endpoint medians; the full 180-row coverage table also
+includes B2–B4, means, standard deviations, quantiles and metric denominators.
+
+| Subset / keepers | Width B1 → B5 | Depth B1 → B5 | Hull B1 → B5 | Mean PD B1 → B5 | Median PD B1 → B5 | Mean NN B1 → B5 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| all_visible / included | 39.22 → 55.46 | 27.63 → 37.96 | 650.77 → 1,393.44 | 17.91 → 24.44 | 16.95 → 23.13 | 5.21 → 6.88 |
+| all_visible / excluded | 39.22 → 55.46 | 25.01 → 34.08 | 593.66 → 1,278.34 | 17.72 → 24.01 | 16.76 → 22.69 | 5.09 → 6.67 |
+| teammate_true / included | 35.22 → 52.60 | 22.69 → 32.89 | 436.28 → 1,088.55 | 19.47 → 27.12 | 18.30 → 25.44 | 9.30 → 12.49 |
+| teammate_true / excluded | 35.17 → 52.60 | 21.60 → 31.36 | 417.18 → 1,039.90 | 19.42 → 26.86 | 18.25 → 25.17 | 9.32 → 12.41 |
+| teammate_false / included | 31.10 → 42.12 | 21.57 → 29.07 | 369.88 → 762.36 | 17.56 → 22.52 | 16.55 → 21.34 | 8.52 → 10.48 |
+| teammate_false / excluded | 31.06 → 42.12 | 20.00 → 27.27 | 342.82 → 705.65 | 17.49 → 22.09 | 16.43 → 20.96 | 8.51 → 10.33 |
+
+Across variants, median hull area is **105.84–149.51% higher** in B5 than B1;
+width is **35.45–49.56% higher**, depth **34.82–45.20%**, mean PD **26.30–39.31%**,
+median PD **27.56–39.03%**, and mean NN **21.41–34.31%**.
+
+Player counts also differ across those bins:
+
+| Subset / keepers | Mean n B1 → B5 | Median n B1 → B5 | n p25–p75 in B1 | n p25–p75 in B5 |
+| --- | ---: | ---: | --- | --- |
+| all_visible / included | 15.1466 → 18.0452 | 15 → 19 | 13–17 | 17–20 |
+| all_visible / excluded | 14.6491 → 17.7034 | 15 → 19 | 13–17 | 16–20 |
+| teammate_true / included | 7.5436 → 9.0562 | 8 → 9 | 6–9 | 8–10 |
+| teammate_true / excluded | 7.3096 → 8.8748 | 7 → 9 | 6–9 | 8–10 |
+| teammate_false / included | 7.6030 → 8.9890 | 8 → 10 | 6–9 | 8–10 |
+| teammate_false / excluded | 7.3395 → 8.8285 | 8 → 10 | 6–9 | 8–10 |
+
+All selected counts are defined in this run: each row above describes 23,718 B1
+frames and 23,715 B5 frames. The complete joint table has 30 rows, covering all
+five bins and six variants. Coverage and n co-vary; their separate marginal
+summaries do not isolate either relationship from composition or event context.
+
+### C. Paired goalkeeper sensitivity
+
+Each subset has 118,581 total original frames. Actual keeper removal occurs in
+47,394 all_visible, 23,020 teammate_true and 24,374 teammate_false observations.
+Unknown keeper omissions are separately counted and are zero here.
+
+Deltas are excluded minus included, joined on match, original frame ordinal and
+literal subset. Only jointly defined values enter comparisons. The 36-row table
+reports both all_frames and keeper_removed scopes, total and scope inventories,
+actual removals, jointly defined pairs, NA pairs, mean/median/mean absolute delta,
+sample standard deviation, p05/p25/p75/p95, min/max and exact numerical change.
+The proportion with numerical change uses jointly defined pairs as its denominator.
+
+Among actual-removal observations, the following mean deltas and proportions apply:
+
+| Subset | Metric | Jointly defined pairs | Mean delta | Mean absolute delta | Numerically changed |
+| --- | --- | ---: | ---: | ---: | ---: |
+| all_visible | Width | 47,393 | -0.04175 | 0.04175 | 1.17% |
+| all_visible | Depth | 47,393 | -10.42660 | 10.42660 | 95.14% |
+| all_visible | Hull | 47,375 | -219.62171 | 219.62171 | 98.85% |
+| all_visible | Mean PD | 47,387 | -0.83890 | 0.90496 | 100.00% |
+| all_visible | Median PD | 47,387 | -0.85998 | 0.96452 | 96.47% |
+| all_visible | Mean NN | 47,387 | -0.40592 | 0.51093 | 100.00% |
+| teammate_true | Width | 23,017 | -0.07606 | 0.07606 | 2.15% |
+| teammate_true | Depth | 23,017 | -9.99206 | 9.99206 | 95.62% |
+| teammate_true | Hull | 22,922 | -190.24858 | 190.24858 | 98.58% |
+| teammate_true | Mean PD | 23,006 | -0.83571 | 1.34041 | 100.00% |
+| teammate_true | Median PD | 23,006 | -0.96407 | 1.51750 | 91.09% |
+| teammate_true | Mean NN | 23,006 | -0.02828 | 0.85573 | 100.00% |
+| teammate_false | Width | 24,372 | -0.04314 | 0.04314 | 1.49% |
+| teammate_false | Depth | 24,372 | -11.78009 | 11.78009 | 98.50% |
+| teammate_false | Hull | 24,352 | -199.58735 | 199.58735 | 99.71% |
+| teammate_false | Mean PD | 24,372 | -1.30420 | 1.40417 | 100.00% |
+| teammate_false | Median PD | 24,372 | -1.31948 | 1.48392 | 94.34% |
+| teammate_false | Mean NN | 24,372 | -0.54325 | 0.67989 | 100.00% |
+
+All-frame median deltas are zero for every metric/subset because most observations
+have no keeper removed. For all_visible, all-frame mean depth and hull deltas
+are -4.16721 and -87.75643, using 118,580 and 118,562 jointly defined pairs.
+Figure C displays median, IQR and p05–p95 for both scopes; these intervals describe
+observed deltas and are not confidence intervals.
+
+The teammate_true mean NN has an affected mean delta of -0.02828, median -0.25159,
+mean absolute delta 0.85573 and p05–p95 of -1.46624 to 2.23752. Its small signed mean
+coexists with variation in both directions. No keeper convention is selected.
+
+### Artifacts, checks and remaining decisions
+
+Seven compact CSVs were written under `outputs/diagnostics/`:
+`phase2b1_metric_by_valid_point_count.csv` (546 rows),
+`phase2b1_metric_by_visible_area.csv` (180),
+`phase2b1_visibility_vs_player_count.csv` (30),
+`phase2b1_goalkeeper_sensitivity.csv` (36),
+`phase2b1_visible_area_bins.csv` (5),
+`phase2b1_player_count_context.csv` (6), and
+`phase2b1_run_summary.csv` (1). The last records input hash, upstream revision,
+population and generation time.
+
+Exactly three new PNGs were exported under `outputs/figures/`:
+`phase2b1_metric_vs_player_count.png`, `phase2b1_metric_vs_visible_area.png`
+and `phase2b1_goalkeeper_sensitivity.png`. They are also embedded in the notebook.
+Generated CSVs and PNGs remain ignored by Git.
+
+**203 offline tests passed**, including nine focused new sensitivity tests; two
+optional network tests were deselected. Ruff passed. All four new notebook code
+cells executed using the existing setup, preserving the earlier Phase 2A cells.
+Tests cover exact-n grouping and quantiles, original-frame quantile weighting,
+ties/missing coverage, same-frame pairing across matches, undefined-pair exclusion,
+exact denominators, unchanged inputs and retention without threshold filtering.
+The source geometry CSV, Phase 2A geometry implementation, metric registry and all
+configuration files remained unchanged.
+
+**Evidence is ready for human review before calibration.** Observed player count
+and coverage are associated with geometry in different ways; their separate
+summaries do not estimate independent effects. Keeper deltas vary materially by
+metric and subset. Endpoint irregularities and mixed-sign spacing deltas remain
+descriptive patterns without a resolution.
+
+No thresholds, eligibility rules, keeper preference, geometry formulas or metric
+provenance changed. No tactical interpretation or later metric was introduced.
+Detailed out-of-bounds, polygon-boundary/edge, coincidence, representative-frame
+and orientation investigations remain explicitly deferred.

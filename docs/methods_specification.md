@@ -1079,3 +1079,26 @@ The implementation is ready for empirical geometry validation. Representative-fr
 review, visibility/edge calibration, unresolved record identity and direction/role
 semantics remain open. Later geometry, sequences, outcome models and tactical
 interpretation are not implemented by this phase.
+
+## 34. Phase 2B-1 descriptive observation sensitivity
+
+Completed on 7 September 2026 using the existing Phase 2A frame-variant table,
+without geometry recomputation. Six existing geometry metrics are summarized by
+exact selected valid-point count and shared visible-area quintiles, separately
+for all three literal subsets and both keeper policies. Coverage bins weight
+each original frame once, retain ties and represent missing coverage separately;
+they are descriptive grouping boundaries with no eligibility meaning.
+
+Keeper differences pair the same original frame and subset, using jointly defined
+values. All-frame and actual-keeper-removal scopes have explicit denominators;
+unknown keeper omissions are reported separately. Standard deviations use ddof=1,
+quantiles use pandas linear interpolation, and undefined metrics remain NA.
+All recorded frame-quality flags are retained in this diagnostic population.
+
+The notebook adds exactly three sensitivity figures with compact supporting tables.
+Results and verification are recorded in the
+[Phase 2B-1 appendix](../report/technical_appendix.md#phase-2b-1--observation-sensitivity-diagnostics).
+The evidence is ready for human review before calibration. No formula, provenance,
+visibility threshold, keeper convention or configuration value changed. Detailed
+boundary/edge, out-of-bounds, coincidence, representative-frame and orientation
+work remains deferred, as do all tactical and later analytical methods.
