@@ -3,16 +3,14 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 2B-2 observation quality and edge validation complete.**
-Phase 2A basic geometry remains locked and implemented. Phase 1/1B
-observability, revision pinning and coordinate diagnostics are complete. Phase 2A
-provides the eight locked within-frame geometry families and descriptive diagnostics;
-model selection and tactical interpretation remain deferred. Existing event/passing
-EDA is preserved. Final visibility thresholds and analytical eligibility remain
-open. Phase 2B-1/2B-2 provide empirical count, coverage, keeper, boundary and
-record-quality diagnostics, including 28 representative frames. Evidence is ready
-for human-reviewed Phase 2B-3 calibration; no rules have been selected. See the
-[current methodology contract](docs/methods_specification.md).
+**Current phase: Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026.**
+Phase 1/1B and locked Phase 2A geometry are complete. Human review approved
+D-primary, keeper conventions and metric-specific robustness challenges after
+the Phase 2B diagnostics. The immediate next gate is **team/role semantics and
+attacking-orientation validation**; tactical spatial interpretation remains
+blocked until it passes. Existing event/passing EDA is preserved. See the
+[approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
+and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
 
 ## Research objective and dataset
 
@@ -20,30 +18,80 @@ How did Bayer Leverkusen create dangerous space during their unbeaten 2023/24
 Bundesliga season, and which recurring attacking sequences were most effective
 against different defensive structures?
 
+This football-facing primary question is preserved. Its operational analytical
+formulation, defining what event + 360 data can directly support, is:
+
+> How did Bayer Leverkusen’s attacking sequences alter the event-aligned visible spatial structure around possession, and which recurring structural changes preceded dangerous attacking outcomes?
+
+Both formulations remain active; observed change and precedence do not establish
+causation or continuous movement.
+
 The project uses [StatsBomb Open Data](https://github.com/hudl/open-data):
 competition 9, season 281, team Bayer Leverkusen (904), on a 120 × 80 coordinate
 grid. The pinned audit confirmed 34 Leverkusen matches, 137,765 events and 118,581
 frames, all linked to events (86.074838% event coverage), with zero orphan frames
-or duplicate event/frame IDs. Metric-specific eligibility remains to be locked
-before analysis.
+or duplicate event/frame IDs. Phase 2B comparison eligibility is now locked;
+comparison-specific observational support and downstream semantics still require review.
 See [research questions](docs/research_questions.md).
 
 ## Methodological scope
 
-StatsBomb 360 is event-aligned freeze-frame spatial context, **not continuous
-22-player tracking**. Planned measurements include visible-player coordinates,
-teammate/opponent structure, visible defensive width/depth, centroids, convex
-hulls, pairwise spacing, zone occupation, local overloads, visible-area-clipped
-Voronoi, and changes between event-aligned spatial states.
+StatsBomb 360 supplies **event-aligned partial spatial observations**. Prioritize
+observed spatial structure, visible outfield structure and spatial-state changes
+around possession. Use visible width/depth, centroid, pairwise/nearest-neighbor
+spacing and the **observed outfield convex-hull footprint**. Hull is a secondary,
+observation-sensitive measure; structural claims should triangulate relevant
+measures and context rather than rely on hull alone. No composite is required.
 
 The project cannot faithfully reproduce continuous velocity, acceleration,
 continuous player trajectories, true time-to-intercept models, full dynamic pitch
 control, continuous EPV tracking models, or named off-ball trajectories when
-player identity is unavailable. Use “visible defensive width” rather than an
-unsupported full-team estimate. Orientation, visibility selection, outcome windows
-and defensive-regime definitions require audit and calibration. See the
+player identity is unavailable. Do not claim complete 22-player state, complete
+defensive shape, actual occupied area, true controlled space, continuous team-shape
+reconstruction or reconstructed tracking. Team/role semantics, orientation,
+sequence construction and outcome definitions remain later gates. See the
 [methods specification](docs/methods_specification.md) and
 [metric registry](docs/metric_registry.md).
+
+## Approved Phase 2B calibration
+
+D-primary requires only the metric's existing status `ok` and actor status
+`single` or `none`. No universal n/coverage minimum, polygon-containment gate,
+edge-distance cutoff or automatic OOB exclusion is approved. Null visibility
+minima mean **no universal hard cutoff approved**, not pending calibration or zero.
+Primary eligibility does not permit naive pooling: every structural comparison
+must report count, coverage, subset, keeper policy, OOB/coincidence flags and actor
+status, and document a common-support strategy when needed. No adjustment or
+weighting method is selected now.
+
+Keeper-excluded geometry is primary for observed outfield centroid, width/depth,
+hull and spacing. Keeper-included geometry remains for an explicitly named full
+visible footprint and sensitivity; count inventories report both. Every future
+headline spatial finding routinely receives **OOB-B whole-frame exclusion** as a
+robustness comparison. Coincidence exclusion is sensitivity for count, centroid
+and spacing; records are never deduplicated. Hull n>=14/7/7 and NN n>=11/10/5/4
+landmarks apply **only in the exact subset/keeper sensitivity rules in the matrix**.
+Finite supplied coordinates and both measurement variants remain preserved.
+
+## Revised roadmap
+
+The next gate is **team/role semantics and attacking-orientation validation**.
+After that, prioritize:
+
+1. Reliable possession and sequence construction.
+2. Event-aligned spatial-state sequences.
+3. Descriptive spatial-state change.
+4. Success/failure outcome definitions.
+5. Comparisons of evolution preceding box entries, shots and future xG.
+6. Recurring interpretable attacking mechanisms.
+
+Inferred defensive lines, high/mid/deep regimes, compactness composites, Voronoi,
+valuable-space composites, graphs, clustering and learned spatial representations
+are **OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**. Each must answer a
+specific need, fit the observation model, add interpretable value over simpler
+geometry, permit validation and materially improve the football analysis.
+They are not globally rejected; existing tracking-dependent rejections stand.
+No downstream method is implemented by this documentation lock.
 
 ## Setup (PowerShell / VS Code)
 
@@ -118,7 +166,7 @@ No new pipeline calls it. See [data notes](data/README.md).
 ## Repository structure
 
 ```text
-config/                 Constants, provisional zones, null calibration values
+config/                 Constants, provisional zones, documented visibility policy
 docs/                   Methods, source foundation, metrics, research questions
 notebooks/              00 observability audit through 07 effectiveness scaffolds
                         Existing 00_data_audit and 01_pass_eda are preserved
@@ -204,7 +252,8 @@ These generated files are ignored by Git; no raw JSON or full frames are saved.
 literal teammate True/False subsets, each with keepers included/excluded. Each
 numeric field has its own status, with observability and record-quality metadata.
 Excluded retains only literal keeper False. Native coordinates and coincident
-record weights remain unchanged; there is no final eligibility filter.
+record weights remain unchanged; the measurement layer applies no research
+eligibility filter. The separately documented Phase 2B D-primary rule is locked.
 
 Open `notebooks/03_spatial_geometry.ipynb` after running the CLI. It reads compact
 derived summaries, validates their source revision and presents distributions,
@@ -226,7 +275,8 @@ versions, missingness, exclusions and configuration with future analytical outpu
 The loader pins the data release independently of the dependency lock. The match
 summary records the exact SHA, source URL and retrieval time. The audit reads
 project constants; visibility and analysis configs
-remain research specifications. Null thresholds mean uncalibrated, not zero.
+remain research specifications. Visibility nulls mean no universal hard cutoff
+approved; outcome-window nulls still mean uncalibrated later definitions, not zero.
 
 Keep reusable logic in the package and exploration in notebooks. Document source
 provenance and operational definitions before locking methods, and perform
@@ -243,3 +293,18 @@ and seven representative contact sheets. Raw records are never persisted. Review
 the Phase 2B-2 section of [notebook 03](notebooks/03_spatial_geometry.ipynb) and the
 [technical appendix](report/technical_appendix.md#phase-2b-2--observation-quality-and-edge-validation)
 for empirical findings, limitations and calibration readiness.
+
+## Phase 2B calibration evidence and decision record
+
+`python scripts/calibration.py` evaluates the historical candidate grid from
+existing derived geometry offline. It does not apply production filters or lock
+every evaluated alternative. Earlier saved notebook/candidate outputs retain
+their pre-approval labels; the current methods contract and versioned calibration
+matrix control the human-approved decision. No expensive diagnostic rerun is
+required for this lock.
+
+The 9 September 2026 decision is **not a scientific version bump**: calibration
+followed the pre-specified validation process, no population/outcome changed after
+effectiveness analysis, and scope was narrowed before tactical/outcome analysis.
+The football question and Phase 2A formulas/data are unchanged. See the
+[decision record](report/technical_appendix.md#phase-2b-human-approval-and-research-scope-lock--9-september-2026).

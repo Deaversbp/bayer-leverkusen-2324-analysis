@@ -6,9 +6,11 @@ configuration, sequence rules, validation and sensitivity analysis.
 
 Current implementation includes data loading, preserved event transforms and the
 Phase 1/1B observability audit and the eight locked Phase 2A geometry families.
-Historical checks below retain their original phase-specific scope; the Phase 2A
-implementation and initial diagnostics are recorded in the final section.
-See `docs/methods_specification.md` for pending decisions and observational limits.
+Historical checks below retain their original phase-specific scope. **Phase 2B
+= LOCKED / COMPLETE**, following human approval on **9 September 2026**. The
+final decision section supersedes earlier proposed/pending calibration wording;
+candidate data and historical empirical conclusions remain unchanged. See
+`docs/methods_specification.md` section 37 for the approved contract and next gate.
 
 ## Phase 1 migration verification
 
@@ -878,6 +880,10 @@ sequences, clustering, modeling and causal interpretation remain out of scope.
 
 ## Phase 2B-3 — Human-reviewable calibration candidates
 
+**Historical pre-approval evaluation.** The final human-approval section below
+records which rules were adopted. Proposed language and saved candidate outputs
+in this section are evidence of that earlier stage, not the current lock status.
+
 **PROPOSED — REQUIRES HUMAN APPROVAL.** Evaluated on 9 September 2026 using
 the existing **118,581 original frames / 711,486 variants / 34 matches**.
 The geometry SHA-256 remains
@@ -1159,3 +1165,115 @@ all 34 matches, and checked original notebook-cell equality. The Phase 2A CSV
 hash matches both preceding diagnostic runs; Git reports no changes to locked
 geometry, the metric registry, source foundation or any configuration file.
 Recommendations remain **PROPOSED — REQUIRES HUMAN APPROVAL**.
+
+## Phase 2B human approval and research-scope lock — 9 September 2026
+
+**Phase 2B = LOCKED / COMPLETE.** Human methodological review is complete. The
+approved contract is [methods section 37](../docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
+and the current [metric calibration matrix](../docs/phase2b3_metric_calibration_matrix.csv).
+This decision supersedes the earlier proposed status; it does not rewrite the
+empirical candidate comparisons or promote every tested alternative to a rule.
+Saved candidate notebooks/CSVs retain their historical pre-approval meaning.
+
+**Primary:** D-primary requires each metric's existing status `ok` and actor
+status `single` or `none`. No universal n/visible-area cutoff, hard polygon or
+edge rule, or automatic OOB exclusion. Null visibility minima explicitly mean
+**no universal hard cutoff approved**. Primary eligibility never permits naive
+pooling: every later structural comparison must inspect/report n, coverage,
+subset, keeper convention, OOB/coincidence flags and actor status. Materially
+different observation populations require an explicitly documented support or
+adjustment strategy; no particular restriction, stratification, matching,
+statistical adjustment or weighting is selected now.
+
+**Keeper convention:** excluded is primary for centroid, width, depth, hull and
+all spacing metrics representing observed outfield structure. Included remains
+available for the explicitly named full visible footprint and sensitivity; count
+inventories retain both. The prior evidence supports the distinction: affected
+width changes are rare (1.17–2.15%), while keeper removal changes depth/hull and
+spacing substantially. Width now follows the approved outfield population even
+though either convention was empirically plausible.
+
+**Robustness:** routine **OOB-B for all future headline spatial findings** excludes
+the entire original frame if any nominal-pitch OOB point exists, with width/hull/
+mean pairwise prioritized. A material change in a finding must be flagged,
+investigated and reported, never resolved by selecting the convenient result.
+The existing 11,508 affected frames (9.7048%), event/match imbalance and modest
+population median shifts justify sensitivity reporting rather than primary
+coordinate exclusion. Finite coordinates remain supplied values: no clipping,
+projection, repair, point-only deletion or automatic primary frame removal.
+
+The approved metric-specific plan retains the Phase 2B-3 sensitivity treatments:
+whole-frame coincidence exclusion for count, centroid and spacing; OOB exclusion
+for width and mean pairwise; keeper pairing prioritized for depth. Hull requires
+n>=14 all_visible or n>=7 either teammate subset plus whole-frame OOB exclusion
+in sensitivity only. NN sensitivity requires n>=11/10 for all_visible included/
+excluded, n>=5 teammate_true and n>=4 teammate_false, plus whole-frame coincidence
+exclusion. These fixed q25/q05 landmarks are robustness challenges, never valid-
+frame definitions or thresholds to re-fit in each later group. Routine headline
+OOB-B is additional to any prioritized metric treatment.
+
+The 50 coincident frames remain unchanged; records are never deduplicated. Spans
+and hull do not prioritize coincidence exclusion because exact repetitions leave
+their geometry invariant. Multiple/unknown actors remain excluded from primary
+comparisons and included in generic unchanged diagnostics. Actor-dependent work
+requires `single` and a unique event join without approving actor-coordinate
+semantics. Polygon containment and boundary distance remain metadata; prior
+point/polygon inconsistencies do not establish invalidity.
+
+**Research scope:** preserve the football-facing primary question:
+
+> How did Bayer Leverkusen create dangerous space during their unbeaten 2023/24 Bundesliga season, and which recurring attacking sequences were most effective against different defensive structures?
+
+Add its operational analytical formulation:
+
+> How did Bayer Leverkusen’s attacking sequences alter the event-aligned visible spatial structure around possession, and which recurring structural changes preceded dangerous attacking outcomes?
+
+Both are retained. The second describes what **event-aligned partial spatial
+observations** directly support. They are not tracking, complete 22-player state,
+named off-ball trajectories, continuous team-shape reconstruction, true controlled
+space, pitch control or continuous movement. Use observed spatial structure,
+visible outfield structure, event-aligned spatial state and spatial-state change.
+
+Keeper-excluded hull is now termed **observed outfield convex-hull footprint**,
+an observation-sensitive secondary structural measure. It remains in Phase 2A
+with the same formula and minima. It is not complete occupied area or defensive
+footprint. Later stretching/expansion/opening claims must triangulate relevant
+width/depth, hull, spacing and local context; no composite is created for that purpose.
+
+**Revised roadmap:** team/role semantics and attacking-orientation validation is
+the immediate next gate. Then prioritize reliable possession/sequence construction,
+event-aligned spatial-state sequences, descriptive spatial-state change,
+success/failure definitions, comparisons preceding box entries/shots/future xG,
+and recurring interpretable mechanisms. The action → visible state → structural
+change → next action → outcome → mechanism chain guides method selection without
+causal claims. Existing phase numbers are preserved where useful.
+
+Inferred lines, high/mid/deep regimes, compactness composites, Voronoi, valuable-
+space composites, graphs, clustering and learned spatial representations are
+**OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**. Each needs a specific
+analytical need, observational support, interpretable incremental value over
+simpler geometry, feasible validation and material football value. They are not
+globally rejected. Existing tracking-dependent REJECT decisions stand.
+
+**Change control:** this is **not a scientific version bump**. No research
+population/outcome changed after effectiveness analysis; calibration followed
+the pre-specified validation process; and scope was narrowed to the observation
+model before tactical/outcome analysis. Phase 2A formulas, units, minima, point
+validity, degeneracy and provenance, derived data, source revision and raw loading
+remain unchanged. No tactical spatial interpretation is permitted until the
+team/role semantics + attacking-orientation gate passes.
+
+**Verification of this lock:** `python -m pytest` passed **244 offline tests**
+with two optional network tests deselected; `python -m ruff check .` passed,
+using the existing `.venv` interpreter. No diagnostic rerun or source retrieval
+was needed. A direct lock audit confirmed the full Phase 2A registry measurement
+contract and every registry formula/provenance table unchanged, equality of
+parsed visibility YAML values, and unchanged SHA-256 hashes for 13 protected
+files (all nine Phase 2A CSVs, geometry implementation, loader, source foundation
+and project/source configuration). It also checked all eight matrix lock statuses,
+keeper-excluded outfield conventions, routine headline OOB-B and the exact
+approved hull/NN sensitivity values. Synthetic D-primary observations with low n,
+missing/tiny coverage, OOB flags, polygon inconsistency and zero edge distance
+remained eligible when their metric/actor statuses permitted; their inputs were
+unchanged. No runtime helper or measurement code was modified. `git diff --check`
+passed. The visibility YAML edit changes explanatory comments only.

@@ -2,20 +2,26 @@
 
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
-**Current status: Phase 2B-3 candidates evaluated — PROPOSED — REQUIRES HUMAN APPROVAL. Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
+**Current status: Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026. Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
-visibility calibration and later methods remain open. The eight locked geometry
+Phase 2B eligibility and sensitivity calibration is now locked in section 37.
+Later method definitions remain open. The eight locked geometry
 families are now implemented and tested without a method change. Direction
 normalization, tactical classifiers, pattern discovery and predictive models remain
-deferred. Section 33 records the implementation boundary.
+deferred. The immediate next gate is **team/role semantics and attacking-orientation
+validation**. Section 33 records the implementation boundary; sections 28 and 37
+record the revised roadmap and approved interpretation. Tactical spatial
+interpretation remains blocked until that next gate passes.
 
 Document lineage: original *Methods & Data Specification v1.0*, September 2026
 (26-page supplied PDF), merged with the repository's completed Phase 1/1B work and
 current source foundation on 7 September 2026. This is the current methodology
 contract, with the original 31 major section numbers retained for traceability.
-Statements marked proposed, candidate, optional or deferred describe future work.
+Sections 32–36 retain dated historical evidence, including pre-approval proposals.
+Section 37 supersedes their pending calibration wording; unselected candidates
+remain candidates. Other proposed, optional or deferred methods remain unapproved.
 Phase 1/1B results below are preserved from the technical appendix; Phase 2A
 implementation diagnostics are recorded separately in section 33 and the appendix.
 
@@ -50,11 +56,11 @@ interfaces govern where the original proposal differs.
 | Standard-pitch metre coordinates proposed | Native 120 × 80 units remain the implemented convention; the 105 × 68 rescaling proposal is retained but unimplemented |
 | PDF schema tests allowed valid or repairable visible polygons | Current audit validates without repair; invalid polygons remain reported as invalid |
 | One canonical row per 360 event in analytical tables | Audit retains original frame records, including duplicates/ambiguous links; analytical event-grain uniqueness requires an explicit eligibility contract |
-| Phase 1 audit still pending / UUID cause unresolved | Phase 1/1B complete; pinned release has zero orphan frames. Coordinate, actor, visibility and metric eligibility questions remain open |
+| Phase 1 audit still pending / UUID cause unresolved | Phase 1/1B complete; pinned release has zero orphan frames. Phase 2B comparison eligibility is locked; team/role and attacking-orientation semantics remain the next gate |
 | Academic sources unavailable at migration | S01–S35 are synchronized in the source foundation; exact adaptations still require method review |
 | Broad Phase 2 included zones and clipped Voronoi | Initial Phase 2A implements the locked basic within-frame geometry; zones/Voronoi and tactical interpretation remain later work |
 | PDF ADOPT labels for all-pairs mean, and DERIVE labels for proximity/overload | Current registry preserves published base geometry versus PROJECT aggregation/eligibility/radius; PDF labels alone do not establish an exact published formula |
-| PDF “Phase 0” calibration and example windows | Calibration remains pending before each relevant method lock; candidate values are not current defaults and all null thresholds remain null |
+| PDF “Phase 0” calibration and example windows | Phase 2B calibration is locked; visibility nulls mean no universal hard cutoff approved. Later sequence/outcome windows remain uncalibrated and null |
 
 The PDF's recommended layout/loader signatures and source aliases are mapped to
 current repository equivalents in sections 24, 25 and 30 rather than silently
@@ -66,26 +72,32 @@ treated as existing code. No historical appendix finding is removed.
 
 > How did Bayer Leverkusen create dangerous space during their unbeaten 2023/24 Bundesliga season, and which recurring attacking sequences were most effective against different defensive structures?
 
+### Operational analytical formulation — locked scope
+
+> How did Bayer Leverkusen’s attacking sequences alter the event-aligned visible spatial structure around possession, and which recurring structural changes preceded dangerous attacking outcomes?
+
+The first is the football-facing primary question; this second formulation states
+what event + 360 observations can directly support. Both are retained. Changes
+and temporal precedence describe observed states, not causal attribution.
+
 ### Supporting questions
 
 The current [research questions](research_questions.md) control numbering:
 
 1. What recurring attacking spatial patterns characterized Leverkusen's possession play?
-2. How did opponent defensive width, depth, compactness, occupied area and line spacing evolve during those patterns?
-3. Which attacking patterns created the largest increases in valuable attacking space?
+2. How did observed spatial structure change during those patterns, using visible width/depth, observed outfield convex-hull footprint, spacing and relevant local context after team/role validation?
+3. Which attacking patterns preceded structural changes associated with dangerous attacking outcomes, without requiring a valuable-space composite?
 4. Which resulting spatial changes were associated with the greatest subsequent chance quality?
-5. How did effectiveness differ across high, mid and deep defensive structures?
-6. Against deep defenses specifically, which patterns most effectively disrupted defensive structure or created exploitable space?
-7. At what point in successful sequences did defensive structure begin to deteriorate?
+5. If a separately justified defensive-regime method is validated, how did effectiveness differ across high, mid and deep observed defensive structures?
+6. Conditional on that optional validation, which patterns against deep observed structures preceded spatial openings and dangerous outcomes?
+7. At which observed event-aligned states did structural changes occur in successful sequences?
 8. Which player actions were most involved in producing those changes?
-9. How sensitive are results to visibility thresholds, defensive-regime definitions and sequence-window definitions?
+9. How sensitive are results to observational support, approved Phase 2B robustness challenges, keeper convention and sequence-window definitions, plus regime definitions if that optional method is used?
 
-The Methods PDF's compatible wording additionally specifies occupied area,
-spacing/line structure (question 2), exploitable space (3), on-ball players
-initiating/progressing/completing sequences (8), and stability under alternative
-quality thresholds and window lengths (9). Preserve those aims within the current
-questions. Named attribution is restricted to identified event actors. “Evolve,”
-“trajectory” and “point” refer to observed states, not unobserved continuous motion.
+Question numbers are preserved for registry references. The PDF's broader aims
+are narrowed to observed states; inferred lines, regimes and composites are
+optional gates, not required answers. Named attribution is restricted to identified
+event actors. Spatial-state history describes observations, not continuous motion.
 
 ### Intended contribution and novelty boundary
 
@@ -307,33 +319,27 @@ subtypes and censoring without rebuilding ingestion. These IDs/rules are planned
 
 ## 10. Frame-quality and observability gate
 
-Visibility is part of the measurement model. For each proposed metric require a
-valid join, valid visible polygon, valid selected-player coordinates, sufficient
-observed geometry and justified actor/event alignment where integration depends
-on the actor. The currently implemented mechanical checks do not constitute
-final analytical eligibility.
+**Phase 2B D-primary is LOCKED:** the metric's existing status must be `ok` and
+actor status must be `single` or `none`. There is no universal minimum n or
+visible-area fraction, automatic OOB exclusion, hard polygon-containment rule or
+edge-distance cutoff. Polygon validity/consistency and continuous boundary
+distances remain diagnostic metadata; they do not automatically gate Phase 2A
+comparison eligibility. No filtering is added to the measurement layer.
 
-For Phase 2A this is a later analytical-use gate, not a rule suppressing raw
-within-frame diagnostic measurements. The registry locks mathematical evaluability
-separately: retain calculable values with missing/invalid visibility or join
-context flagged, and do not determine final research eligibility in the geometry
-layer. Its point minima are not calibrated visibility thresholds.
+Primary eligibility does not permit naive pooling. Every later structural
+comparison must inspect and report selected valid-player count, visible-area
+fraction, subset, keeper policy, whole-frame OOB/coincidence flags and actor status.
+Keep original frame identity, join status and missingness as additional context.
+Materially different observation populations require an explicitly documented
+common-support restriction, stratification, matched descriptive comparison or
+statistical adjustment. **No specific adjustment or weighting method is selected.**
 
-Use metric-specific flags rather than only global pass/fail. A small visible area
-may support some local proximity measurements while edge-censoring a width
-estimate; it never proves an unseen defender cannot be nearer. For extrema-based
-width/depth, plan to flag an extreme near the visible boundary. The edge tolerance
-is uncalibrated. Report visible-player/team-subset geometry, not full-team coverage.
-
-Retain raw observability metadata alongside every future metric: original frame
-identity, counts and unknown flags, visible area/coverage, join validity,
-actor/multiple-actor diagnostics, subset/keeper choice, and metric eligibility or
-missing reason. Derived target-zone coverage and quality tiers remain future.
-
-Choose thresholds from pre-outcome coverage distributions and geometric stability,
-not whichever threshold yields the strongest tactical result. Freeze before
-outcome comparisons, report attrition by match/event/context, and sensitivity-test
-visibility choices. Section 32 retains exact implemented audit definitions.
+Event-integrated and actor-dependent methods require their own validated join,
+team/role and coordinate semantics. Actor-dependent work requires `single` and a
+unique event join; that condition alone does not validate actor alignment. No
+unseen player, complete team structure or true controlled space is established by
+these gates. Section 37 states the approved keeper and robustness conventions;
+section 32 retains exact historical audit definitions.
 
 ## 11. Method compatibility gate
 
@@ -375,7 +381,7 @@ scope. A formula in the original project PDF is not itself proof of academic ori
 | Centroid | Mean selected visible coordinates, collective location; S07/S08 |
 | Visible width / depth (length) | Lateral/longitudinal extrema spans; S07/S12; depth span is not centroid position/block height |
 | Length-to-width ratio | Depth divided by width; shape proportion, not universal compactness; S07; zero-width handling unresolved |
-| Convex hull / occupied surface | Visible footprint; S07/S08; Phase 2A registry now locks three distinct non-collinear points and NA for degenerate/error cases |
+| Convex hull footprint | Observed outfield convex-hull footprint when keeper excluded; secondary observation-sensitive structure, not controlled space; S07/S08; locked mathematical conditions unchanged |
 | Mean pairwise/interpersonal distance | Mean over unordered selected pairs; S07 supports base distance, registry aggregation remains explicit PROJECT/DERIVE |
 | Stretch index | Mean observed-player distance from centroid; S07/S12; component choices require review |
 | Nearest-opponent distance (later) | Actor/ball, receiver-endpoint or zone-center proximity remains deferred; S07 base distance, S21 precedent. Phase 2A within-subset nearest-neighbor spacing is a separate PROJECT/DERIVE summary |
@@ -394,6 +400,9 @@ especially for aggregates, proximity selection and local balance.
 
 ## 13. Voronoi and visible-space geometry — deferred
 
+**OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION.** Apply section 37's five
+admission conditions before considering the retained method options below.
+
 Retain S13's observed-point nearest-player tessellation concept. Any future cell
 must be clipped to `visible_area` and the pitch under the registry's adaptation;
 unbounded/full-pitch cells are not complete territorial control. The PDF's proposed
@@ -408,6 +417,10 @@ S27, not required v1 methods. Neither clipped Voronoi nor naive full-pitch Voron
 is part of initial Phase 2A implementation scope.
 
 ## 14. Defensive regime and compactness methodology — deferred
+
+**OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION.** Neither high/mid/deep
+classification nor a compactness composite is a mandatory phase. The following
+design options apply only if section 37's admission conditions are met.
 
 A defensive block is a tactical phase; compactness is a geometric property/family
 (S09–S12). FIFA vocabulary/context (S04/S05) and Bauer's phase/formation precedent
@@ -429,6 +442,9 @@ thresholds and low-block classification remain explicitly unapproved.
 
 ## 15. Inferred defensive lines and between-line structure — deferred
 
+**OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION.** Inferred lines are not
+required for the core event-aligned spatial-state analysis.
+
 Anonymous off-ball points prevent assigning lines from nominal player positions.
 The PDF proposes ADAPT clustering visible defenders longitudinally, for example
 hierarchical clustering or a one-dimensional Gaussian mixture. Constrain possible
@@ -441,10 +457,11 @@ its exact definition/provenance is registered. Emit no gap when visibility or
 clustering quality is insufficient; missing is preferable to false precision.
 Line counts, reliability thresholds and inference are not implemented.
 
-## 16. Spatial trajectory features — planned
+## 16. Event-aligned spatial-state sequence features — planned
 
-Here trajectory means an event-state history, not an identified player's continuous
-path. The reserved `sequences/trajectories.py` namespace has that restricted meaning.
+Use spatial-state history or spatial-state change for an event-state sequence.
+The legacy `sequences/trajectories.py` namespace has that restricted meaning; it
+does not authorize continuous movement or named off-ball trajectory claims.
 For a base metric M, the PDF proposes its first difference between eligible
 consecutive states and a rate obtained by dividing that difference by delta-t.
 These are DERIVE/PROJECT features citing M's source, not new published motion
@@ -514,6 +531,9 @@ that models already pass them.
 
 ## 19. Valuable-space measurement: staged approach — deferred
 
+**OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION.** The original stages below
+are design alternatives if justified, not a required progression to a composite.
+
 Do not create a dangerous-space composite prematurely (S18–S20).
 
 | Original stage | Retained plan and limits |
@@ -531,9 +551,14 @@ circularity remain unresolved; no dangerous-space score is approved.
 
 ## 20. Pattern-discovery methodology ladder — deferred
 
+The core goal is recurring interpretable sequence mechanisms. Clustering, graph
+representations and learned spatial representations are **OPTIONAL — REQUIRES
+METHOD-SPECIFIC JUSTIFICATION** under section 37. The choices below are not a
+mandatory escalation ladder; simpler descriptive mechanisms may be sufficient.
+
 1. Football-defined descriptive patterns: transparent rules as baselines and
    interpretation aids.
-2. Trajectory-feature clustering: standardized possession/sub-sequence event and
+2. Optional spatial-state sequence clustering: standardized possession/sub-sequence event and
    spatial-summary vectors; K-means baseline, Gaussian mixtures for probabilistic
    clusters, HDBSCAN only if unknown cluster count/density structure warrants it.
 3. Sequential pattern mining: discretize actions/zones and consider PrefixSpan
@@ -556,7 +581,7 @@ history adds information beyond simpler context.
 | A: event/location baseline | Current ball/action location, action type, play pattern, elapsed possession time and basic event context |
 | B: current spatial state | Add current visible-frame geometry |
 | C: event/timing history | Add prior actions and elapsed-time features |
-| D: spatial trajectory history | Add changes/summaries of prior spatial states |
+| D: spatial-state history | Add changes/summaries of prior observed spatial states |
 
 The key comparison is D against B and C out of sample, not whether a complex model
 beats a trivial xT baseline. Explicitly declare the nested/ablation feature sets
@@ -589,9 +614,10 @@ Use S31/S32 for dependence-aware evaluation and S33 for bootstrap uncertainty.
 - Evaluate probability calibration where applicable and use interpretable
   baselines. Keep all preprocessing and tuning within development partitions.
 - Report visibility/missingness and sample attrition by match, event type/team and
-  context. Sensitivity analyses must cover visibility/edge thresholds, player and
-  goalkeeper inclusion, coordinate eligibility, sequence/action/time windows,
-  outcome horizons, regimes, and later composite construction.
+  context. Apply the approved Phase 2B keeper, OOB and multiplicity robustness
+  plan and inspect observational support; polygon/edge metadata introduce no
+  threshold gate. Sequence windows/outcome horizons need later sensitivity plans.
+  Regimes and composites require such checks only if their optional gates pass.
 - Distinguish exploratory from confirmatory findings under many patterns/subgroups;
   do not present the largest discovered difference as pre-specified evidence.
 - Use “associated with,” “preceded,” “co-occurred with” or “was followed by.” Pattern
@@ -603,13 +629,16 @@ mechanical verification and the later analytical validation requirements are dis
 
 ## 23. Analytical outputs — planned
 
-The team-level tactical profile will show defensive regimes faced, Leverkusen
-occupation by regime, common progression routes, current-state and trajectory
-summaries. Pattern cards should contain a football-readable name assigned after
-inspection, frequency, representative sequence, start/end geometry, characteristic
-spatial changes, future box-entry/shot rates, future xG, uncertainty and
-opponent/regime distribution. For a given attacking pattern, compare defensive
-response subtypes and spatial consequences without causal attribution.
+After semantics and sequence/outcome gates, prioritize observed spatial-state
+sequences and recurring interpretable attacking mechanisms. Pattern cards should
+show a football-readable name assigned after inspection, frequency, representative
+sequence, start/end observed geometry, spatial-state changes, box-entry/shot rates,
+future xG and uncertainty under approved outcome definitions. Report observational
+support and robustness alongside those comparisons. Opponent labeling requires
+validated team semantics. Regime distributions or inferred response subtypes are
+optional additions only after method-specific justification and validation; the
+core article must not depend on classifying high/mid/deep regimes. No causal
+attribution or continuous spatial trajectory is implied.
 
 Sequence visuals should show event-aligned states left-to-right in small multiples:
 pitch, ball/action point, visible attackers/defenders after justified role mapping,
@@ -686,7 +715,7 @@ The PDF's pre-analysis contracts remain requirements at the relevant method gate
 | Unique event IDs and frame joins | Verified zero duplicates/orphans in the pinned run; invalid/ambiguous records remain diagnostic cases |
 | Usable ordered event indices; possession IDs/teams | Original order is preserved; complete future sequence eligibility/order contracts remain to be locked |
 | Frame teammate/actor/keeper boolean/null structure | Audit records literal boolean/unknown flags; no inferred global attacking/defending labels |
-| Coordinates within tolerated bounds | Validity/coordinate diagnostics exist; final geometry bounds/tolerances and eligibility remain uncalibrated |
+| Finite supplied coordinates and nominal bounds flags | Phase 2B retains finite OOB coordinates in primary observations; whole-frame OOB-B is routine headline sensitivity, without tolerance or repair |
 | Visible polygons valid or flagged | Topology validation implemented; PDF's “repairable” option is superseded by no automatic repair |
 | Shot xG present where expected | Must be asserted before future outcome construction; not established merely by overall event/frame counts |
 | Coordinate/orientation sanity checks pass or flagged | Direct/mirrored diagnostics implemented; no coordinate rule or normalization is validated by a closer comparison |
@@ -704,40 +733,45 @@ analytical suite or remeasure the data.
 
 ## 27. Calibration tasks — fixed before substantive results
 
-The original “Phase 0” means planned pre-outcome calibration, not an assertion
-that audit completion has resolved thresholds. Phase 1/1B established evidence;
-Phase 2A research eligibility and later stage-specific locks still require choices.
+Phase 2B completed the pre-specified pre-outcome calibration process and is
+**LOCKED / COMPLETE** (section 37). D-primary deliberately has no universal n,
+coverage, polygon-containment or edge-distance cutoff. Metric-specific q25/q05
+landmarks are fixed sensitivity challenges only, not definitions of valid frames.
 
-Before the relevant outcome analysis freeze and document: actor alignment policy
-and tolerance if justified; visibility/edge censoring; observation sufficiency
-beyond Phase 2A's now-locked mathematical minima;
-tactical zones; overload radii; regime thresholds; line-clustering quality;
-eligible event family; primary action/time windows; and primary future horizon.
-Use pre-outcome diagnostics, geometry stability and explicit sensitivity plans.
-Record rationale and values in versioned config and article methods.
+In `config/visibility.yaml`, null now means **no universal hard cutoff approved**;
+it does not mean zero or calibration pending. `exclude_edge_sensitive_frames:
+false` records the deliberate absence of automatic edge exclusion. YAML values
+are preserved; only their explanatory comments change. Outcome-window nulls in
+other configuration files still mean those later definitions are uncalibrated.
 
-All current visibility and outcome thresholds are intentionally null. Null means
-uncalibrated, not zero or permissive eligibility.
-`exclude_edge_sensitive_frames: false` is a provisional setting, not validated
-approval of edge-censored metrics.
-The provisional `zones.yaml` rectangles assume attack toward increasing x and
-must not be applied to tactical interpretation before orientation is justified.
-No configuration values are resolved or changed here.
+Before later analysis, define team/role and orientation semantics, possession and
+sequence eligibility, common observational support strategy, action/time windows,
+success/failure outcomes and future horizons. Optional spatial methods need their
+own justification and calibration if pursued. Zones, radii, regimes and line
+inference are not mandatory preconditions to the core descriptive sequence study.
+Provisional `zones.yaml` rectangles assume increasing-x attack and remain unusable
+for tactical interpretation until orientation is validated. Choose no later
+threshold or adjustment method in this lock.
 
 ## 28. Analysis phases and immediate Phase 2A boundary
+
+**Roadmap revised on 9 September 2026.** Existing phase identifiers are retained
+for references; the sequence below, rather than numerical order, controls priority.
 
 | Phase | Current status / intended work |
 | --- | --- |
 | 1: data and observability audit | **COMPLETE**: coverage, counts, joins, visible-player/area diagnostics, missingness and actor-coordinate checks |
 | 1B: revision pinning and coordinate semantics | **COMPLETE**: immutable source, compatible pinned joins, diagnostic hypotheses and multiple-actor findings; semantics are not universally resolved |
-| 2A: basic within-frame visible-player geometry | **LOCKED / IMPLEMENTED.** Offline tests and descriptive diagnostics verify the registry formulas, record handling and metadata; research eligibility remains open |
-| Remaining Phase 2 geometry validation | Later: qualified zones and clipped Voronoi, representative-frame visual validation; separate method decisions required |
-| 3: defensive regime characterization | Later: define/validate high/mid/deep structure without outcome information |
-| 4: sequence construction | Later: possessions, event/spatial histories and action/time windows |
-| 5: descriptive spatial evolution | Later: where/when observed defensive structure changes |
-| 6: pattern discovery | Later: interpretable clustering/sequential methods; inspect before naming |
-| 7: effectiveness analysis | Later: pattern frequencies, spatial changes, box entries, shots and future xG with uncertainty |
-| 8: predictive incremental-value test | Later: spatial history versus current state and event/timing history |
+| 2A: basic within-frame visible-player geometry | **LOCKED / IMPLEMENTED.** Formulas, units, mathematical minima, record handling and six variants unchanged |
+| 2B: observation validation and calibration | **LOCKED / COMPLETE.** Count/coverage/keeper sensitivity, observation quality, representative review and human-approved calibration |
+| Immediate next gate | **Team/role semantics and attacking-orientation validation**; tactical spatial interpretation remains blocked |
+| 4: sequence construction | After the next gate: reliable possessions, then event-aligned spatial-state sequences and action/time windows |
+| 5: descriptive spatial evolution | Next: descriptive spatial-state change with common observational support |
+| 7: outcome definitions and descriptive comparisons | Next: lock success/failure definitions, then compare observed spatial evolution preceding box entries, shots and future xG |
+| 6: recurring interpretable sequence mechanisms | Next: football-readable descriptive mechanisms; clustering or learned representations are optional |
+| 3: defensive regime characterization | **OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**; no automatic high/mid/deep classification |
+| Advanced spatial options | Inferred lines, compactness, Voronoi, valuable-space composites, graphs and learned representations are optional gates under section 37 |
+| 8: predictive incremental-value test | Secondary and unapproved; only after a separate need and method definition |
 | 9: technical article synthesis | Later: pair statistical results with football-readable sequences and inference limits |
 
 Phase 2A locked metrics are visible player count, centroid, visible width, visible
@@ -749,9 +783,10 @@ specifies exact formulas/provenance, six subset/keeper combinations, native unit
 valid-point rules, minima, missing/degenerate outcomes and Shapely error handling.
 
 Require raw observability metadata with every metric and both goalkeeper variants.
-The registry retains record-based measurements and ambiguity flags, with a future
-primary-comparison exclusion and unchanged-record inclusion sensitivity for
-multiple/unknown actor status. This does not select a final research sample.
+The registry retains record-based measurements and ambiguity flags. Phase 2B now
+locks the primary-comparison exclusion and unchanged-record inclusion sensitivity
+for multiple/unknown actor status. A comparison still needs its specific common
+observational support assessment; eligibility does not certify naive pooling.
 Preserve all raw actor records; do not silently select/deduplicate them.
 No direction-dependent tactical interpretation
 is permitted until orientation and role semantics are justified. Scalar within-frame
@@ -778,10 +813,14 @@ A scientific version v1.1 or higher is required for a new primary question,
 materially changed study population, new primary outcome, threshold changes after
 viewing effectiveness, replacing a published metric with another proxy, adding
 external data to core inference, or making a high-capacity model primary.
-This document records the original v1.0, completed audit amendments and the
-7 September 2026 Phase 2A measurement-definition lock and its tested implementation;
-it does not claim that
-visibility calibration or later analytical method lock has occurred.
+This document records the original v1.0, completed audit amendments, the
+7 September 2026 Phase 2A measurement-definition lock and the **9 September 2026
+human-approved Phase 2B lock and research-scope realignment**. This is **not a
+scientific version bump**: no research population or outcome changed after
+effectiveness analysis; calibration followed the pre-specified validation process;
+and interpretation was narrowed to the actual observation model before any
+tactical/outcome analysis. The football-facing primary question is preserved.
+No downstream sequence, outcome, adjustment or tactical method is approved here.
 Future method changes must record trigger, rationale, provenance,
 compatibility, validation/sensitivity and effect on prior results.
 
@@ -1192,6 +1231,12 @@ permitted phase; orientation and all later analytical methods remain deferred.
 
 ## 36. Phase 2B-3 eligibility and goalkeeper calibration candidates
 
+**Historical candidate evaluation, before human approval on 9 September 2026.**
+The evidence and alternative rules below are retained for traceability. Section 37
+now controls the approved primary/sensitivity rules and scope. In particular it
+requires routine OOB-B for headline findings, fixes the outfield keeper convention,
+and leaves the common-support comparison strategy to a later explicit method.
+
 **PROPOSED — REQUIRES HUMAN APPROVAL.** This section records reviewable
 alternatives, not an adopted eligibility contract. Configuration, the metric
 registry, source revision, Phase 2A measurements and their formulas are unchanged.
@@ -1336,3 +1381,164 @@ comparison rule should ever be revised. Any future operationalization requires
 a separate explicit approval and method change. Section 10's eventual join,
 polygon and actor-alignment requirements for integrated event analyses remain
 open; D is not permission to bypass them. No tactical analysis is started.
+
+## 37. Human-approved Phase 2B lock and operational research scope
+
+**Phase 2B = LOCKED / COMPLETE — 9 September 2026.** Human methodological review
+approves the following contract. It supersedes the pending recommendations in
+section 36, the earlier Phase 2B appendix sections and saved candidate notebook
+outputs. Unselected B/C/E alternatives remain historical comparison evidence;
+they are not all promoted to approved primary filters. The current
+[calibration matrix](phase2b3_metric_calibration_matrix.csv) records the lock.
+
+### Observation model, terminology and intended analytical chain — LOCKED
+
+StatsBomb 360 supplies **event-aligned partial spatial observations**. It does
+not supply continuous tracking, complete 22-player states, named off-ball
+trajectories, continuous team-shape reconstruction, true controlled space, true
+pitch control or continuous movement trajectories. Future claims must use
+**observed spatial structure**, **visible outfield structure**, **event-aligned
+spatial state**, **spatial-state change**, **visible width/depth**, and **observed
+outfield convex-hull footprint** as appropriate.
+
+Do not claim “true team width,” “complete defensive shape,” “actual occupied
+area,” “reconstructed tracking,” “player trajectories from 360” or “true pitch
+control” without independently supported later justification. Methods already
+REJECTED for missing tracking information remain rejected for faithful
+reproduction; the optional gates below do not reopen those claims.
+
+The football question and operational formulation in section 2 are both retained.
+The core analytical chain is:
+
+```text
+Leverkusen attacking actions
+    → event-aligned visible spatial states
+    → change in observed surrounding structure
+    → next attacking actions
+    → box entry / shot / future xG
+    → recurring interpretable attacking mechanisms
+```
+
+This is an analytical priority and temporal sequence, not a causal finding. No
+outcome window, success/failure rule or sequence construction is implemented here.
+
+### Primary eligibility and common observational support — LOCKED
+
+A Phase 2A metric is primarily eligible for later descriptive/research comparison
+exactly when **its existing status is `ok` and actor status is `single` or `none`**.
+The locked mathematical minima and missing/degenerate behavior remain unchanged.
+There is **no universal minimum selected-player count, universal minimum
+visible-area fraction, hard polygon-containment rule, hard edge-distance threshold
+or automatic OOB exclusion**. These are deliberate decisions, not unfinished
+calibration. Null visibility minima mean **no universal hard cutoff approved**.
+
+Every structural comparison must inspect and report common observational support,
+retaining at minimum selected valid-player count, visible-area fraction, selected
+subset, keeper policy, OOB flag, coincident-record flag and actor status. Missing
+support metadata must be disclosed. Where compared observation populations differ
+materially, the later phase must explicitly document common-support restriction,
+stratification, matched descriptive comparison or statistical adjustment. **No
+specific method, weighting or definition of material difference is approved now.**
+Hull must inspect joint n/coverage support; NN comparisons must account for both.
+Primary eligibility alone never permits naive pooling of unlike observations.
+
+### Goalkeeper and hull interpretation — LOCKED
+
+Use **`goalkeeper_policy = excluded`** as primary for centroid, visible width,
+visible depth, convex hull area, mean/median pairwise distance and mean nearest-
+neighbor distance when representing **observed outfield structure**. The existing
+filter means literal `keeper=False`; unknown keeper omissions remain separately
+recorded. Included geometry remains available for an explicitly named **full
+visible footprint** or sensitivity. Player-count inventories report both variants.
+Do not delete either variant. Literal teammate subsets remain literal flags;
+all_visible combines both sides and is not one team's geometry.
+
+Keeper-excluded hull is the **observed outfield convex-hull footprint**, an
+observation-sensitive **secondary structural measure**. It is not complete team
+occupied area, controlled space, pitch control or a complete defensive footprint.
+Do not base tactical conclusions on hull alone. Claims of stretching, expansion
+or structural opening should triangulate visible width, visible depth, hull
+footprint, pairwise spacing and relevant local spatial context where appropriate.
+This does not authorize a composite metric or implement a local-context method.
+
+### Sensitivity plan and record preservation — LOCKED
+
+All robustness samples start from the applicable D-primary comparison sample,
+except the explicitly labeled unchanged-record actor-inclusion diagnostic. Use
+whole **original-frame** OOB/coincidence flags, even if the selected subset or
+keeper-excluded variant does not contain the offending point. Preserve all raw
+records and all original Phase 2A measurements.
+
+| Metric | Approved prioritized sensitivity in addition to keeper pairing |
+| --- | --- |
+| Count | Whole-frame coincidence exclusion; report both keeper inventories |
+| Centroid | Whole-frame coincidence exclusion |
+| Visible width | Whole-frame OOB exclusion |
+| Visible depth | Keeper pairing prioritized; routine headline OOB-B still applies |
+| Convex hull area | n>=14 all_visible; n>=7 teammate_true; n>=7 teammate_false; plus whole-frame OOB exclusion |
+| Mean pairwise distance | Whole-frame OOB and coincidence exclusion |
+| Median pairwise distance | Whole-frame coincidence exclusion |
+| Mean nearest-neighbor distance | n>=11 all_visible/included; n>=10 all_visible/excluded; n>=5 teammate_true and n>=4 teammate_false under either keeper policy; plus whole-frame coincidence exclusion |
+
+These fixed q25 hull and q05 NN values are **robustness landmarks only**, not
+definitions of valid frames. They are the approved values from the pinned sample;
+do not silently re-estimate them in later groups or revised populations. Individual
+challenges should remain distinguishable from combinations so offsetting selection
+effects are not called robustness. B/C/E sweeps may supply historical context;
+they introduce no universal primary count or coverage filter.
+
+**OOB:** primary observations retain all finite supplied coordinates and their
+flags. No clipping, projection, coordinate repair, point-only deletion or automatic
+frame exclusion. **OOB-B is routine for every future headline spatial finding**:
+rerun the applicable comparison excluding the entire original frame if it contains
+any nominal-pitch OOB point. Width, hull and mean pairwise remain priorities,
+without exempting other headline metrics. If a substantive finding changes
+materially, flag it, investigate and report the sensitivity; do not select the
+more convenient result. No numeric material-change threshold is chosen here.
+
+**Polygon/edge:** containment, validity/consistency and continuous polygon-boundary
+distance remain diagnostic metadata. Neither “outside visible polygon = invalid”
+nor an edge-distance censoring rule is approved.
+
+**Coincidence:** never deduplicate coordinates. Whole-frame exclusion is sensitivity
+for count, centroid and all three spacing metrics. Width, depth and hull do not
+prioritize coincidence exclusion because exact repetitions leave their geometry
+invariant, subject to their unchanged mathematical status rules.
+
+**Actors:** preserve records; exclude `multiple`/`unknown` from later primary
+comparisons. Permit generic diagnostic inclusion as unchanged sensitivity.
+Actor-dependent work requires `single` and a unique event join, but this does
+not approve event/frame actor-coordinate semantics or resolve identities.
+
+### Optional method gates and immediate next work — LOCKED scope
+
+Inferred defensive lines, high/mid/deep defensive regimes, compactness composites,
+Voronoi, valuable-space composites, graph representations, clustering and learned
+spatial representations are **OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**.
+They are not globally rejected and are not mandatory phases. Each requires all of:
+
+1. A specific analytical need.
+2. Support from the observation model.
+3. Interpretable incremental value over simpler geometry.
+4. A feasible validation approach.
+5. A material improvement to the football analysis.
+
+The immediate next gate is **team/role semantics and attacking-orientation
+validation**. After it, prioritize reliable possessions and sequence construction;
+event-aligned spatial-state sequences; descriptive spatial-state change;
+success/failure outcome definitions; comparison of evolution preceding box
+entries/shots/future xG; and recurring interpretable sequence mechanisms, in that
+order. No defensive-regime classification, Voronoi or clustering starts
+automatically. Existing phase numbering is preserved in the revised section 28.
+
+### Change control
+
+This is **not a scientific version bump**. No research population or outcome
+changed after effectiveness analysis; calibration followed the pre-specified
+validation process; and the scope narrows interpretation to the actual observation
+model before tactical/outcome analysis. The football-facing primary question,
+Phase 2A formulas, units, minima, validity/degeneracy behavior, provenance, derived
+data, source revision and raw-loading behavior are unchanged. This task locks
+the documented method; it does not execute a later research comparison or select
+an adjustment/weighting scheme. Historical candidate helpers remain diagnostic
+evaluators, not a production eligibility pipeline.

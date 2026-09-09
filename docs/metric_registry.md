@@ -7,6 +7,14 @@ sample or advance later metrics. Existing Phase 1 raw-record
 counts remain audit outputs; the Phase 2A valid-point count has the explicit
 definition below and must not silently replace those audit fields.
 
+**Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026.** The
+[approved calibration matrix](phase2b3_metric_calibration_matrix.csv) and
+[methods section 37](methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
+now govern comparison eligibility, keeper convention and robustness. This is a
+status/interpretation cross-reference only: the Phase 2A formulas, units, minima,
+point validity, degeneracy rules, six measurement variants and provenance below
+are unchanged. It adds no filtering to the measurement implementation.
+
 Provenance uses SOURCE, ADOPT, ADAPT, DERIVE, PROJECT and REJECT from the
 [source foundation](source_foundation.md#3-provenance-framework). Definition status
 `LOCKED` is separate from provenance and implementation status. S01/S02 support
@@ -240,27 +248,39 @@ For later comparisons of these Phase 2A metrics, keep frames with `multiple` or
 `unknown` actor status out of the **primary** comparison and retain them unchanged
 as a separately labeled inclusion sensitivity. This is a conservative,
 frame-level record-ambiguity policy, applying even to duplicate-invariant spans
-and hulls so paired comparisons use the same declared policy. It is not a final
-research-eligibility decision and is not executed by the measurement layer.
-`single`/`none` do not establish final eligibility either. Coincidence without
+and hulls so paired comparisons use the same declared policy. Phase 2B now locks
+this comparison policy together with each metric's existing `ok` status as
+D-primary; it is not executed by the measurement layer. Common observational
+support remains required before comparisons. Coincidence without
 actor ambiguity is retained with a flag and the same formulas, with no automatic
 deduplication or exclusion. A later justified change to the ambiguity policy
 requires an explicit method revision; unknown person identity remains unresolved.
 
-## 4. Remaining calibration and interpretation decisions
+## 4. Approved calibration and remaining interpretation decisions
 
-The eight formulas, minima, record/flag filters, units, numerical missing rules
-and ambiguity treatment are locked and implemented for descriptive diagnostics. Remaining choices
-are research eligibility/visibility thresholds (including edge censoring), a
-preferred goalkeeper convention if later justified, resolution of actual identity
-in multiple-actor records, and event/team/coordinate semantics for football
-interpretation. None prevents computing the defined native-record diagnostics.
+The Phase 2A measurement contract remains unchanged. Human-approved Phase 2B
+D-primary requires the metric's existing status `ok` and actor status `single`
+or `none`. No universal n/coverage cutoff, polygon-containment gate, edge-distance
+gate or automatic OOB exclusion is approved. Visibility YAML values remain null
+and edge exclusion remains false; null now means **no universal hard cutoff
+approved**, not calibration pending.
 
-`config/visibility.yaml` remains unchanged: `minimum_visible_attackers`,
-`minimum_visible_defenders` and `minimum_visible_area_fraction` are null;
-`exclude_edge_sensitive_frames: false` is not a validated eligibility rule. No
-visibility or outcome threshold, coordinate transformation, composite compactness,
-Voronoi, tactical regime, sequence feature or outcome model is added by this lock.
+For observed outfield structure, keeper-excluded centroid, width, depth, hull
+and spacing are primary. Included remains available for an explicitly named full
+visible footprint or sensitivity; count inventories report both. The approved
+keeper-excluded hull term is **observed outfield convex-hull footprint**. It is a
+secondary, observation-sensitive structural measure, not complete occupied area
+or controlled space; conclusions must not rely on hull alone.
+
+The matrix specifies routine whole-frame OOB-B for headline spatial findings,
+multiplicity-sensitive coincidence exclusion, fixed hull q25/NN q05 sensitivity
+landmarks, and unchanged actor-inclusion diagnostics. These are robustness
+challenges, not modifications of mathematical minima or point validity. Every
+structural comparison must inspect/report common observational support; no
+adjustment or weighting method is selected. Team/role semantics and attacking-
+orientation validation are the next gate and still block tactical spatial
+interpretation. Actor-dependent analysis requires `single` and a unique event
+join without thereby approving actor-coordinate semantics.
 
 ## 5. Later metric candidates — unchanged status
 
@@ -268,6 +288,14 @@ The following existing rows remain proposed, not implemented. Their exact
 definitions, role mapping, observation eligibility, thresholds and sensitivity
 choices are not advanced by Phase 2A. Their original Status column describes
 definition maturity, not completed code.
+
+**Roadmap status, 9 September 2026:** defensive regimes, inferred lines,
+compactness composites, Voronoi, valuable-space composites, graphs, clustering
+and learned representations are **OPTIONAL — REQUIRES METHOD-SPECIFIC
+JUSTIFICATION** under methods section 37. This scheduling/interpretation status
+does not change the provenance classifications or candidate formulas below.
+Outcome definitions remain a later priority after semantics and sequence gates;
+none is implemented by the Phase 2B lock. Tracking-dependent rejections remain.
 
 | Variable | Football meaning | Formula / definition | Source / provenance | Status | Required raw fields | Observation grain | Limitations | Research question |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

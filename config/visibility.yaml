@@ -1,4 +1,7 @@
-# Null means uncalibrated, not zero or an implicit permissive threshold.
+# Phase 2B LOCKED / COMPLETE — human approval, 9 September 2026.
+# Null means no universal hard cutoff approved; it is not zero or pending calibration.
+# Metric-specific robustness landmarks and common-support requirements are in
+# docs/methods_specification.md section 37. Edge distances remain metadata only.
 minimum_visible_attackers: null
 minimum_visible_defenders: null
 minimum_visible_area_fraction: null
