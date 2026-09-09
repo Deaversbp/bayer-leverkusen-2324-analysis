@@ -2,7 +2,7 @@
 
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
-**Current status: Phase 2B-2 COMPLETE — Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
+**Current status: Phase 2B-3 candidates evaluated — PROPOSED — REQUIRES HUMAN APPROVAL. Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
@@ -1189,3 +1189,150 @@ identity mapping, tactical zones or formation interpretation is introduced.
 revision, raw-loading behavior, all calibration YAML values, goalkeeper preference
 and eligibility rules remain unchanged. Human review of calibration is the next
 permitted phase; orientation and all later analytical methods remain deferred.
+
+## 36. Phase 2B-3 eligibility and goalkeeper calibration candidates
+
+**PROPOSED — REQUIRES HUMAN APPROVAL.** This section records reviewable
+alternatives, not an adopted eligibility contract. Configuration, the metric
+registry, source revision, Phase 2A measurements and their formulas are unchanged.
+Run `python scripts/calibration.py` to evaluate the existing derived CSV offline;
+the runner checks its hash against both preceding diagnostic runs and records
+the hashes of all Phase 2B-1/2 evidence tables. It neither retrieves raw data nor
+persists coordinates, frame records or eligible-frame lists. Only aggregate
+candidate summaries are saved under `outputs/diagnostics/phase2b3_*.csv`.
+
+The main review artifact is the
+[metric calibration matrix](phase2b3_metric_calibration_matrix.csv), reproduced
+as `outputs/diagnostics/phase2b3_metric_calibration_matrix.csv` and in the final
+notebook section. The [technical appendix](../report/technical_appendix.md#phase-2b-3--human-reviewable-calibration-candidates)
+contains measured retention, distribution shifts, stability and composition.
+These are PROJECT eligibility candidates informed by empirical diagnostics, not
+published cutoffs or causal results.
+
+### Candidate definitions and why these landmarks
+
+Twenty named alternatives cover five strategies plus explicit paired OOB,
+coincidence and actor treatments. Every alternative first requires that the
+particular metric's existing status is `ok`; there is no common hull-validity
+gate suppressing another metric. Centroid components retain their shared status.
+
+| Strategy | Candidate rule and purpose |
+| --- | --- |
+| A | Every mathematically defined metric; no visibility or anomaly exclusion. Permissive diagnostic baseline and ambiguity-inclusion alternative. |
+| B | `n >= q05`, `q25`, `q50`, or `q75`, separately for each literal subset and keeper variant. These sample the lower tail and the central distribution landmarks already examined in Phase 2B-1. |
+| C | Coverage `>= q20`, `q40`, `q60`, or `q80` across original frames, using the existing Phase 2B-1 quintile boundaries. |
+| D primary | Metric status `ok` and actor status `single` or `none`; no extra count, coverage, OOB or coincidence exclusion. Preserve the registry's later primary-comparison ambiguity policy. |
+| D sensitivity | D primary plus metric-specific count/anomaly checks listed below. No hard coverage gate. |
+| E | D primary plus count q25/coverage q20, or count q50/coverage q40, excluding whole-frame OOB and coincidence. Conservative comparisons, not preferred defaults. |
+
+Count quantiles use the observed integer value at pandas `higher` interpolation;
+coverage quantiles use linear interpolation with each original frame weighted once.
+Both comparisons are inclusive (`>=`); all ties remain together. Consequently C
+retention is not exactly the complement of the earlier right-closed bins. Missing
+coverage fails C/E, but remains flagged and eligible under A/D if the metric is
+defined. A missing anomaly inventory fails only a requested anomaly check. All
+unknowns and exclusions remain declared, without imputing observations.
+
+| Variant | n q05 | n q25 | n q50 | n q75 |
+| --- | ---: | ---: | ---: | ---: |
+| all_visible / included | 11 | 14 | 17 | 19 |
+| all_visible / excluded | 10 | 14 | 17 | 19 |
+| teammate_true / included | 5 | 7 | 8 | 10 |
+| teammate_true / excluded | 5 | 7 | 8 | 9 |
+| teammate_false / included | 4 | 7 | 9 | 10 |
+| teammate_false / excluded | 4 | 7 | 9 | 10 |
+
+Coverage landmarks are approximately **0.216822584412, 0.265017325037,
+0.318401586888 and 0.383158787876**; use full precision in
+`phase2b3_empirical_thresholds.csv`, not these display-rounded values. Exact-n
+support, observations below/at each threshold, and joint count/coverage strata
+are supplied. Threshold selection does not use metric values or an outcome.
+The subsequent stability results do not identify a common plateau: these
+landmarks remain comparison candidates, not validated minimum sample sizes.
+
+### Exact proposed primary, sensitivity and metadata treatments
+
+**Primary proposal:** D primary for descriptive comparisons of observed geometry,
+with the literal subset and intended keeper population declared. Retain all
+mathematically eligible values without a universal count/coverage threshold.
+This is conditional on reporting count and coverage alongside comparisons:
+nearest-neighbor comparisons should use exact selected-n strata and shared
+coverage quintiles; hull comparisons must also disclose joint count/coverage
+support. Do not present an unadjusted pooled comparison across different
+observation populations as a structural difference. Where strata have no common
+support, report the comparison as unsupported. The later analysis must declare
+its contrasts, support and weighting before any outcome analysis; no minimum
+stratum size, covariate model or weight is approved by this calibration.
+
+**Metric-specific sensitivity proposal (D sensitivity):**
+
+- Count and centroid: exclude whole frames with any coincident records.
+- Width: exclude whole frames with any nominal-pitch OOB point.
+- Depth: retain D primary eligibility; prioritize the included/excluded keeper
+  pair as its sensitivity. Broad OOB-B remains an additional comparison.
+- Hull: require n at least the variant's q25 (14 all-visible, 7 either teammate
+  subset) and exclude whole-frame OOB. q25 is a lower-quartile support landmark
+  used to challenge this especially n-sensitive quantity, not a stability lock.
+- Mean pairwise distance: exclude whole-frame OOB and coincidence.
+- Median pairwise distance: exclude whole-frame coincidence; test OOB separately.
+- Mean nearest-neighbor distance: require n at least q05 (included/excluded
+  all-visible 11/10; teammate_true 5; teammate_false 4) and exclude whole-frame
+  coincidence. This challenges sparse endpoints while retaining most observations;
+  it does not make NN comparable across unequal n or verify unseen neighbors.
+
+Report the individual B, C, OOB and coincidence comparisons as well as D/E, so
+offsetting changes in a combination are not mistaken for robustness. The q05/q25
+choice for these different sensitivities is a reviewable methodological judgment
+about coverage cost and observed sensitivity, not an automatically inferred optimum.
+
+**Goalkeeper proposal:** use `excluded` (literal keeper=False) for observed
+outfield centroid, depth, hull and outfield spacing; width may use either
+convention empirically, with excluded preferred when paired with other outfield
+shape quantities. Use included for an explicitly named full visible footprint,
+and always preserve both count inventories. The all-visible cloud combines both
+literal teammate subsets and must never be called one team's shape. Keeper
+pairing uses the same original frame/subset and jointly defined values; report
+the loss of definition as well as actual-removal and all-frame deltas. Unknown
+keeper omissions remain separate (zero in the current sample). This choice is
+about the represented population, not minimizing variance.
+
+**OOB proposal:** OOB-A and OOB-B/C primary all retain supplied finite values with
+flags. OOB-B sensitivity excludes any affected original frame for every metric;
+OOB-C sensitivity does so only for width, hull and mean pairwise distance, whose
+upper tails showed OOB enrichment. The latter is prioritization, not evidence
+that other metrics are immune. No clipping, projection, point-only deletion,
+repair, rescaling or coordinate transformation is allowed.
+
+**Metadata-only:** supplied-polygon inconsistency and continuous boundary
+proximity never gate eligibility here. All 118,581 polygons were valid and
+pitch-contained, yet 20,582 frames had points outside their polygon; containment
+cannot certify observation validity. Preserve the existing flags/edge summaries
+for later sensitivity/stratification. Full-population point/polygon flags are
+not newly reconstructed because Phase 2B-2 persisted aggregate edge outputs.
+
+**Coincidence/actor proposal:** preserve every record. Exclude coincident frames
+only in multiplicity-sensitive robustness checks, never by deduplication. The
+four multiple-actor frames remain included in generic diagnostic geometry (A).
+For later primary comparisons retain the registry's exclusion of `multiple` and
+`unknown`, with A as unchanged inclusion sensitivity. Generic-geometry inclusion
+in a primary comparison would require an explicit registry policy revision;
+this task does not make that revision. Actor-dependent work additionally requires
+`single` and a unique event join (`actor_unique` candidate); this is necessary,
+not sufficient to approve actor alignment or identity-dependent analyses.
+
+### Human approval and remaining boundaries
+
+The evidence favors a **combination**: metric-specific mathematical availability,
+the existing comparison ambiguity rule, analysis-specific common observation
+support, and sensitivity-only count/coverage/anomaly restrictions. A single global
+visibility gate discards unequal portions of event and match populations without
+certifying the remaining full-team geometry. No statistical stability tolerance
+or causal explanation is claimed.
+
+Human review must approve the represented keeper population, D primary and its
+analysis-specific comparison conditions, the exact D sensitivity thresholds,
+OOB-C priorities versus routine OOB-B, and whether the existing actor-ambiguity
+comparison rule should ever be revised. Any future operationalization requires
+a separate explicit approval and method change. Section 10's eventual join,
+polygon and actor-alignment requirements for integrated event analyses remain
+open; D is not permission to bypass them. No tactical analysis is started.

@@ -875,3 +875,287 @@ eligibility rule, goalkeeper convention, source revision, geometry formula or
 metric provenance changed. No coordinates were clipped, mirrored, repaired or
 deduplicated. Defensive regimes, orientation normalization, Voronoi, zones,
 sequences, clustering, modeling and causal interpretation remain out of scope.
+
+## Phase 2B-3 — Human-reviewable calibration candidates
+
+**PROPOSED — REQUIRES HUMAN APPROVAL.** Evaluated on 9 September 2026 using
+the existing **118,581 original frames / 711,486 variants / 34 matches**.
+The geometry SHA-256 remains
+`a6af9ceb6182c02159de78c8e57ad5ecda635d47e282eec610baf9daa45d5216` and revision
+`533862946a73608c134d18b78226b6371ce7173c` is unchanged. This was an offline
+evaluation, without new raw retrieval, geometry recomputation or permanent
+eligibility changes. All earlier Phase 2B findings above remain empirical
+associations, not causal explanations.
+
+The reproducible entry point is `python scripts/calibration.py`; candidate
+definitions and summary code live in `leverkusen.spatial.calibration`. The main
+human-review artifact is the eight-row
+[metric calibration matrix](../docs/phase2b3_metric_calibration_matrix.csv), also
+generated at `outputs/diagnostics/phase2b3_metric_calibration_matrix.csv`.
+[Methods section 36](../docs/methods_specification.md#36-phase-2b-3-eligibility-and-goalkeeper-calibration-candidates)
+states exact proposed rules, their rationale and the approval boundary.
+
+### Candidate grid, denominators and support
+
+Twenty named candidates cover A (all mathematically defined), four B count
+landmarks, four C coverage landmarks, D primary/sensitivity, two E combined
+filters, five OOB primary/sensitivity variants, coincidence sensitivity and
+unique-actor eligibility. Explicit no-op primary OOB rows show that retaining
+coordinates is distinct from rerunning a restricted robustness population.
+OOB/coincidence predicates refer to the **entire original frame**, propagated from
+all_visible/included, even when a literal subset has no affected selected point.
+There is no containment or polygon-edge exclusion.
+
+Each candidate has 54 metric/variant summaries (nine numeric outputs, including
+both centroid components, times six variants): **1,080 retention rows and 1,080
+distribution rows**. Retention percentages use the original 118,581-frame
+inventory; separate columns use the metric's mathematical denominator and count
+only additional filter removals. Match summaries include zero-retained matches;
+minimum/median counts are over all 34 matches. Event composition preserves all
+24 observed event types, including rare categories and zero-retained categories.
+Distribution references are all-defined A values for that metric/variant, not a
+complete-case population selected by another metric. Paired-primary columns also
+compare each sensitivity with its explicitly named primary. Mean, median, sample
+standard deviation (ddof=1), p05/p25/p75/p95, absolute differences and relative
+differences are retained. Relative differences divide by the absolute baseline
+statistic; zero/undefined denominators remain NA.
+
+Count landmarks are q05/q25/q50/q75 from each variant's observed distribution,
+using `higher` interpolation to return actual integer n values. Exact-n support
+at these landmarks is **2,985–33,770 frames** across the six variants. Coverage
+landmarks are the four previous quintile boundaries, weighted once per original
+frame. Both rules use `>=`, preserving ties; C retains 94,865 / 71,149 / 47,433 /
+23,717 original frames before metric availability. They differ slightly from
+complements of the earlier right-closed bins because boundary ties are included.
+No 30%, 40% or 50% coverage default was introduced.
+
+The joint `phase2b3_count_coverage_support.csv` shows n-by-coverage-quintile
+inventories, match support and defined counts/medians for all nine outputs. It
+supports review of common observational support without treating equal medians
+or marginal summaries as independent adjustment. Sparse/empty strata do not
+become certified comparisons merely because their inputs are mathematically valid.
+
+### Retention and distribution consequences
+
+The following comparison uses **all_visible / excluded hull area**. All candidates
+retain some frames in every match; the range of match retention is still material.
+
+| Candidate | Eligible frames | % of inventory | Minimum per match | Median per match | Hull median change vs A |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| A | 118,562 | 99.984 | 2,847 | 3,443 | 0.00% |
+| B q05: n>=10 | 114,011 | 96.146 | 2,718 | 3,333 | +1.90% |
+| B q25: n>=14 | 93,745 | 79.056 | 2,003 | 2,804.5 | +7.09% |
+| B q50: n>=17 | 62,278 | 52.519 | 924 | 1,907 | +14.46% |
+| B q75: n>=19 | 31,202 | 26.313 | 214 | 919.5 | +26.39% |
+| C q20 | 94,851 | 79.988 | 1,841 | 2,848.5 | +8.60% |
+| C q40 | 71,142 | 59.994 | 1,061 | 2,151 | +16.09% |
+| C q60 | 47,429 | 39.997 | 548 | 1,350.5 | +25.04% |
+| C q80 | 23,717 | 20.001 | 138 | 676.5 | +36.91% |
+| D primary | 118,558 | 99.981 | 2,847 | 3,443 | +0.001% |
+| D sensitivity: n>=14, no frame OOB | 84,150 | 70.964 | 1,860 | 2,495.5 | +5.81% |
+| E q25/q20 | 71,019 | 59.891 | 1,149 | 2,079.5 | +12.42% |
+| E q50/q40 | 41,232 | 34.771 | 407 | 1,175 | +23.90% |
+| OOB-B sensitivity | 107,054 | 90.279 | 2,650 | 3,156.5 | -1.60% |
+
+Across all six variants, E q25/q20 retains **59.72–64.43%** and E q50/q40
+**32.78–43.37%** for each of the six geometry metrics. Their retained populations
+are alike within a variant because these count cutoffs exceed the mathematical
+minima in this sample, not because the method enforces a common complete case.
+
+The primary/sensitivity trade-off for the three **excluded** populations is:
+
+| Metric | all_visible primary / sensitivity | teammate_true primary / sensitivity | teammate_false primary / sensitivity |
+| --- | ---: | ---: | ---: |
+| Count | 118,577 / 118,531 | 118,577 / 118,531 | 118,577 / 118,531 |
+| Centroid (each axis) | 118,576 / 118,530 | 118,574 / 118,528 | 118,565 / 118,519 |
+| Width | 118,576 / 107,069 | 118,574 / 107,067 | 118,565 / 107,058 |
+| Depth | 118,576 / 118,576 | 118,574 / 118,574 | 118,565 / 118,565 |
+| Hull | 118,558 / 84,150 | 118,294 / 87,167 | 117,840 / 84,325 |
+| Mean pairwise | 118,570 / 107,020 | 118,516 / 106,967 | 118,403 / 106,855 |
+| Median pairwise | 118,570 / 118,524 | 118,516 / 118,470 | 118,403 / 118,357 |
+| Mean nearest-neighbor | 118,570 / 113,963 | 118,516 / 114,730 | 118,403 / 116,003 |
+
+Depth's D sensitivity mask is identical because its prioritized robustness check
+is the keeper convention. The separate OOB-B and B/C rows remain available. Count
+is defined for known empty sets; the other mathematical denominators differ.
+The proposed outfield hull sensitivity retains **70.96–73.51%**, whereas the
+outfield NN sensitivity retains **96.11–97.83%**. Neither establishes completeness.
+
+| all_visible / excluded metric | A median | D sensitivity median | E q25/q20 median | C q80 median |
+| --- | ---: | ---: | ---: | ---: |
+| Width | 47.5236 | 47.0688 | 50.1095 | 55.4623 |
+| Depth | 29.8332 | 29.8332 | 31.4002 | 34.0768 |
+| Hull | 933.6984 | 987.9524 | 1,049.6490 | 1,278.2893 |
+| Mean pairwise | 21.1891 | 21.0436 | 21.7817 | 24.0079 |
+| Median pairwise | 20.0302 | 20.0305 | 20.6197 | 22.6858 |
+| Mean nearest-neighbor | 6.1393 | 6.1052 | 6.1429 | 6.6656 |
+
+For example E q25/q20 barely moves the NN median (+0.059%) while removing 40.1%
+of frames. This is not evidence that filtering is harmless: count and coverage
+restrictions can move the marginal distribution in opposite directions.
+
+### Stability findings and limits
+
+Successive changes are reported in `phase2b3_threshold_stability.csv`, starting
+at A and stepping through each B/C/E family. No percentage is used to classify
+"stable". These are changes in nested observed populations, not repeated
+measurements of a known true geometry or independent-effect estimates.
+
+For all_visible/excluded hull, successive median changes under B are
+**+1.90%, +5.09%, +6.89%, +10.42%**. Under C they are **+8.60%, +6.90%, +7.71%,
++9.49%**. Increasing restriction does not yield a diminishing-change plateau.
+For NN, the B sequence is **-0.56%, -1.60%, -0.51%, +1.47%**: the sign reverses.
+Its C sequence diminishes (**+3.22%, +2.31%, +1.64%, +1.16%**), but leaves only
+20% of frames and does not certify common n/composition or unseen neighbors.
+The complete table includes all seven statistics and all six variants, so a
+single favorable median cannot decide a rule.
+
+### Goalkeeper convention: the quantity, not the variance
+
+The new paired comparison includes count and centroid as well as the six Phase
+2B-1 metrics. Pairing is on match, original frame ordinal and literal subset,
+with all-frame and actual-keeper-removal scopes and jointly defined denominators.
+
+Among actual-removal frames, width changes in only **1.17–2.15%**, with mean
+absolute changes **0.0418–0.0761** native units. Either convention is defensible
+for the declared observed width; excluded is a coherent companion to outfield
+shape. Depth changes in **95.14–98.50%**, mean decrease **9.99–11.78** units;
+hull changes in **98.58–99.71%**, mean decrease **190.25–219.62** squared units.
+Use excluded to represent the observed outfield footprint, and included for a
+full visible footprint. These are different quantities, not error corrections.
+
+Mean absolute keeper deltas are **0.905–1.404** for mean pairwise distance,
+**0.965–1.518** for median pairwise, and **0.511–0.856** for NN. The teammate_true
+NN signed mean of -0.028 hides a mean absolute change of 0.856; it must not be
+described as insensitive. Outfield spacing should use excluded and retain the
+included pairing. For centroid x, actual-removal mean absolute changes are
+**1.392, 2.475 and 2.040** for all-visible, teammate_true and teammate_false;
+the corresponding y values are **0.443, 0.763 and 0.732**. These describe stored
+native axes, without pooled direction-dependent positional interpretation.
+
+Exclusion loses defined hulls in **12 / 84 / 20** frames, centroid/spans in
+**1 / 3 / 2**, and distance metrics in **6 / 11 / 0**, respectively. These are
+losses relative to defined included values; both variants can already be NA.
+All current keeper flags are known. Count should accompany whichever population
+is represented, with both inventories preserved; it is a record count.
+
+### OOB, coincidence, polygon and actor policy
+
+OOB-A and OOB-B/C primary retain all observations subject to mathematical
+definition. OOB-B sensitivity removes **11,508 original frames (9.7048%)**, leaving
+**107,073 (90.2952%)** before metric availability, across all 34 matches. Match
+retention for included width ranges **85.09–94.37%**. OOB-C applies this same
+whole-frame removal only to width, hull and mean pairwise distance because their
+upper tails showed OOB enrichment (29.93%, 16.53%, 19.31%, against 9.70%).
+It does not imply the other metrics are immune.
+
+For all-visible outfield geometry, OOB-B changes median width **-0.957%**, depth
+**-0.540%**, hull **-1.597%**, mean pairwise **-0.686%**, median pairwise **-0.599%**
+and NN **-0.717%**. These modest population medians coexist with tail enrichment
+and meaningful individual excursions (previous median/p95/max 1.380/5.049/10.663).
+Retain supplied coordinates with flags in primary observations; prioritize OOB-C
+and show the full OOB-B comparison. Do not remove only offending points.
+
+Coincidence sensitivity removes **50 frames (0.0422%)**, leaving **118,531** before
+metric availability, across five affected matches. Of these, 42 are in match
+3895139 (about 1.12% of that match), so global rarity masks concentration. The
+four multiple-actor frames overlap this group; D sensitivity removes only 46
+additional frames for centroid/count/median pairwise after D primary exclusions.
+No coincident frame is automatically removed for duplicate-invariant width,
+depth or hull; their coincidence-sensitivity outputs therefore equal A exactly.
+
+Across all six variants, coincidence exclusion changes centroid means by at most
+**0.001738** (x) / **0.000858** (y), mean-pairwise means by **0.000269**, median-
+pairwise means by **0.000138**, and NN means by **0.000744** native units. NN median
+changes are at most **0.001486** units. These small population effects do not
+negate the local multiplicity effects established in Phase 2B-2. A notable
+discrete exception is teammate_false/excluded **median count 9 → 8**, despite a
+mean count change of only **-0.000219**: removing 50 frames crosses the median
+rank boundary. Do not report all count summaries as numerically insensitive.
+
+All four multiple-actor frames remain unmodified. A includes them for generic
+point-cloud diagnostics. D primary follows registry section 3 by excluding
+`multiple`/`unknown` for later comparisons; A is the inclusion sensitivity.
+The user-suggested generic-primary retention is mathematically feasible but would
+revise that existing comparison policy, so it is not silently adopted. The
+`actor_unique` candidate also requires a unique event join and actor status
+`single`, excluding four current frames; actor-specific alignment remains
+unapproved. No actor selection, coordinate alteration or deduplication occurs.
+
+The polygon evidence remains **118,581 valid pitch-contained polygons**, all
+13,812 OOB points outside their supplied polygon, and **20,582 polygon-inconsistent
+frames**, with defining-extreme p05 edge distances about **0.266–0.391** units.
+These are metadata and sensitivity concerns, not point/frame invalidity criteria.
+Full-population edge flags were not persisted upstream; this phase reuses their
+aggregate evidence and does not fabricate row-level edge eligibility.
+
+### Filtering bias and human decisions
+
+Coverage q20 retains 80% overall, but only **34.87% of Shot**, **20.74% of Goal
+Keeper**, and **40.49% of Clearance** observations, versus **82.87% of Pass**.
+At q80 only **10/889 Shot frames (1.12%)** remain. Match 3895292 retains only
+**1,843/3,195 (57.68%)** under q20; match 3895202 retains **138/3,433 (4.02%)**
+under q80, compared with a best-match q80 retention of **48.67%**. A cleaner-looking
+sample would systematically lose large portions of particular contexts.
+
+Even count q25 for all-visible/included retains **66.73–97.44%** across matches;
+outfield q25 spans **63.59–96.30%** (see match table for exact denominators).
+For all-visible/excluded, E q25/q20 retains **59.89%** overall but only **35.96%**
+in its least-retained match; E q50/q40 retains **34.77%** overall and **12.74%**
+in its least-retained match. Included E q50/q40 retains just **6.19% of Shot**
+and **2.15% of Goal Keeper** frames. No tactical reason is inferred.
+
+OOB exclusion also changes event representation: included width retains **86.56%**
+of Pressure, **89.86%** of Pass and **97.53%** of Shot. Event tables show both
+retention within each type and percentage-point changes in its share of the
+defined population; rare categories retain their denominators rather than being
+pooled away. Thus even the prioritized anomaly sensitivity is not neutral sampling.
+
+The most defensible recommendation is a **combination**, not global validity:
+metric mathematical minima plus the existing actor-comparison policy, keeper
+choice tied to the observed quantity, count/coverage common-support disclosure
+for intended comparisons, and metric-specific robustness exclusions. Primary
+eligibility alone does not authorize an unstratified structural comparison.
+Exact-n/coverage strata remain descriptive support checks; later contrasts,
+minimum inferential support and weights require their own approved definition.
+
+Human decisions remain: approve D primary with these comparison conditions;
+approve or revise the q25 hull/q05 NN sensitivity landmarks; decide whether
+OOB-C priorities suffice or OOB-B is routine for every metric; declare full
+visible footprint versus outfield shape; and explicitly approve any departure
+from the registry's actor-ambiguity comparison rule. Missing full-team locations,
+unknown identity and unresolved coordinate/team semantics cannot be resolved by
+thresholds. No calibration is marked locked or applied permanently.
+
+### Artifacts and verification
+
+Fourteen aggregate CSVs (about 13.8 MB combined) contain the candidate definitions,
+28 empirical thresholds, 1,080 resolved metric/variant rules, retention and
+distribution comparisons, 540 successive-threshold rows, 427 joint count/coverage
+strata, event/match composition, paired keeper and OOB comparisons, the metric
+matrix, evidence inventory and run provenance. They are derived summaries, not
+raw coordinates, freeze frames or selected-frame exports, and remain ignored by
+Git. The matrix also has the versioned documentation copy for review in a clone.
+
+The notebook appends **16 cells, including eight executed code cells**, preserving
+all **37 original cells** and their outputs. Two standalone PNGs show retention
+versus median changes and successive-threshold changes for the all-visible
+outfield example; all six variants remain in the CSVs and notebook tables. Both
+figures were visually reviewed, and notebook schema validation passed.
+
+**244 offline tests passed; two optional network tests were deselected.** The 16
+new calibration cases cover deterministic empirical landmarks and ties, explicit
+metric-specific and paired definitions, original-frame anomaly propagation,
+mathematical availability without hidden thresholds, missing coverage/anomaly
+semantics, zero-retained matches, distribution denominators, keeper pairing,
+source/status rejection and preservation of raw records and excursions. An
+all-undefined object-dtype hull fixture exposed a validation edge case; finite
+validation now handles empty defined-value collections without coercing values.
+`python -m ruff check .` passed. Commands used the repository `.venv` interpreter.
+
+Independent artifact checks reconciled every match/event composition count with
+the 1,080 retention rows, confirmed every candidate/metric/variant still covers
+all 34 matches, and checked original notebook-cell equality. The Phase 2A CSV
+hash matches both preceding diagnostic runs; Git reports no changes to locked
+geometry, the metric registry, source foundation or any configuration file.
+Recommendations remain **PROPOSED — REQUIRES HUMAN APPROVAL**.
