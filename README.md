@@ -4,6 +4,9 @@ Analyze how Bayer Leverkusen created dangerous attacking space during the unbeat
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
 **Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE, 10 September 2026.**
+**Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK — diagnostics complete.**
+The next step is Phase 3A-2 representative possession/boundary review; final
+attacking episodes and segmentation rules are not implemented.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -407,3 +410,40 @@ normalized spatial state, team-color mapping, interpolation or forward fill.
 The style guide is locked only within validated scope. This approval does not
 resolve unsupported-type semantics or off-ball identities, authorize unrestricted
 full-sample spatial analysis, or create final sequences, outcomes or tactics.
+
+## Phase 3A-1 progression and reset diagnostics
+
+```powershell
+.\.venv\Scripts\python.exe scripts/progression_diagnostics.py
+```
+
+The CLI retrieves the pinned match/event/360 resources in memory, reuses the
+locked semantic/orientation functions, and writes 28 derived `phase3a1_*.csv`
+files plus four figures under ignored `outputs/`. It retains the complete
+86,025-event context and reconciles all 2,888 groups, 46,143 anchors and 43,431
+anchor intervals with Phase 2C-2. Raw records and previous outputs are preserved.
+
+Open [notebook 06](notebooks/06_progression_reset_diagnostics.ipynb) for offline
+review. Reusable code lives in `leverkusen.sequences.progression_diagnostics`;
+existing pattern-discovery and sequence scaffolds remain unchanged.
+
+The action layer contains **37,984 Leverkusen Pass/Carry vectors** with explicit
+valid endpoints and validated Phase 2C frames. Another 5,713 otherwise explicit
+vectors remain context without normalized action coordinates. Opponent and
+Pressure anchors remain separate from Leverkusen action vectors. Among 2,662
+measurable possessions, median net progression is **31.0 x-units**, cumulative
+forward/backward medians are **57.75/18.1**, and median/p90 maximum peak retreat
+are **16.8/53.2**. The 226 groups without safe actions remain in the inventory.
+
+Retreat/recovery use ordered action start/end vertices, not additional independent
+360 states or inferred endpoint arrival times. Inter-action jumps, skipped context,
+initial field position and censoring need review. Both plotted extreme examples
+begin with provider Corner events at x=120; a running peak initialized there can
+remain unrecovered throughout subsequent play.
+
+Outputs cover sign runs, three temporal layers, observed/censored peak recovery,
+literal provider termination context, candidate prevalence/overlap sweeps, a
+50-possession extreme inventory and **26 complete deterministic review timelines**.
+No reset setting is selected. Phase 3A-2 review precedes Phase 3A-3 segmentation
+calibration and method lock. See [methods section 41](docs/methods_specification.md#41-phase-3a-1-progression-and-reset-diagnostics)
+and the [measured findings](report/technical_appendix.md#phase-3a-1-progression-and-reset-diagnostics--10-september-2026).

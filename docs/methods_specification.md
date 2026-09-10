@@ -6,6 +6,8 @@ Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 **10 September 2026 human approval: Phase 2C = LOCKED / COMPLETE — RESTRICTED
 SEMANTIC SCOPE. Section 40 records the approved boundary. Phase 3 — Possession
 and Spatial-Sequence Method Design is now authorized within that scope.**
+**Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK.** Section 41 records the completed
+progression/reset diagnostics and the next Phase 3A-2 review step.
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
@@ -2060,3 +2062,199 @@ clustering, prediction or causal analysis is implemented or authorized by this
 documentation change. Unrestricted full-sample spatial analysis remains outside
 the approved population. This task stops at recording the lock and design
 authorization; Phase 3 implementation requires its own subsequent work.
+
+## 41. Phase 3A-1 progression and reset diagnostics
+
+**10 September 2026 — Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK.**
+Phase 2C remains **LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE**. The Phase
+2A/2B/2C contracts, source behavior, gates and frame membership are unchanged.
+
+The working hypothesis for later calibration is that an attacking episode may
+be a contiguous portion of a Leverkusen possession characterized by sustained
+or renewed progression, bounded by explicit football termination or a meaningful
+reset of progress. This is not an adopted definition. The hierarchy remains
+match → provider possession → full event context → future candidate episodes,
+with validated anchors available inside that context. No final segmentation,
+eligibility, outcome, tactical label, clustering or change-point method is created.
+
+### Population and two analytical layers
+
+The parent is the existing match/period/provider-possession/team-904 group.
+`match_event_inventory()` audits each complete match, including incoming/outgoing
+related-cloud conflicts, before selection. `frame_semantics()` remains the sole
+semantic authority. Source revision remains
+`533862946a73608c134d18b78226b6371ce7173c`. All 2,888 groups and 86,025 events remain
+context, including unsupported, unlinked, opponent and administrative records.
+
+**Action-vector layer:** use own-team Pass/Carry events with valid explicit
+start/end pairs **and a validated Phase 2C frame**. This conservative diagnostic
+extraction does not enlarge semantic scope or define future sequence eligibility.
+Otherwise explicit unsupported/unlinked vectors remain event context without
+normalized action coordinates. Shot and Pressure are not forced into this layer.
+A recorded pass endpoint does not assert successful controlled possession; no
+completion filter is applied. `normalize_attacking_point()` supplies the existing
+Leverkusen reference, without duplicated orientation logic. IDs, indices, times,
+teams and raw/additional coordinates remain distinct in memory.
+
+Derive `delta_x = end_x - start_x`, corresponding delta-y, Euclidean displacement,
+forward component `max(delta_x,0)` and backward magnitude `abs(min(delta_x,0))`.
+These use explicit vectors only; no displacement is inferred between actions.
+The resulting sample is 20,092 Pass and 17,892 Carry vectors (37,984 total),
+covering 2,662 groups. There are 5,713 otherwise explicit own-team vectors outside
+the frame scope. The 226 groups with no safe action retain missing progression
+measurements, not invented zero progression. No raw coordinate is altered.
+
+**Spatial-anchor layer:** retain all 46,143 validated frames, including 6,846
+opponent anchors. Summarize consecutive normalized event-start-x differences by
+previous/next type and actual event-team IDs separately. These are differences
+between actor/event references, not automatically ball progression. Pressure is
+not automatically ball location, a Leverkusen possession action, defender-to-ball
+distance or a continuous pressure episode. Mixed actor/type coordinates are not
+pooled into action-path retreat/recovery. Phase 2B metric-specific geometry
+eligibility remains a separate layer; no geometry metric is recomputed here.
+
+The existing revision-bound guard checks full-season and possession totals.
+All 43,431 anchor intervals reconcile with Phase 2C-2, including median/p90
+1.103/3.214 seconds. No unsupported frame receives trusted normalized coordinates.
+
+### Ordered vertices, cumulative displacement and retreat
+
+Order safe actions by event index within each parent, appending each recorded
+start then end as two **action-ordered vertices**. These are not two independent
+360 observations. Retain repeated coordinates. First-safe x is the first action
+start; last-safe x is the final action end; min/max cover all vertices; net x is
+last minus first. Forward/backward totals sum only the explicit-vector components.
+They can exceed pitch length through repeated actions and are not player distance
+or attacking success. A zero backward total gives a missing ratio and an explicit
+zero-denominator flag; no-action ratios remain missing.
+
+Inter-action jumps `next_start_x - previous_end_x` are reported separately.
+Net progression equals forward minus backward totals plus the sum of those jumps.
+Skipped actions or action semantics may explain discontinuities; they do not
+establish observed motion. No coordinate or running peak is forward-filled into
+unsupported full-context rows.
+
+At each ordered vertex, running peak is the maximum observed x so far; retreat
+is peak minus current x. Report all vertices and each measurable parent's maximum.
+The vertex distribution weights longer paths and repeats shared endpoints; it is
+not an independent-frame or possession-weighted distribution. Also summarize
+maximum retreat after first reaching x>=30/60/80/100. The >=5/10/15/20/25/30/40
+retreat sweep is diagnostic only, with both all-parent and measurable-parent
+denominators. No value defines a reset.
+
+### Runs, temporal interruption and exploratory recovery
+
+Strict runs are maximal contiguous positive or negative delta-x values **in the
+usable action subsequence**. Zero/opposite sign ends a run. Full-context events
+may intervene and their counts are retained; runs do not certify consecutive
+football actions or uninterrupted control. Report action count, cumulative and
+maximum single components, first-start/last-end x, and first-to-last action-start
+timestamp span. A one-action span is zero, not instantaneous action completion.
+A separately labeled non-positive alternative permits exact-zero actions while
+requiring at least one negative action. No near-zero tolerance or preferred run
+convention is selected. >=2/3/4/5-action settings are prevalence sweeps only.
+
+Time gaps use source period-local timestamps for all context events, safe actions,
+and all validated anchors separately. No pair crosses match/period/possession
+boundaries. Report quantiles through p99, maximum and strict >3/5/10/15-second
+rates; equal timestamps remain zero. No allowed maximum is chosen. Possession
+duration remains last event start minus first event start, including stoppage or
+administrative time, not active playing time.
+
+The simple exploratory recycling/recovery calculation is a nonoverlapping
+excursion below the **running record peak**. First observed x below that peak
+starts it; first later observed x at or above the same level ends it. Equal peaks
+update the reference to the latest observation. Record reference/onset/trough/
+return event indices, retreat size, peak-to-return event-position difference and
+peak-to-trough/trough-to-recovery timing. `new_peak_reached` means any subsequent
+safe vertex in the same parent exceeds the reference, not a future outcome.
+
+Unobserved recovery is censored at the last safe observation. Recovery time/count
+is missing, with follow-up recorded separately; this does not establish failure
+to recover in the full football sequence. Endpoint arrival times are not supplied:
+both vertices carry their source **action-start timestamp reference**. These
+durations are source timestamp differences, not exact physical recycling times.
+No action duration, trajectory or motion is inferred.
+
+This running-record diagnostic is simpler than a local-peak or “sustained rise”
+rule. It can miss renewed local rises below an earlier high. In this sample,
+171 groups start their safe path at x=120 and 205 reach 120 somewhere. Both plotted
+extreme examples begin with provider Corner records at x=120, so a global-peak
+excursion can persist through many later rises. This needs human review, not
+coordinate correction or an automatic reset declaration.
+
+### Presentation, provider context and selection
+
+Delta-x bins are `<-20`, `[-20,-10)`, `[-10,0)`, `[0,10)`, `[10,20)`, `>=20`;
+zero is separately counted in the numeric summary. Field-depth bands are below
+0, `[0,30)`, `[30,60)`, `[60,80)`, `[80,100)`, `[100,120)`, and 120 or above.
+These are presentation choices, not tactical zones; provisional zone config is
+not used. Duration landmarks use strict >30/60/90/120 seconds. Arithmetic uses
+supplied values without rounding/tolerance/repair; quantiles use pandas linear
+interpolation.
+
+Football context inventories actual type names (Shot, Foul Won/Committed,
+Offside, Injury Stoppage, Referee Ball-Drop, Half Start/End, Dispossessed,
+Miscontrol, Interception, Ball Recovery, Duel, Block, Clearance), literal
+`out=True`/`counterpress=True`, named pass types and supplied Pass/Duel/Interception/
+Ball Receipt outcomes. Shot outcome, goal and xG do not select signals or settings.
+Provider labels such as pass.type:Recovery and duel.outcome:Won are not project
+success outcomes. The final provider-group record is inventoried with actual
+next-event type/team/possession-team/period context. No token automatically
+creates a hard episode boundary; overlapping tokens are not independent counts.
+
+Candidate prevalence covers literal tokens, single backward magnitude, cumulative
+peak retreat, run length, all temporal layers, observed peak-recovery time,
+censored follow-up and any observed recovery. Recovery/follow-up settings use
+>3/5/10/15/30 seconds. Each setting stays separate: no score, boundary strength or
+preferred setting. Cross-family overlap enumerates all numeric combinations for
+single backward actions, peak retreat, strict negative runs, safe-action gaps and
+observed peak-recovery time. All-parent prevalence means observed support, not
+proof of signal absence where actions are missing.
+
+The extreme manifest unions top 20 groups by duration, event count, anchor count
+and maximum retreat, breaking ties by possession key and retaining ranks: 50
+distinct groups. The separate 26-group review manifest takes first two keys per
+stratum: nonnegative vectors with >=2 positive actions; exactly one backward
+action <=5 units and p75 forward total; p95 single retreat; >=3 negative actions
+in a run; observed recovery; p95 excursion count; positive duration <=p25 with
+p90 net-x/time; Shot context; p95 anchor count; <=1 anchor; and p95 absolute summed
+inter-action jump. Add four extreme leaders, then fill to 26 from the longest
+unused extreme groups. These values select review cases only. Nonnegative vectors
+need not imply a monotonic full path when jumps occur; that ambiguity is retained.
+
+Each selected full timeline retains every parent event, both team fields, relative
+time, UUID/index/type, validated status and safe action coordinates/displacement/
+peak/retreat where defined. Unsupported spatial fields stay missing. Selected
+path vertices and literal provider-token context are separate CSVs. No episode,
+reset or tactical label is attached; this is not a prevalence sample.
+
+### Artifacts, support and next gate
+
+`scripts/progression_diagnostics.py` writes 28 derived CSVs and four lightweight
+figures. Reusable logic resides in `leverkusen.sequences.progression_diagnostics`
+and `leverkusen.visualization.progression`. Every CSV records the source revision;
+the source inventory records URLs/counts, and execution summary records completion
+UTC and package versions. `run_statistics` holds sign-run distributions separately
+from execution `run_summary`. The requested retreat/run/recovery tables are
+derived diagnostics, not raw-source dumps or final sequences. Previous outputs
+remain untouched. `06_progression_reset_diagnostics.ipynb` reviews the evidence
+offline without embedding reusable transformations.
+
+Pass/Carry median delta-x is 2.3/0.2 units and negative rates are 41.18/28.86%.
+Measurable-possession median net/forward/backward progression is 31.0/57.75/18.1;
+median/p90 maximum peak retreat is 16.8/53.2. At the illustrative 20-unit setting,
+383 groups contain a single backward vector and 1,195 show cumulative peak retreat.
+That difference can include multiple actions **and discontinuities**; it is not
+a reset count. Of 4,781 record-peak excursions, 3,519 have observed recovery and
+1,262 are censored; conditional median/p90 recovery timestamp spans are
+5.008/22.1512 seconds. The technical appendix records the complete findings.
+
+The next review should compare cumulative and single-action retreat, strict and
+zero-tolerant runs, literal stoppage/restart context, all temporal layers, and
+observed/censored recovery. Restart-seeded peaks, endpoint-time uncertainty and
+skipped-action discontinuities prevent promoting any signal directly into a
+boundary rule. **No segmentation threshold/rule, outcome or model is selected.**
+**Phase 3A-2 — Representative Possession / Boundary Review is next**, followed by
+**Phase 3A-3 — Segmentation Calibration & Method Lock**. Phase 2C remains locked
+as before; Phase 3 sequence segmentation remains unimplemented.
