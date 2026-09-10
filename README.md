@@ -3,12 +3,14 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026.**
-Phase 1/1B and locked Phase 2A geometry are complete. Human review approved
-D-primary, keeper conventions and metric-specific robustness challenges after
-the Phase 2B diagnostics. The immediate next gate is **team/role semantics and
-attacking-orientation validation**; tactical spatial interpretation remains
-blocked until it passes. Existing event/passing EDA is preserved. See the
+**Current phase: Phase 2C = VALIDATED PARTIALLY — NOT LOCKED, 9 September 2026.**
+Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
+34-match semantic audit supports a conservative 72,596-frame core scope;
+45,985 frames remain unsupported for operational team/orientation mapping.
+Linked-cloud team-label contradictions and mixed event-type orientation block
+the full semantic gate and later sequence/tactical work. See the
+[Phase 2C decision](docs/methods_specification.md#38-phase-2c-teamrole-semantics-and-attacking-orientation),
+the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
 and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
 
@@ -48,8 +50,9 @@ continuous player trajectories, true time-to-intercept models, full dynamic pitc
 control, continuous EPV tracking models, or named off-ball trajectories when
 player identity is unavailable. Do not claim complete 22-player state, complete
 defensive shape, actual occupied area, true controlled space, continuous team-shape
-reconstruction or reconstructed tracking. Team/role semantics, orientation,
-sequence construction and outcome definitions remain later gates. See the
+reconstruction or reconstructed tracking. The full team/role and orientation
+gate remains open; sequence construction and outcome definitions remain later
+gates. See the
 [methods specification](docs/methods_specification.md) and
 [metric registry](docs/metric_registry.md).
 
@@ -308,3 +311,28 @@ followed the pre-specified validation process, no population/outcome changed aft
 effectiveness analysis, and scope was narrowed before tactical/outcome analysis.
 The football question and Phase 2A formulas/data are unchanged. See the
 [decision record](report/technical_appendix.md#phase-2b-human-approval-and-research-scope-lock--9-september-2026).
+
+## Phase 2C semantics and orientation review
+
+Run `.venv/Scripts/python scripts/semantics_orientation.py` to audit pinned
+events, 360 and lineups across the season in memory. It writes compact
+`outputs/diagnostics/phase2c_*.csv` tables and 27 deterministic native/normalized
+figures under `outputs/figures/`. Generated outputs remain ignored by Git.
+No raw JSON or duplicate frame dataset is saved. For presentation-only refreshes,
+`--figures-only` reuses the completed audit manifest and retrieves only its
+selected matches; rerun the full audit if semantic rules or source change.
+
+Open [notebook 04](notebooks/04_semantics_orientation.ipynb) after the CLI. It
+reads derived evidence offline, checks provenance and presents teammate,
+event/possession, orientation, exceptions, normalization and representative
+plots. It does not rerun downloads or overload the locked geometry notebook.
+The existing `04_defensive_structures.ipynb` scaffold is unchanged.
+
+Within the explicit validated scope, True/False map to event team/other team.
+Native coordinates already place the event team's attack toward +x. Choosing
+Leverkusen as target records identity for its events and rotates both axes for
+opponent events. Unsupported cases return missing normalized coordinates.
+This additional layer does not change raw coordinates, Phase 2A geometry or
+Phase 2B eligibility. The [style guide](docs/visualization_style_guide.md) applies
+Leverkusen red, opponent charcoal and gold action markers only to that scope.
+See the [results and blockers](report/technical_appendix.md#phase-2c-semantic-and-orientation-audit--9-september-2026).
