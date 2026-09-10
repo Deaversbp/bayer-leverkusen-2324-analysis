@@ -3,18 +3,20 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
-**Current phase: Phase 2C = VALIDATED PARTIALLY — NOT LOCKED, 9 September 2026.**
+**Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE, 10 September 2026.**
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
 Phase 2C-2 readiness audit (10 September 2026) finds **READY — WITH RESTRICTIONS**:
 2,888 Leverkusen possessions contain 46,143 validated anchors; 84.07% have at
-least three, across all 34 matches. A restricted semantic lock is recommended
-for human review; **Phase 2C remains VALIDATED PARTIALLY — NOT LOCKED**.
+least three, across all 34 matches. Human review approved Recommendation A:
+the existing `validated_core_event_team_scope` is locked for **validated
+spatial-anchor sequence analysis**. **Phase 3 — Possession and Spatial-Sequence
+Method Design is now authorized** within that scope.
 Linked-cloud contradictions and mixed event-type orientation remain unresolved
 outside that scope. Final sequence construction and tactical work remain later
 gates. See the [readiness findings](docs/methods_specification.md#39-phase-2c-2-validated-spatial-anchor-coverage-and-sequence-readiness), the
-[Phase 2C decision](docs/methods_specification.md#38-phase-2c-teamrole-semantics-and-attacking-orientation),
+[Phase 2C approval and locked boundary](docs/methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock),
 the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
 and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
@@ -55,8 +57,9 @@ continuous player trajectories, true time-to-intercept models, full dynamic pitc
 control, continuous EPV tracking models, or named off-ball trajectories when
 player identity is unavailable. Do not claim complete 22-player state, complete
 defensive shape, actual occupied area, true controlled space, continuous team-shape
-reconstruction or reconstructed tracking. The full team/role and orientation
-gate remains open; sequence construction and outcome definitions remain later
+reconstruction or reconstructed tracking. Team/orientation semantics are locked
+only for frames passing every existing Phase 2C gate. Full-sample normalization
+remains unsupported; sequence construction and outcome definitions remain later
 gates. See the
 [methods specification](docs/methods_specification.md) and
 [metric registry](docs/metric_registry.md).
@@ -83,8 +86,12 @@ Finite supplied coordinates and both measurement variants remain preserved.
 
 ## Revised roadmap
 
-The next gate is **team/role semantics and attacking-orientation validation**.
-After that, prioritize:
+The next authorized phase is **Phase 3 — Possession and Spatial-Sequence Method
+Design** for the locked semantic population. Design must retain the complete
+provider possession event stream as context, the validated Phase 2C subset as
+trusted spatial states, and Phase 2B metric-specific eligibility/support for any
+geometry comparison. Sequence units, minimum anchors, maximum gaps, windows and
+start/end rules remain unresolved. After that method review, prioritize:
 
 1. Reliable possession and sequence construction.
 2. Event-aligned spatial-state sequences.
@@ -368,8 +375,35 @@ The median possession supplies 10 validated anchors; median/p90 consecutive gaps
 are 1.103/3.214 seconds. Among 571 shot-containing possessions, 87.74% have at
 least three anchors. Opponent events supply 14.84% of validated anchors.
 
-**Recommendation: A — lock the restricted semantic scope for validated
-spatial-anchor sequence analysis, subject to human review.** More unsupported-type
-semantic work is not necessary before restricted sequence design. No lock,
-anchor minimum, maximum gap, temporal window or outcome is selected here.
+The audit originally recommended A, pending human review. **Human approval on
+10 September 2026 now locks the restricted semantic scope** for validated
+spatial-anchor sequence analysis. More unsupported-type semantic work is not
+necessary before restricted sequence design. No anchor minimum, maximum gap,
+temporal window or outcome is selected by this lock.
 See the [complete evidence and limitations](report/technical_appendix.md#phase-2c-2-sequence-readiness-audit--10-september-2026).
+
+## Approved Phase 2C scope and change control
+
+Historical progression is preserved: the initial Phase 2C audit was **VALIDATED
+PARTIALLY — NOT LOCKED**; Phase 2C-2 found **READY — WITH RESTRICTIONS**; human
+review then approved **LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE**.
+Saved audit tables, notebooks and dated findings retain their original status;
+the [approval record](docs/methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock)
+controls current authorization. No scientific version bump is required: the
+decision follows pre-outcome semantic validation and the pre-specified readiness
+audit, without changing raw data, Phase 2A/2B methods or research questions.
+
+Only Pass, Carry, Shot and Pressure frames passing **all** existing frame-level
+gates qualify. Within that scope, literal teammate True/False maps to event
+team/other known match team. Event team remains separate from possession team,
+including the 6,846 opponent anchors in Leverkusen possessions. Native event-team
+attack is +x; the Leverkusen reference uses identity for its events and
+`(120-x, 80-y)` for opponent events, preserving raw coordinates. No half, venue,
+possession-team or x-only flip is approved. Pressure is a spatial anchor, not
+automatically a ball location or a Leverkusen possession action.
+
+Unsupported events remain full-stream context; their frames supply no trusted
+normalized spatial state, team-color mapping, interpolation or forward fill.
+The style guide is locked only within validated scope. This approval does not
+resolve unsupported-type semantics or off-ball identities, authorize unrestricted
+full-sample spatial analysis, or create final sequences, outcomes or tactics.
