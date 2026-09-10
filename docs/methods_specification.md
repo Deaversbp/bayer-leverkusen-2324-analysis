@@ -2258,3 +2258,171 @@ boundary rule. **No segmentation threshold/rule, outcome or model is selected.**
 **Phase 3A-2 — Representative Possession / Boundary Review is next**, followed by
 **Phase 3A-3 — Segmentation Calibration & Method Lock**. Phase 2C remains locked
 as before; Phase 3 sequence segmentation remains unimplemented.
+
+
+## 42. Phase 3A-2A representative possession / boundary review pack
+
+**10 September 2026: Phase 3A-2A = REVIEW PACK READY ? HUMAN LABELING PENDING.**
+This is a standardized human calibration packet. It does not decide boundaries,
+label episodes, select segmentation thresholds/rules, define outcomes, or fit
+models. Phase 3A-1 remains **DIAGNOSTIC / NOT A METHOD LOCK**, and sections 37?41
+remain unchanged. The next step is human Phase 3A-2B review.
+
+### Bounded population, sampling and presentation order
+
+The fixed source remains `533862946a73608c134d18b78226b6371ce7173c`. Existing
+Phase 3A-1 summaries, representative keys and recovery inventory supply selection
+evidence. The bounded pool is **100 provider possessions**: the 26 earlier
+representatives plus all Leverkusen possessions in their lowest match ID,
+3895052. All nine representative matches receive the existing full-match semantic
+audit, including incoming/outgoing linked conflicts, before extracting pool
+parents. No full-season diagnostic is rerun. Each pool parent's event, safe-action
+and validated-anchor counts must reconcile with the preserved Phase 3A-1 summary.
+Raw records are held in memory and never written or modified.
+
+Select the first parent per requested descriptive category, preferring previous
+representatives, breaking ties by the full `(match_id, period, possession_id,
+possession_team_id)` key. Fill remaining places to 28 with unused previous keys
+then remaining sorted pool keys. This retains all 26 previous cases and adds
+3895052/1/17 and 3895052/1/23. All 25 categories have examples in this bounded pool;
+absence would be reported rather than forced. Category flags are overlapping
+sampling descriptions, not human judgments or population-prevalence estimates.
+
+The complete per-category **review sampling criteria**, pool counts and selected
+case IDs are recorded in `phase3a2_category_coverage.csv`. They use path retreat
+<=5 for near-monotonic contrasts; a single backward action <=5 with forward sum
+>=30; large single vectors >=20; multi-action runs >=3; cumulative backward >=40
+without a >=20 single vector; observed record-peak recovery <=3 or >15 seconds;
+censoring and subsequent higher vertices; literal restart/Shot/out/Pressure
+context; duration >60 with >=3 local peak plateaus or duration >120; >=50 or <=1
+anchors; excursion sizes 20?40 from record peaks >=100 versus <=60; short positive
+duration <=10 with net-x/time >=3; and ordinary circulation with retreat 5?25,
+>=2 positive/negative actions and duration <=60. Equal adjacent vertices collapse
+only for counting local peak plateaus; the plotted and stored paths retain them.
+No screen certifies attacking continuity or a reset.
+
+Stable case IDs are separate from `review_order`. The presentation starts with
+forward contrasts, single-action and multi-action retreat, then recovery, set
+pieces, Shot context, long cases and borderline/sparse evidence. Overlapping
+categories remain available in the coverage table; a case is not forced to be a
+unique football type. Original sampling groups are retained separately.
+
+### Neutral candidate moments and explanatory context
+
+There are **181 candidate review moments in 26 parents**; two parents have none.
+Candidates union the first action at each single-backward and record-peak-retreat
+setting 5/15/30/40, first strict negative/non-positive runs reaching lengths 2/3
+(marked at the observed run's last action), the first negative vector without a
+magnitude minimum, the first negative-to-positive action turn, the shortest and
+longest observed record-peak recoveries, and first full-event gaps >3/10/15 seconds.
+Also retain literal Shot, foul, injury stoppage, Half Start/End, Offside, referee
+ball-drop, restart and out context. Duplicates merge by parent/event index; IDs
+follow event order. Reasons explicitly say **review sampling criterion**. No
+single setting is preferred or authorized for production sequence logic.
+
+Every selected timeline retains all source parent events in index order, named
+event actor where supplied, both team fields, timestamp/elapsed time, prior actual
+event gap, literal context, semantic status, safe-vector status and positive,
+negative and non-positive action-run memberships. Run lengths are in the safe
+Pass/Carry subsequence, which can contain intervening full-context events.
+Provider outcome tokens are limited to the pre-existing non-Shot context whitelist;
+Shot outcome, goal, xG and success do not enter selection or candidate logic.
+
+Missingness distinguishes no 360 frame, linked but unsupported semantics,
+validated spatial anchor, and safe action-vector availability. No coordinates,
+peaks or zero displacements are inserted into unsupported/non-action rows. Safe
+start/end x/y and deltas reuse Phase 3A-1 extraction and locked normalization.
+Running peak and retreat in a timeline row are the safe action-end observation.
+Pressure and other non-action anchors retain their separate actor/event x.
+
+Candidate context is at most three actual prior events, the candidate and three
+subsequent events, strictly inside the provider parent. Candidate `attacking_x`
+is the safe action end; `candidate_anchor_x` is separately the event/actor start.
+`prior_peak_x` refers to the latest safe running-record maximum through the
+candidate action, including its start, or to the last available action reference
+at a non-action event. It is explanatory context, not a forward-filled current
+ball state. Retreat/recovery fields are missing when no safe current action exists.
+The recent negative diagnostic is the most negative delta among the last three
+safe actions through the candidate. Run lengths are counts through the action.
+Time/events since peak use the latest equal peak reference. Candidate recovery is
+first later safe vertex at/above that peak, only when currently below it; recovery
+time/count starts at the candidate, unlike Phase 3A-1's peak-to-return span.
+Absence is censored, not football failure. Starting depth bands reuse Phase 3A-1.
+No event is selected because a later attack succeeds or produces a future Shot.
+
+### Figures and locked geometry support
+
+Each parent has an attacking-x trace, a compact summary and a complete timeline
+CSV. Gold diamonds/crosses distinguish safe action starts/ends; other validated
+actor/event observations are separate. Context markers and neutral candidate
+lines do not label resets. Every trace states:
+
+> Lines connect ordered event observations for review; they are not tracked trajectories.
+
+Both vertices use action-start timestamp references: endpoint arrival times and
+physical recycling duration are unavailable. The missingness strip retains every
+event. Summary fields cover duration/events/anchors/actions, first/max/last x,
+net and cumulative forward/backward components, retreat, largest negative vector,
+strict/non-positive runs, record-peak excursions/recoveries, Shot/restart/out
+context and candidate count. There is no reset score.
+
+Seventeen candidate moments receive before/exact-candidate/after pitch triptychs.
+Fifteen are distributed across the original sampling groups, taking one candidate
+per case by literal restart/Shot context, descending measured retreat, then event
+index. An additional pair shows Corner and continuing-Shot context in the first
+sorted parent meeting both descriptions. Before/after anchors are strictly nearest
+validated frames in the same parent; the exact candidate is never substituted.
+There are **37 usable panels and 14 explicitly unavailable slots**, representing
+35 distinct frames. The C12 Shot is unsupported and its middle panel stays empty.
+
+All normalized anonymous points, polygon and explicit action vectors delegate to
+locked Phase 2C helpers. Team colors, L/O labels, actor halo, keeper square and gold
+solid provider vector follow the locked style; there are no inferred trajectories,
+formations or defensive lines. Each usable panel names event/parent, team, time,
+UUID, anchor/semantic status, actor/event x and action-end retreat if available.
+
+For only those frames, `frame_geometry()` supplies the six unchanged Phase 2A
+native subset/keeper variants, including every measurement/support/status field.
+Native centroid coordinates remain unchanged; extra attacking centroids use the
+same Phase 2C transform. Literal subset flags are mapped to teams only in validated
+scope. Width/depth and distances/hull are invariant to the validated 180-degree
+rotation. D-primary retains metric status `ok` and actor status `single`/`none`;
+OOB-B availability is recorded separately using whole-original-frame OOB flags.
+Counts, visible polygon coverage/status, keeper policy, selected subset, actor,
+OOB and coincidence metadata remain attached. Outfield values are primary;
+keeper-included variants remain sensitivity/full-visible context. The observed
+outfield convex-hull footprint is secondary.
+
+These are individual-frame review diagnostics, not pooled or adjusted structural
+comparisons. All locked Phase 2B common-support obligations and metric-specific
+sensitivity rules still apply before any later headline comparison. No geometry
+change defines a boundary; no advanced spatial metric or composite is introduced.
+
+### Human annotation and next gate
+
+`phase3a2_boundary_review_sheet.csv` contains five blank human-only columns:
+`review_label`, `review_boundary_event_index`, `review_boundary_time`,
+`review_confidence`, `review_notes`. The builder refuses to overwrite an annotated
+worksheet. Neither automatic labels nor confidence estimates are generated.
+
+| Human label | Intended definition |
+| --- | --- |
+| CONTINUE | Attacking phase appears continuous despite backward/lateral movement. |
+| POSSIBLE_RESET | Evidence suggests a reset, but the case is insufficiently clear. |
+| CLEAR_RESET | Possession continues, but the prior phase appears abandoned/reorganized before renewed progression. |
+| HARD_BOUNDARY | Football event/context supplies a very strong candidate phase termination/reset. |
+| AMBIGUOUS | Available event/spatial evidence does not support confident judgment. |
+
+Confidence is 1 low, 2 moderate or 3 high, left blank. These are human calibration
+labels, not model targets yet. Notebook 07 and the ignored static HTML pack explain
+all conventions and expose every case. Full regeneration fetches each of nine
+matches once; `--render-only` uses saved derived CSVs offline. Initial visual QA
+added the Corner/Shot contrast pair via one bounded re-read of an already selected
+match, without rerunning the season or changing any prior diagnostic evidence.
+
+Next is **human Phase 3A-2B review**. Only after labels are supplied may Phase 3A-3
+consider calibration and a separate method lock. No review sampling criterion is
+adopted automatically. No final episodes, outcomes, ML/clustering or change-point
+method exists in this review pack. Restricted semantics, partial observation,
+unavailable endpoint timing and uncertain control inside provider possessions
+remain explicit limitations.

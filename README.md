@@ -5,8 +5,9 @@ Analyze how Bayer Leverkusen created dangerous attacking space during the unbeat
 
 **Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE, 10 September 2026.**
 **Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK — diagnostics complete.**
-The next step is Phase 3A-2 representative possession/boundary review; final
-attacking episodes and segmentation rules are not implemented.
+**Phase 3A-2A = REVIEW PACK READY — HUMAN LABELING PENDING.**
+The next step is human Phase 3A-2B review; final attacking episodes and
+segmentation rules are not implemented.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -447,3 +448,36 @@ literal provider termination context, candidate prevalence/overlap sweeps, a
 No reset setting is selected. Phase 3A-2 review precedes Phase 3A-3 segmentation
 calibration and method lock. See [methods section 41](docs/methods_specification.md#41-phase-3a-1-progression-and-reset-diagnostics)
 and the [measured findings](report/technical_appendix.md#phase-3a-1-progression-and-reset-diagnostics--10-september-2026).
+
+
+## Phase 3A-2A human review pack
+
+**Phase 3A-2A = REVIEW PACK READY ? HUMAN LABELING PENDING.** Phase 3A-1
+remains **DIAGNOSTIC / NOT A METHOD LOCK**; Phase 3A is not complete.
+
+Open [07_boundary_review.ipynb](notebooks/07_boundary_review.ipynb) or the generated
+[static review pack](outputs/review/phase3a2_boundary_review.html). The pack contains
+28 possessions (all 26 earlier representatives plus two), 181 neutral candidate
+review moments, 28 complete timelines and progression figures, and 17 spatial
+triptychs. All 25 requested case categories have descriptive examples. The 51
+snapshot slots contain 37 validated panels and 14 explicit unavailable states.
+
+Annotate [phase3a2_boundary_review_sheet.csv](outputs/diagnostics/phase3a2_boundary_review_sheet.csv)
+manually. All five human fields are blank, including confidence. Use the manifest's
+`review_order` for the intended reading order; case IDs remain stable. No boundary
+labels, segmentation rule/threshold, outcome or model was introduced. Numeric
+screens are review sampling criteria only. Geometry is corroborative evidence;
+missing spatial observations and endpoint arrival times remain unresolved.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/boundary_review.py
+# Offline rendering from existing derived review CSVs:
+.\.venv\Scripts\python.exe scripts/boundary_review.py --render-only
+```
+
+The builder reuses Phase 3A-1 evidence and audits only the nine representative
+matches, fetching pinned events/360 once per match in a normal build. It writes
+only derived `phase3a2_` outputs and refuses to overwrite human annotations. The
+notebook reads derived outputs offline. Next: **human Phase 3A-2B review**, then
+separately authorized Phase 3A-3 calibration and method lock after labels exist.
+See [methods section 42](docs/methods_specification.md#42-phase-3a-2a-representative-possession--boundary-review-pack).

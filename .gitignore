@@ -32,6 +32,7 @@ dist/
 outputs/diagnostics/*
 outputs/figures/*
 outputs/tables/*
+outputs/review/*
 !outputs/diagnostics/.gitkeep
 !outputs/figures/.gitkeep
 !outputs/tables/.gitkeep

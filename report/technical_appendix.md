@@ -2090,3 +2090,87 @@ code, readiness logic, metric registry and Phase 2B calibration matrix. Methods
 sections 37–40 were also verified unchanged. The new pipeline retrieves raw data
 only in memory and writes only derived `phase3a1_` artifacts; the Phase 2C source
 and membership totals remain exactly reconciled.
+
+
+## Phase 3A-2A ? representative possession / boundary review pack
+
+**10 September 2026: Phase 3A-2A = REVIEW PACK READY ? HUMAN LABELING PENDING.**
+Phase 3A-1 remains DIAGNOSTIC / NOT A METHOD LOCK. This packet prepares human
+judgment and does not decide any boundary or complete Phase 3A.
+
+The deterministic 100-parent bounded pool yields **28 possessions**, reusing all
+26 Phase 3A-1 representatives and adding 3895052/1/17 and 3895052/1/23. Nine match
+resources receive the existing complete-match semantic audit at the unchanged
+pinned revision. Counts for every pool parent reconcile with Phase 3A-1; no
+full-season calculation was rerun. The selected timelines retain **1,960 full
+context events, 1,061 validated anchors and 898 safe Pass/Carry vectors**.
+
+The pack contains **181 neutral candidate review moments** across 26 cases; C01
+and C28 have zero candidates. Candidate reasons explicitly record review sampling
+criteria, including weak sign turns and multiple Phase 3A-1 sweep settings.
+All 25 requested categories have descriptive examples, including ordinary
+circulation C19 and the C20 nonnegative-vector/discontinuous-path contrast.
+This is purposive coverage, not a prevalence sample or a boundary classifier.
+
+| Artifact | Count / content |
+| --- | --- |
+| Manifest | 28 cases, stable IDs and separate intentional review order |
+| Complete individual timelines | 28 CSVs, plus combined timeline |
+| Attacking-x progression traces | 28 PNGs with observation-order caption |
+| Candidate worksheet | 181 rows; all five human fields blank |
+| Bounded context | At most three prior/subsequent actual events per candidate |
+| Spatial triptychs | 17 candidate moments / 51 slots |
+| Validated spatial panels | 37: 11 before, 14 exact candidate, 12 after |
+| Explicitly unavailable slots | 14: 6 before, 3 exact candidate, 5 after |
+| Distinct rendered frames | 35; repeated appearances retain slot identity |
+| Geometry | Six native subset/keeper variants per usable slot, 222 rows |
+| Case-category coverage | All 25 categories; criteria and pool/selected counts |
+| Inspection entry points | Notebook 07 and ignored static HTML review pack |
+
+Literal restart coverage is **3 Corner, 5 Free Kick, 2 Throw-in, 1 Goal Kick and
+1 Kick Off parent**. Seven cases contain `out=True`. Corner-seeded x=120 and its
+full retreat values remain visible, without suppression or automatic episode
+classification. The added C12 Corner/Shot panel pair supplies an explicit contrast.
+
+Nine cases contain a Shot; **C10, C12, C15 and C17** have later own-team actions
+inside the same provider parent. C12 (3895292/2/109) shows Shot ? Goal Keeper ?
+Clearance ? Leverkusen Pass/Carry. Its exact Shot spatial state is unsupported,
+so that candidate slot is empty and the next validated Pass is shown only in the
+after panel. C15 shows Block/Goal Keeper/Clearance and a subsequent Leverkusen
+Pass. C10/C17 include substantial opponent event context before later Leverkusen
+actions; same-parent membership does not certify uninterrupted control. Shot is
+not automatically an episode end; no Shot outcome, goal or xG selected the cases.
+
+Case C19 is the ordinary circulation example; C20 isolates a coordinate-jump
+ambiguity; C27/C28 preserve sparse/administrative context. Advanced versus deeper
+record-peak origins are sampled with a shared 20?40 retreat band, without defining
+tactical zones or reset magnitude. All category flags remain descriptive; no
+CONTINUE, POSSIBLE_RESET, CLEAR_RESET, HARD_BOUNDARY or AMBIGUOUS label is applied.
+Confidence remains blank (human scale 1 low / 2 moderate / 3 high).
+
+The complete methodology, field references, criteria and label definitions are in
+methods section 42. The worksheet is
+`outputs/diagnostics/phase3a2_boundary_review_sheet.csv`; the manifest and HTML
+are `outputs/diagnostics/phase3a2_review_manifest.csv` and
+`outputs/review/phase3a2_boundary_review.html`. All generated CSVs retain source
+revision. Existing raw data and locked code/configuration remain unchanged.
+
+Verification: **341 offline tests passed; two optional network tests deselected**.
+Fifteen focused tests cover deterministic selection, complete context retention,
+blank annotation protection, parent-bounded context/snapshots, safe coordinates,
+unsupported/missing states, restart and Shot context, exact observed timing,
+geometry support, no interpolation/ML dependencies and raw-input immutability.
+The complete suite, Ruff and diff whitespace checks passed. All 13 notebook code
+cells executed and the notebook passed schema validation. Visual QA inspected
+forward, long, Corner, Shot and unsupported-state presentations. SHA-256 checks
+confirmed all 207 protected files unchanged, and the entire original methods
+document remains an unchanged prefix. All 222 geometry variant rows reconcile
+with the preserved Phase 2A metric values, statuses and support fields at their
+original frame indices (numeric comparison tolerance 1e-12 for CSV round trips).
+
+Remaining limitations: partial restricted spatial observations, endpoint arrival
+times unavailable, purposive sampling, action-subsequence discontinuities,
+uncertain provider-possession control, and no common-support-adjusted geometry
+comparison. The next step is **human Phase 3A-2B review**, followed by separately
+reviewed Phase 3A-3 calibration after human labels exist. No segmentation rule,
+threshold, final episode, outcome, model or clustering method was introduced.
