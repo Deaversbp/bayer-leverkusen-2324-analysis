@@ -1542,3 +1542,182 @@ data, source revision and raw-loading behavior are unchanged. This task locks
 the documented method; it does not execute a later research comparison or select
 an adjustment/weighting scheme. Historical candidate helpers remain diagnostic
 evaluators, not a production eligibility pipeline.
+
+## 38. Phase 2C team/role semantics and attacking orientation
+
+**9 September 2026 — VALIDATED PARTIALLY — NOT LOCKED.** This additional semantic
+layer does not change the Phase 2A native measurements or the locked Phase 2B
+D-primary, keeper, observation-quality or sensitivity contracts. Semantic
+unsupported status is not a new geometry validity filter. No sequence, tactical
+or outcome implementation is authorized by this audit.
+
+### Evidence and provenance
+
+The audit uses the existing loader at immutable revision
+`533862946a73608c134d18b78226b6371ce7173c`: all 34 Leverkusen matches, 137,765
+events and 118,581 uniquely linked 360 frames. Events, frames and lineups are
+read in memory; only aggregate tables, a bounded representative manifest and
+rendered figures are written. Mutable branch documentation is not a source.
+
+The pinned [360 specification, pages 1–2](https://github.com/hudl/open-data/blob/533862946a73608c134d18b78226b6371ce7173c/doc/Open%20Data%20360%20Frames%20v1.0.0%20%281%29.pdf)
+defines teammate relative to the actor's team, and location in the linked
+event's actor-team attacking direction, 0 to 120. The pinned
+[event specification, pages 6 and 23](https://github.com/hudl/open-data/blob/533862946a73608c134d18b78226b6371ce7173c/doc/Open%20Data%20Events%20v4.0.0.pdf)
+defines possession team as the team starting the possession; other teams may
+have events within it. Its coordinate diagram has x increasing rightward and
+y increasing downward. These are intended provider semantics, tested against
+the observed sample rather than accepted as universal record-level guarantees.
+
+All 118,585 actor records have literal `teammate=True`; four frames contain
+multiple actors. All checked named event actors belong to their event-team
+lineup. Ordinary 360 points lack named identity: actor flags and lineup checks
+cannot independently verify every off-ball team assignment. The named shot
+freeze-frame cross-check is supporting evidence only: proximity is not identity.
+
+Provider `related_events` gives 174,952 directed edges to other known events;
+36,250 share an exactly equal native coordinate/keeper multiset. Of those,
+35,615 have the expected team labels (unchanged for same event team, inverted
+for opposite event teams), but 635 do not. Edges are directed, not counts of
+independent pairs or frames; reciprocal links can count twice. Exact cloud
+reuse is evidence of paired observations, not inferred cross-time identity.
+Both endpoints of any observed contradiction are quarantined from operational
+semantic mapping, including incoming nonreciprocal links. This evidence rules
+out a universal observed teammate-to-event-team guarantee. It does not identify
+which endpoint is wrong or authorize correcting it.
+
+### Event team, possession and role language
+
+Event team equals possession team in **99,999 frames** and differs in **18,582
+(15.6703%)**. Neither field is missing in this pinned sample. The breakdown by
+exact provider event type is `phase2c_event_vs_possession_team.csv`. Opponent
+events within a Leverkusen possession remain opponent events. Possession team
+is a possession annotation, not proof of the team's control at every instant.
+
+`team_context()` preserves event/possession IDs and names independently and
+returns `event_team_is_leverkusen`, `possession_team_is_leverkusen`, explicit
+agreement/missing status, and these descriptive contexts:
+
+| Context | Required literal team fields |
+| --- | --- |
+| Leverkusen event in Leverkusen possession | Both IDs are 904 |
+| Opponent event in Leverkusen possession | Event belongs to other match team; possession ID 904 |
+| Leverkusen event in opponent possession | Event ID 904; possession belongs to other match team |
+| Opponent possession context | Both IDs belong to the other match team |
+| Ambiguous possession context | Missing/invalid team or possession anchor |
+
+Later “Leverkusen attacking context” may use **Leverkusen possession-team
+annotation** as its candidate unit, keeping both its own and opponent events
+distinguishable. This is not a possession boundary algorithm, sequence-inclusion
+decision or instantaneous attacking-role assignment. `teammate=False` means
+the other team only in validated scope; it must not universally mean “defending
+team”: Pressure, for example, can be performed by the non-possession team.
+No inferred defender roles, formations, tactical lines or identities are emitted.
+
+### Orientation hypotheses and the Phase 1B reconciliation
+
+| Hypothesis | Evidence and decision |
+| --- | --- |
+| H1: fixed-pitch/team-period flipping | Rejected as a general rule for event anchors. All 134 nonempty match/team/half shot strata have median start x at least 91.6; both teams shoot toward the same increasing-x end across halves and venues. Two of the 136 possible strata have no shots. |
+| H2: event-team +x | Supported for core event coordinates and a restricted aligned 360 subset. All 916 event shots end at x >= 92.1; 914 start above x=60; 889 are 360-linked. Pass/carry displacement distributions include both signs. Goalkeeper distributions and event/possession-disagreement contexts supply additional checks. |
+| H3: possession-team +x | Not a universal frame rule. Core events can disagree with possession team while their actor matches the event coordinate exactly and the literal teammate keeper is generally at low x. Shot evidence alone cannot distinguish H2/H3 when those team IDs agree. |
+| H4: event-type-dependent/paired semantics | Supported. Related opposite-team events can share unchanged native clouds while their labels invert; difficult event locations need not reference the frame's retained orientation. Some pairs also contradict expected flag inversion. No universal repair follows. |
+
+Pass and Carry are supporting anchors, not evidence that every action travels
+forward. “Normal pass” here means no provider `pass.type` field. The aggregate
+outputs separate all event anchors from 360-linked anchors, match/team/period,
+normal vs typed passes, event/possession agreement, start x, end x, delta x and
+visible keeper means. Keeper means describe visible observations only; no keeper
+visibility or distance threshold becomes an eligibility condition.
+
+Phase 1B direct/mirrored distances remain diagnostic ranks, not alignment truth
+or normalization gates. Shot is direct; Pass, Carry and Pressure are predominantly
+direct. Dribbled Past is entirely mirrored in this sample; Dispossessed and
+Foul Won are overwhelmingly mirrored. Duel, 50/50, Ball Receipt* and Dribble
+are mixed. Equal-cloud related-event evidence supports reuse of paired/opponent
+coordinates as an explanation for part of this pattern. It does not prove every
+case, explain every mixed type, or permit historical coordinate changes.
+
+### Conditional semantic scope and additional coordinates
+
+`frame_semantics()` returns `validated_core_event_team_scope` only if all hold:
+
+1. Exact pinned revision; unique audited event/frame join and two distinct known
+   match teams including Leverkusen; the event team is one of those teams.
+2. Exact event type is Shot, Pass, Carry or Pressure. Whole event types are **not**
+   declared safe: the remaining gates apply to each frame.
+3. The complete match's incoming and outgoing provider links have been audited
+   and no exact-native-cloud team-label contradiction touches the frame. A
+   missing audit assertion is unsupported, not equivalent to no conflict.
+4. All supplied points have finite valid coordinate pairs and literal boolean
+   actor/team/keeper flags; exactly one actor exists and its teammate flag is True.
+5. Actor coordinates equal either the supplied event coordinate pair exactly or
+   its exact float32 encoding. This encoding fingerprint is not a distance
+   tolerance, coordinate rounding/repair, or proof of named point identity.
+
+The restricted scope combines intended provider semantics, primary/supporting
+anchors, observed encoding alignment and absence of known linked contradiction.
+It is a conservative operational validation, **not independent verification of
+every anonymous point** or an estimate of unseen label error. Other event types
+remain unsupported even when their actor is direct. Exact alignment alone does
+not promote a type; absence of a related link does not verify its neighbors.
+
+Within that scope, `point_team_label()` maps literal True to event team and False
+to the other match team. Thus True/False are Leverkusen/opponent for a Leverkusen
+event, and opponent/Leverkusen for an opponent event. It returns `team_id`,
+`frame_player_side`, `is_leverkusen` and `is_opponent`, without named identity.
+Unsupported flags/scope/teams return unresolved and missing semantic fields.
+
+`normalize_attacking_point()` preserves `x_raw,y_raw` and supplies
+`x_attacking,y_attacking,orientation_status,orientation_basis`. The caller must
+name both the validated event-team reference and the desired attacking target:
+
+| Reference versus target team | Additional coordinates | Status |
+| --- | --- | --- |
+| Same team | `(x, y)` | `identity_explicit` |
+| Other match team | `(120-x, 80-y)` | `rotated_180` |
+| Unsupported semantics/reference | Missing normalized coordinates | `unsupported` |
+| Invalid supplied location | Missing coordinates | `invalid_location` |
+
+Native core coordinates already have the event team attacking +x. The figures
+choose Leverkusen as target, so its events are explicit identity and opponent
+events rotate 180 degrees. Neither half nor home/away enters this rule. Rotation
+of both axes preserves handedness (determinant +1), distances and hull area;
+x-only reflection would reverse handedness. Y still increases down the displayed
+pitch. Left/right interpretation requires a named attacking frame, not fixed
+stadium-side inference. Polygon vertices and action ends use the same transform.
+Finite OOB points remain OOB; raw data and Phase 2A geometry are never overwritten.
+
+In validated scope “forward” is an increasing-x displacement for the named
+attacking reference. “Toward the attacking end” is axial direction, not guaranteed
+decreasing distance to goal, ball control, danger or tactical success. No such
+language is attached to unsupported observations.
+
+### Review, style and remaining method gate
+
+`phase2c_event_semantics.csv` records per-type counts, direct/mirrored rates,
+agreement, conditional scope counts, excluded counts and reasons. Supporting
+tables retain every exact event type, including small samples. Representative
+selection is deterministic: first sorted match/supplied frame for team/half/core
+action strata, away-pass strata, each difficult type, one linked conflict and
+nonexact core examples. It is not an effectiveness or prevalence sample.
+Native/normalized figures show the supplied polygon, points, actor, keeper and
+explicit event vector; unsupported normalized panels remain empty.
+
+The [visualization guide](visualization_style_guide.md) establishes red Leverkusen,
+charcoal opponent, gold action, subdued polygon, keeper square, outfield circle,
+actor halo and redundant L/O text **within the conditional validated scope**.
+Unrestricted application remains blocked. Solid arrows mean provider-recorded
+action vectors; dashed arrows are reserved for future event-to-event progression
+indicators. Neither is a continuously tracked trajectory.
+
+**Lock questions A–G:** C (team versus possession) is answered for the full
+sample. D/E (orientation/transform) and B/G (point mapping/football plotting) are
+supported only within the explicit scope. A is intended actor-team semantics
+with observed contradictions, not a universal guarantee. F provides a reviewable
+conditional/unsafe classification; difficult types remain materially unresolved.
+The exact blockers are team-label contradictions on reused related clouds,
+unresolved orientation/actor association in mixed and paired event types, and
+lack of independent named identity for ordinary off-ball points. A provider-backed
+resolution or a separately justified restricted research population is needed
+before a full method lock. **Do not begin reliable sequence construction,
+tactical interpretation or outcome analysis on the full sample.**

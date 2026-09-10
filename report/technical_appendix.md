@@ -1277,3 +1277,156 @@ missing/tiny coverage, OOB flags, polygon inconsistency and zero edge distance
 remained eligible when their metric/actor statuses permitted; their inputs were
 unchanged. No runtime helper or measurement code was modified. `git diff --check`
 passed. The visibility YAML edit changes explanatory comments only.
+
+## Phase 2C semantic and orientation audit — 9 September 2026
+
+**VALIDATED PARTIALLY — NOT LOCKED.** The complete audit ran against revision
+`533862946a73608c134d18b78226b6371ce7173c` using the unchanged loader. All 34
+matches, 137,765 events, 118,581 frames and both team lineups per match were
+inspected. There were no duplicate event/frame IDs or orphan frames. The method
+and pinned provider documentation are in
+[section 38](../docs/methods_specification.md#38-phase-2c-teamrole-semantics-and-attacking-orientation).
+
+### Team semantics and possession
+
+All **118,585 actor records** have literal teammate True; four frames have
+multiple actors. No valid observed point has an unknown teammate flag. All
+checked named event actors are in their event-team lineup. This supports intended
+actor-team semantics without independently identifying anonymous off-ball points.
+
+Of **174,952 directed related-event edges**, **36,250** have identical native
+coordinate/keeper multisets. Expected team-label agreement holds on **35,615**;
+**635** edges contradict it. These touch **642 distinct frames**, counting
+both incoming and outgoing links. A directed edge count is not a unique pair
+or frame count. For example, opposite-team Clearance → Duel has 209 equal-cloud
+edges, of which 207 fail expected label inversion. There are also contradictions
+touching core types; the audit does not declare either endpoint correct.
+
+The independent named shot freeze-frame dataset supplies **13,157** point
+records, all in the expected team lineup. Nearest 360 point flags agree for
+**11,855 (90.104%)**; nearest distance median is **0.980** units, p95 **3.091**,
+maximum **43.126**. One nearest-point tie occurs. This is a proximity check,
+not a point-identity match, and its disagreements do not establish an error rate
+for 360 team labels. Coverage, coincident points and separately supplied positions
+limit the comparison; no nearest-player identity is assigned or persisted.
+
+Event/possession team IDs agree in **99,999** frames and differ in **18,582
+(15.6703%)**, with neither missing. Selected exact-type breakdown:
+
+| Event type | Same team | Different team |
+| --- | ---: | ---: |
+| Pass | 31,657 | 1,415 |
+| Carry | 27,698 | 1,043 |
+| Shot | 874 | 15 |
+| Pressure | 1,210 | 8,870 |
+| Dribbled Past | 27 | 419 |
+| Dispossessed | 528 | 114 |
+| Foul Won | 525 | 105 |
+| Duel | 814 | 925 |
+| 50/50 | 93 | 87 |
+| Ball Receipt* | 32,121 | 1,277 |
+
+### Orientation evidence and exceptions
+
+All **916 event shots** have valid end x, ranging **92.1–120**; 391 end exactly
+at 120. Starts range **57.7–118.8**, with 914 above x=60. Every one of **134
+nonempty match/team/period strata** has median start x at least 91.6. Two
+possible team/half strata have no shots. Both teams and halves share the same
+attacking end in event coordinates; fixed-pitch period flipping is unsupported.
+The linked subset has **889 shots**, all direct in the actor-distance diagnostic.
+
+Normal passes (no provider pass.type) have both positive and negative delta x:
+20,189 positive and 13,180 negative among 33,689 valid all-event vectors. Carries
+likewise have 17,312 positive and 9,496 negative among 32,369 vectors. Zero-dx
+events account for the remainder. These are supporting distributions, not a
+definition that passes or carries are inherently forward.
+
+Pressure distinguishes event versus possession references particularly well:
+among **8,870 differing-team frames**, **8,869** actors match the event start
+exactly as supplied or after exact float32 encoding; one does not. The visible
+literal teammate keeper mean-x median is **3.659** (2,271 frames with such a
+keeper), versus **114.902** for literal non-teammate keepers (1,443 frames).
+This supports event-team rather than universal possession-team coordinates;
+visible-keeper exceptions remain in the distributions. Shots alone would not
+distinguish these hypotheses where team IDs agree.
+
+Phase 1B patterns recur: Dribbled Past **100% mirrored**, Dispossessed **97.348%**,
+Foul Won **96.825%**; Duel **44.508% mirrored**, 50/50 **50%**, Ball Receipt*
+**11.555%**, Dribble **41.915%**. Pass is **99.906% direct**, with exact ties;
+Carry **99.732%**, Pressure **99.990%**. Rates use frames with comparable single
+actor distances, not all records. Unchanged exact related clouds support paired
+reuse for some opposite-team events; they do not establish a correction for
+every observation. Direct-versus-mirrored rank never selects a normalization.
+
+### Conditional implementation and visual review
+
+The source/type/join/known-flag/single-actor/exact-encoding/no-linked-conflict
+gates yield:
+
+| Type | All linked frames | Validated conditional scope | Unsupported |
+| --- | ---: | ---: | ---: |
+| Pass | 33,072 | 32,999 | 73 |
+| Carry | 28,741 | 28,648 | 93 |
+| Pressure | 10,080 | 10,076 | 4 |
+| Shot | 889 | 873 | 16 |
+| All other types | 45,799 | 0 | 45,799 |
+| Total | 118,581 | **72,596** | **45,985** |
+
+Among the 186 unsupported core frames, first-failure reasons are 83 linked-team
+conflicts, 101 nonexact actor encodings and two unresolved actor statuses.
+Reasons are ordered and need not be independent. The 642 conflict-frame count
+includes non-core types and is reported separately rather than hidden by the
+first-failure status. The four-type scope is a conservative additional semantic
+restriction, not a replacement for the Phase 2B geometry sample.
+
+Within it, **1,200,432 anonymous point records** can receive conditional
+Leverkusen/opponent labels. There are **43,781 identity frames** and **28,815
+180-degree frames** when Leverkusen is the target. Arithmetic validation covers
+**1,273,028 locations** (those points plus event starts); maximum round-trip
+absolute error is **7.106e-15** units, with zero for identity. This is numerical
+precision, not a calibrated spatial tolerance or evidence for an ambiguous
+frame. Synthetic non-collinear examples verify both-axis rotation, handedness,
+pairwise-distance and hull-area invariance, including OOB coordinates.
+
+**27 deterministic native/normalized figures** cover both teams, both halves,
+home/away matches, Shot/Pass/Carry, Pressure and seven difficult types, an
+equal-cloud conflict and nonexact core actors. They are review examples rather
+than a random prevalence sample. Identity and rotated examples preserve team
+labels and rotate the polygon, actor, points and event vector consistently;
+unsupported examples show literal T/F native markers and an explicitly empty
+normalized panel. Representative inspection includes a second-half identity
+pass, an opponent shot rotated through both axes, and Dispossessed with distant
+native event/actor locations. No visual inspection assigns named point identity.
+
+The [style guide](../docs/visualization_style_guide.md) and centralized constants
+establish a conditional convention: Leverkusen red `#B51232`, opponent charcoal
+`#30343B`, action gold `#A65F00`, L/O text, keeper squares, outfield circles and
+actor halos. Solid recorded-action vectors and reserved dashed event-transition
+indicators have distinct meanings. Unrestricted football-facing use is not locked.
+
+### Reproduction, validation and readiness
+
+`scripts/semantics_orientation.py` writes 14 aggregate/manifest CSVs prefixed
+`phase2c_` and the 27 figures; it never persists raw JSON or a full duplicate
+frame table. Source SHA is included in every CSV; run summary includes retrieval
+completion UTC and the match inventory records denominators. The new
+`04_semantics_orientation.ipynb` reads these outputs offline and checks source
+and count consistency. `--figures-only` can refresh styling from the existing
+audit manifest without recomputing season semantics; a changed semantic rule
+requires the complete audit.
+
+Offline verification: **268 tests passed**, two optional network tests
+deselected; `ruff check .` and `git diff --check` passed. All 13 protected-file
+SHA-256 hashes remain unchanged: nine Phase 2A CSVs, geometry implementation,
+loader, source foundation and project/source configuration. The old geometry
+and defensive-structure notebooks, registry formulas, visibility configuration
+and locked Phase 2B matrix are untouched. The new notebook executed all nine
+code cells successfully and passed notebook schema/output validation.
+
+The remaining blockers are concrete: conflicting labels on reused clouds;
+unresolved frame reference and actor association for mixed/paired types; and no
+independent ordinary off-ball identity with which to settle all exceptions.
+Provider clarification or an explicitly justified restricted research scope
+must resolve the relevant gate. **Full-sample reliable sequence construction
+is not ready to begin.** No possessions, transitions, tactical zones, outcomes,
+clustering, tracking or causal claims were implemented.
