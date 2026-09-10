@@ -19,7 +19,10 @@ from leverkusen.data.semantic_diagnostics import (
     related_conflict_ids,
     related_evidence,
 )
-from leverkusen.spatial.orientation import VALIDATED, frame_semantics
+from leverkusen.spatial.orientation import PHASE2C_STATUS, VALIDATED, frame_semantics
+
+# Recorded 10 September 2026 run, not expectations for another data release.
+LOCKED_RECONCILIATION_REVISION = "533862946a73608c134d18b78226b6371ce7173c"
 
 KEY = ["match_id", "period", "possession_id", "possession_team_id"]
 LEVELS = (1, 2, 3, 4, 5, 6, 8, 10)
@@ -552,6 +555,29 @@ def summarize_readiness(possessions, gaps, stream, matches):
     return tables
 
 
+def validate_locked_reconciliation(
+    source_revision, full_season_totals, possession_totals
+):
+    """Check recorded audit counts, independently of semantic membership gates.
+
+    Full season: events, linked, validated, unsupported frames.
+    Leverkusen possessions: groups, events, linked, validated, unsupported frames.
+    Different releases require their own review; this is not a universal fixture.
+    """
+    if source_revision != LOCKED_RECONCILIATION_REVISION:
+        raise ValueError(
+            "Locked reconciliation applies only to its recorded source revision"
+        )
+    if tuple(full_season_totals) != (137765, 118581, 72596, 45985):
+        raise ValueError(
+            f"Phase 2C source/scope reconciliation failed: {full_season_totals}"
+        )
+    if tuple(possession_totals) != (2888, 86025, 74647, 46143, 28504):
+        raise ValueError(
+            f"Phase 2C-2 possession reconciliation failed: {possession_totals}"
+        )
+
+
 def run_readiness(output_dir, progress=print):
     """Read pinned events/frames once per match, persist only derived diagnostics."""
     matches = sorted(
@@ -605,10 +631,19 @@ def run_readiness(output_dir, progress=print):
             "all_unsupported_frames",
         )
     )
-    if totals != (137765, 118581, 72596, 45985):
-        raise ValueError(f"Phase 2C source/scope reconciliation failed: {totals}")
     stream = pd.concat(streams, ignore_index=True)
     p, gaps = possession_inventory(stream), anchor_gaps(stream)
+    validate_locked_reconciliation(
+        loader.STATSBOMB_REVISION,
+        totals,
+        (
+            len(p),
+            len(stream),
+            int(stream.linked_360.sum()),
+            int(stream.validated_anchor.sum()),
+            int((stream.linked_360 & ~stream.validated_anchor).sum()),
+        ),
+    )
     if len(gaps) != int((p.validated_spatial_anchor_count - 1).clip(lower=0).sum()):
         raise ValueError("Anchor pair reconciliation failed")
     tables = summarize_readiness(p, gaps, stream, matches)
@@ -631,7 +666,7 @@ def run_readiness(output_dir, progress=print):
                 "python_version": __import__("platform").python_version(),
                 "pandas_version": pd.__version__,
                 "numpy_version": np.__version__,
-                "phase2c_status": "VALIDATED PARTIALLY — NOT LOCKED",
+                "phase2c_status": PHASE2C_STATUS,
                 "box_entry_inventory": "skipped: full event-location semantics and entry/completion rules remain unresolved",
                 "shot_ending_convention": "literal final recorded event only; final meaningful event not defined",
             }

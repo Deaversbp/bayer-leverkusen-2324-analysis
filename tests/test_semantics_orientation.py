@@ -14,12 +14,18 @@ from leverkusen.data.semantic_diagnostics import (
     team_context,
 )
 from leverkusen.spatial.orientation import (
+    PHASE2C_STATUS,
     VALIDATED,
     frame_semantics,
     normalize_attacking_point,
     point_team_label,
 )
 from leverkusen.visualization import style
+
+
+def test_approved_status_does_not_expand_the_authoritative_frame_scope():
+    assert PHASE2C_STATUS == "LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE"
+    assert VALIDATED == "validated_core_event_team_scope"
 
 
 @pytest.fixture

@@ -14,6 +14,7 @@ from leverkusen.sequences.readiness import (
     representative_possessions,
     summarize_readiness,
     temporal_windows,
+    validate_locked_reconciliation,
 )
 from leverkusen.spatial.orientation import VALIDATED
 
@@ -315,3 +316,35 @@ def test_representatives_are_deterministic_unique_and_keep_full_timelines(exampl
     for key, group in timeline.groupby(KEY):
         expected = stream.set_index(KEY).loc[[key]]
         assert len(group) == len(expected)
+
+
+def test_locked_run_reconciliation_accepts_recorded_revision_and_both_populations():
+    validate_locked_reconciliation(
+        "533862946a73608c134d18b78226b6371ce7173c",
+        (137765, 118581, 72596, 45985),
+        (2888, 86025, 74647, 46143, 28504),
+    )
+
+
+@pytest.mark.parametrize(
+    "population,index",
+    [
+        *(("season", i) for i in range(4)),
+        *(("possession", i) for i in range(5)),
+    ],
+)
+def test_locked_run_reconciliation_rejects_any_count_drift(population, index):
+    season = [137765, 118581, 72596, 45985]
+    possession = [2888, 86025, 74647, 46143, 28504]
+    (season if population == "season" else possession)[index] += 1
+    with pytest.raises(ValueError, match="reconciliation failed"):
+        validate_locked_reconciliation(STATSBOMB_REVISION, season, possession)
+
+
+def test_locked_run_counts_are_not_a_universal_other_revision_fixture():
+    with pytest.raises(ValueError, match="recorded source revision"):
+        validate_locked_reconciliation(
+            "0" * 40,
+            (137765, 118581, 72596, 45985),
+            (2888, 86025, 74647, 46143, 28504),
+        )

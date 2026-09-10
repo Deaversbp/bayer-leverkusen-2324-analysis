@@ -47,9 +47,13 @@ REQUIRES METHOD-SPECIFIC JUSTIFICATION**, not mandatory phases. They must meet t
 five admission conditions in [methods section 37](methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope).
 Tracking-dependent methods already rejected remain rejected for faithful reproduction.
 
-**Phase 2B = LOCKED / COMPLETE.** Tactical spatial interpretation remains blocked
-until **team/role semantics and attacking orientation** are validated. Then
-prioritize reliable possessions, spatial-state sequences, descriptive changes,
+**Phase 2B = LOCKED / COMPLETE. Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC
+SCOPE (10 September 2026).** [The human-approved boundary](methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock)
+authorizes **Phase 3 — Possession and Spatial-Sequence Method Design** for
+validated spatial-anchor sequence analysis. Full event context, validated states
+and Phase 2B measurement support remain distinct layers. Tactical spatial
+interpretation still requires later method/outcome decisions. Then prioritize
+reliable possessions, spatial-state sequences, descriptive changes,
 success/failure definitions, comparisons preceding box entries/shots/future xG,
 and recurring interpretable mechanisms. No adjustment, weighting or downstream
 method is selected here. This pre-analysis scope clarification preserves the

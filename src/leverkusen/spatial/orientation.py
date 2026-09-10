@@ -16,6 +16,8 @@ from leverkusen.data.semantic_diagnostics import (
 from leverkusen.spatial.geometry import valid_point
 
 VALIDATED = "validated_core_event_team_scope"
+# Human approval metadata only; frame membership remains defined below.
+PHASE2C_STATUS = "LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE"
 
 
 def frame_semantics(event, frame, match, *, source_revision, related_team_conflict):

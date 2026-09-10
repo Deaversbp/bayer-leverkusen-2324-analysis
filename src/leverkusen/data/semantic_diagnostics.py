@@ -582,7 +582,9 @@ def semantic_decision_summaries(table, type_summary):
             else "exclude_from_orientation_inference"
         )
     )
-    classification["later_sequence_use"] = "not_implemented; phase2c_gate_not_locked"
+    classification["later_sequence_use"] = (
+        "not_implemented; phase3_method_design_authorized_for_validated_scope_only"
+    )
     classification["notes"] = classification.event_type.map(
         lambda t: (
             "Only exact actor encoding, one actor, known flags, audited no related-cloud conflict; not whole event type"

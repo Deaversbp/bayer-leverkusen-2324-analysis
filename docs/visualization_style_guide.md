@@ -1,11 +1,15 @@
 # Semantic visualization convention — Phase 2C
 
-**9 September 2026: conditional convention established for the validated core
-scope; unrestricted football-facing application is NOT LOCKED.** The overall
-Phase 2C gate is **VALIDATED PARTIALLY — NOT LOCKED**. Apply these team colors
+**10 September 2026: LOCKED within the approved restricted semantic scope.**
+Phase 2C = **LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE**, following human
+approval in [methods section 40](methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock).
+The convention was established conditionally on 9 September while Phase 2C was
+VALIDATED PARTIALLY — NOT LOCKED; that historical finding remains unchanged.
+Unrestricted football-facing application is not authorized. Apply these team colors
 only when `semantics_status = validated_core_event_team_scope`, as defined in
 [methods section 38](methods_specification.md#38-phase-2c-teamrole-semantics-and-attacking-orientation).
-An event type alone is not sufficient. The convention does not resolve the
+An event type alone is not sufficient. Unsupported frames retain unresolved
+labels and cannot receive Leverkusen/opponent semantic colors. The convention does not resolve the
 remaining frame semantics or authorize tactical interpretation.
 
 The executable source of plotting constants is
@@ -50,6 +54,9 @@ team, possession team, period, match, event ID, semantic/orientation status and
 pinned source. Points remain anonymous observations in a single event frame.
 
 ## Arrow contract
+
+The following arrow semantics are locked within the approved scope. No sequence
+plotting implementation or inferred movement is authorized by this convention.
 
 **Solid arrow (`PROVIDER_ACTION_ARROW`) = recorded action vector.** Draw only
 when the provider gives a valid event start and end, e.g. pass, carry or shot

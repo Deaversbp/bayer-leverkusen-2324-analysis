@@ -7,7 +7,7 @@ import pandas as pd
 
 from leverkusen.data import loader
 from leverkusen.data.semantic_diagnostics import inspect_event, run_semantic_diagnostics
-from leverkusen.spatial.orientation import frame_semantics
+from leverkusen.spatial.orientation import PHASE2C_STATUS, frame_semantics
 from leverkusen.visualization.semantics_orientation import write_representatives
 
 
@@ -69,7 +69,7 @@ def main():
     )
     print(summaries["normalization_validation"].to_string(index=False))
     print(
-        f"Wrote {len(manifest)} representative native/normalized figures. Phase 2C: VALIDATED PARTIALLY - NOT LOCKED."
+        f"Wrote {len(manifest)} representative native/normalized figures. Phase 2C: {PHASE2C_STATUS}."
     )
     return table, representatives, summaries
 

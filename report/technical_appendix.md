@@ -10,7 +10,12 @@ Historical checks below retain their original phase-specific scope. **Phase 2B
 = LOCKED / COMPLETE**, following human approval on **9 September 2026**. The
 final decision section supersedes earlier proposed/pending calibration wording;
 candidate data and historical empirical conclusions remain unchanged. See
-`docs/methods_specification.md` section 37 for the approved contract and next gate.
+`docs/methods_specification.md` section 37 for the approved Phase 2B contract.
+**Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE**, following human
+approval on **10 September 2026**. [Methods section 40](../docs/methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock)
+and the final approval record below control the current boundary and authorize
+Phase 3 possession/spatial-sequence method design. Historical audit statuses,
+findings and saved outputs retain their original chronology.
 
 ## Phase 1 migration verification
 
@@ -1280,6 +1285,9 @@ passed. The visibility YAML edit changes explanatory comments only.
 
 ## Phase 2C semantic and orientation audit — 9 September 2026
 
+*Historical initial result. The subsequent restricted-scope human approval is
+recorded at the end of this appendix; no finding below is withdrawn.*
+
 **VALIDATED PARTIALLY — NOT LOCKED.** The complete audit ran against revision
 `533862946a73608c134d18b78226b6371ce7173c` using the unchanged loader. All 34
 matches, 137,765 events, 118,581 frames and both team lineups per match were
@@ -1432,6 +1440,9 @@ is not ready to begin.** No possessions, transitions, tactical zones, outcomes,
 clustering, tracking or causal claims were implemented.
 
 ## Phase 2C-2 sequence-readiness audit — 10 September 2026
+
+*Historical readiness recommendation before human approval. The final decision
+record below supersedes its pending-lock status only.*
 
 **Readiness classification: READY — WITH RESTRICTIONS. Recommendation A:
 lock the restricted semantic scope for validated spatial-anchor sequence
@@ -1692,3 +1703,107 @@ the ECDF shows both its short-gap detail and full long-gap range. The new code
 reuses the unchanged loader and semantic gates, and the full-season scope counts
 reconcile exactly with Phase 2C. Only derived `phase2c2_` outputs are written;
 previous Phase 2A/2B outputs and locked implementation/configuration are untouched.
+
+## Phase 2C restricted-scope human approval — 10 September 2026
+
+**Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE.** Human methodological
+review approved Recommendation A for **validated spatial-anchor sequence analysis**.
+The initial result (VALIDATED PARTIALLY — NOT LOCKED) and Phase 2C-2 readiness
+result (READY — WITH RESTRICTIONS) remain historical evidence. This decision
+closes Phase 2C only for the approved population; it does not resolve all frames
+or authorize unrestricted full-sample normalization or spatial-sequence analysis.
+
+The one authoritative scope remains `validated_core_event_team_scope`, with the
+unchanged `frame_semantics()` logic. Pass, Carry, Shot and Pressure still require
+every existing frame-level gate. No type is universally safe, and unsupported
+types retain their classifications, related-cloud contradictions and orientation
+uncertainty. No named identity is assigned to ordinary off-ball points.
+
+The locked-run reconciliation is specific to revision
+`533862946a73608c134d18b78226b6371ce7173c`:
+
+| Population | Possession groups | Events | Linked frames | Validated | Unsupported linked |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Full audited 34-match season | — | 137,765 | 118,581 | 72,596 | 45,985 |
+| Leverkusen provider possession/period groups | 2,888 | 86,025 | 74,647 | 46,143 | 28,504 |
+
+These are observed counts for the reviewed release, not expectations for another
+revision. Of the Leverkusen-possession anchors, 6,846 are opponent events. The
+complete event context retains its own event-team and possession-team fields;
+the latter does not establish instantaneous control or change an opponent event
+into a Leverkusen action.
+
+Within validated scope, teammate True/False maps to event team/other known match
+team. Native event-team attacking direction is increasing x. An explicit
+Leverkusen reference keeps `(x_raw,y_raw)` for Leverkusen events and uses
+`(120-x_raw,80-y_raw)` for opponent events, with `identity_explicit` and
+`rotated_180` statuses respectively. Raw coordinates remain unchanged. No half,
+home/away, possession-team or x-only flip is approved. Unsupported frames return
+unresolved labels and no trusted normalized spatial state.
+
+Unsupported events remain valid full-stream context, not invalid/deleted football
+events or data eligible for heuristic repair. No interpolation, forward fill or
+inferred spatial state is permitted. Dribbled Past, Dispossessed, Foul Won, Duel,
+50/50, Ball Receipt*, Dribble and other mixed/unsupported types need no additional
+semantic work before restricted design; revisit them only for a demonstrated
+downstream need. Pressure can supply a validated frame but is not automatically
+ball location, a Leverkusen possession action, exact defender-to-ball distance
+or a continuously observed pressure episode.
+
+Approval rests on the pre-specified readiness evidence: >=1/2/3/4/5-anchor rates
+of 93.91/88.54/84.07/78.46/73.51%, median 10 anchors, median/p90 time gaps of
+1.103/3.214 seconds across 43,431 intervals, 88.77% <=3 seconds and 95.97% <=5,
+match >=3 rates of 72.09–92.71%, and >=3/5 rates of 87.74/79.51% among 571
+Shot-containing possessions. All four anchor types occur in all 34 matches.
+These measure coverage, not tracking resolution or analytical sequence validity.
+
+The architectural lock separates complete ordered event context from the trusted
+spatial-anchor subset. Semantic validity does not replace Phase 2B eligibility:
+metric status, actor policy, goalkeeper convention, selected-player counts,
+visible-area support, OOB/coincidence flags, robustness checks and common
+observational support still govern each geometry comparison. A validated frame
+can lack a usable or comparable value for a particular metric.
+
+The visualization convention is locked only for validated frames: Leverkusen
+red, opponent charcoal, action gold, outfield circles, keeper squares, actor
+halo/outline and useful L/O labels. Unsupported frames cannot use semantic team
+colors. Solid arrows require provider action start/end coordinates; dashed arrows
+are future event-to-event progression indicators. Neither is a tracked trajectory.
+This lock implements no sequence plot or tactical interpretation.
+
+**No scientific version bump is required.** The approved restriction follows
+pre-outcome semantic validation and the planned feasibility audit. Descriptive
+Shot coverage is not an effectiveness result or a selected success/danger outcome.
+No outcome, tactical or effectiveness finding drove the population choice, and
+raw data, Phase 2A/2B methods and both research-question formulations are unchanged.
+
+**Phase 3 — Possession and Spatial-Sequence Method Design is now authorized**
+within the approved semantic population. Unsupported semantics, off-ball identity,
+continuous tracking, unrestricted normalization, sequence unit/start/end/eligibility,
+anchor/time/event-gap minima or maxima, duration/windows, spatial-state features,
+box entry, future-xG horizon, success/failure, specific common-support implementations
+and tactical mechanisms remain unresolved. These do not block the restricted
+Phase 2C completion. No sequence dataset, threshold, outcome or tactical method
+is introduced by this approval.
+
+The implementation change is limited to approval-status metadata and a
+revision-bound reconciliation guard, preserving every semantic gate. The guard
+checks the full-season and Leverkusen-possession totals before a future readiness
+run writes outputs; focused offline tests exercise count drift and wrong-revision
+rejection without network retrieval. The existing derived audit files and executed
+notebooks are preserved as historical evidence; the current approval lives here
+and in methods section 40. No live season rerun is needed for this status lock.
+
+Lock verification: **309 offline tests passed; two optional network tests
+deselected**. The 12 added tests cover approval metadata and acceptance/rejection
+of the exact revision-bound reconciliation, including drift in any of the nine
+population counts. `python -m ruff check .` and `git diff --check` passed. An AST
+comparison against the preceding commit confirmed every semantic mapping,
+orientation and normalization function is unchanged, along with semantic-evidence
+helpers; only the diagnostic later-use status text changed. The saved pinned
+inventory and possession table passed the new reconciliation guard, including
+6,846 opponent anchors. A combined SHA-256 check over 155 protected files confirmed
+unchanged diagnostic CSVs, figures, notebooks, configuration, loader, geometry
+implementation, metric registry and Phase 2B calibration matrix. This verifies
+preservation of the audited population and methods without re-downloading or
+rewriting the historical evidence.

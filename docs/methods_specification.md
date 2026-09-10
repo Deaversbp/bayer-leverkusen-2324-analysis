@@ -3,20 +3,20 @@
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
 **Current status: Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026. Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
-**10 September 2026 update: Phase 2C remains VALIDATED PARTIALLY — NOT LOCKED.
-Phase 2C-2 readiness audit is complete; section 39 recommends a restricted
-semantic lock for human review and does not implement that lock.**
+**10 September 2026 human approval: Phase 2C = LOCKED / COMPLETE — RESTRICTED
+SEMANTIC SCOPE. Section 40 records the approved boundary. Phase 3 — Possession
+and Spatial-Sequence Method Design is now authorized within that scope.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
 Phase 2B eligibility and sensitivity calibration is now locked in section 37.
 Later method definitions remain open. The eight locked geometry
 families are now implemented and tested without a method change. Direction
-normalization, tactical classifiers, pattern discovery and predictive models remain
-deferred. The immediate next gate is **team/role semantics and attacking-orientation
-validation**. Section 33 records the implementation boundary; sections 28 and 37
-record the revised roadmap and approved interpretation. Tactical spatial
-interpretation remains blocked until that next gate passes.
+normalization is locked only within the validated Phase 2C population; tactical
+classifiers, pattern discovery and predictive models remain deferred. The next
+gate is **possession and spatial-sequence method design**. Section 33 records
+the geometry implementation boundary; sections 28 and 40 control the current
+roadmap. Tactical interpretation and outcomes still require later method review.
 
 Document lineage: original *Methods & Data Specification v1.0*, September 2026
 (26-page supplied PDF), merged with the repository's completed Phase 1/1B work and
@@ -25,6 +25,9 @@ contract, with the original 31 major section numbers retained for traceability.
 Sections 32–36 retain dated historical evidence, including pre-approval proposals.
 Section 37 supersedes their pending calibration wording; unselected candidates
 remain candidates. Other proposed, optional or deferred methods remain unapproved.
+Sections 38–39 retain the initial Phase 2C findings and Phase 2C-2 recommendation
+as dated history; section 40 supersedes their pending-lock status only, preserving
+the semantic gates, empirical evidence and unresolved full-sample limitations.
 Phase 1/1B results below are preserved from the technical appendix; Phase 2A
 implementation diagnostics are recorded separately in section 33 and the appendix.
 
@@ -59,7 +62,7 @@ interfaces govern where the original proposal differs.
 | Standard-pitch metre coordinates proposed | Native 120 × 80 units remain the implemented convention; the 105 × 68 rescaling proposal is retained but unimplemented |
 | PDF schema tests allowed valid or repairable visible polygons | Current audit validates without repair; invalid polygons remain reported as invalid |
 | One canonical row per 360 event in analytical tables | Audit retains original frame records, including duplicates/ambiguous links; analytical event-grain uniqueness requires an explicit eligibility contract |
-| Phase 1 audit still pending / UUID cause unresolved | Phase 1/1B complete; pinned release has zero orphan frames. Phase 2B comparison eligibility is locked; team/role and attacking-orientation semantics remain the next gate |
+| Phase 1 audit still pending / UUID cause unresolved | Phase 1/1B complete; pinned release has zero orphan frames. Phase 2B comparison eligibility and restricted Phase 2C semantics are locked; Phase 3 sequence-method design is now authorized (section 40) |
 | Academic sources unavailable at migration | S01–S35 are synchronized in the source foundation; exact adaptations still require method review |
 | Broad Phase 2 included zones and clipped Voronoi | Initial Phase 2A implements the locked basic within-frame geometry; zones/Voronoi and tactical interpretation remain later work |
 | PDF ADOPT labels for all-pairs mean, and DERIVE labels for proximity/overload | Current registry preserves published base geometry versus PROJECT aggregation/eligibility/radius; PDF labels alone do not establish an exact published formula |
@@ -758,8 +761,10 @@ threshold or adjustment method in this lock.
 
 ## 28. Analysis phases and immediate Phase 2A boundary
 
-**Roadmap revised on 9 September 2026.** Existing phase identifiers are retained
-for references; the sequence below, rather than numerical order, controls priority.
+**Roadmap updated on 10 September 2026 after restricted Phase 2C approval.**
+The newly authorized Phase 3 is possession/spatial-sequence method design. The
+older numerical roadmap is retained with explicit legacy labels where needed;
+the old optional defensive-regime phase 3 is not the newly authorized Phase 3.
 
 | Phase | Current status / intended work |
 | --- | --- |
@@ -767,12 +772,14 @@ for references; the sequence below, rather than numerical order, controls priori
 | 1B: revision pinning and coordinate semantics | **COMPLETE**: immutable source, compatible pinned joins, diagnostic hypotheses and multiple-actor findings; semantics are not universally resolved |
 | 2A: basic within-frame visible-player geometry | **LOCKED / IMPLEMENTED.** Formulas, units, mathematical minima, record handling and six variants unchanged |
 | 2B: observation validation and calibration | **LOCKED / COMPLETE.** Count/coverage/keeper sensitivity, observation quality, representative review and human-approved calibration |
-| Immediate next gate | **Team/role semantics and attacking-orientation validation**; tactical spatial interpretation remains blocked |
-| 4: sequence construction | After the next gate: reliable possessions, then event-aligned spatial-state sequences and action/time windows |
+| 2C: team/role semantics and attacking orientation | **LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE**, unchanged frame gates; unsupported observations remain unresolved |
+| 2C-2: sequence-readiness audit | **COMPLETE — READY — WITH RESTRICTIONS**; empirical coverage inventory, no sequence thresholds |
+| 3: possession and spatial-sequence method design | **AUTHORIZED** for validated spatial-anchor sequence analysis; complete provider event context, validated states and Phase 2B comparison support remain separate |
+| Legacy 4: sequence construction | After Phase 3 method review: implement approved possession/state sequences; no final dataset is constructed by this lock |
 | 5: descriptive spatial evolution | Next: descriptive spatial-state change with common observational support |
 | 7: outcome definitions and descriptive comparisons | Next: lock success/failure definitions, then compare observed spatial evolution preceding box entries, shots and future xG |
 | 6: recurring interpretable sequence mechanisms | Next: football-readable descriptive mechanisms; clustering or learned representations are optional |
-| 3: defensive regime characterization | **OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**; no automatic high/mid/deep classification |
+| Legacy 3: defensive regime characterization | **OPTIONAL — REQUIRES METHOD-SPECIFIC JUSTIFICATION**; separate from current Phase 3; no automatic high/mid/deep classification |
 | Advanced spatial options | Inferred lines, compactness, Voronoi, valuable-space composites, graphs and learned representations are optional gates under section 37 |
 | 8: predictive incremental-value test | Secondary and unapproved; only after a separate need and method definition |
 | 9: technical article synthesis | Later: pair statistical results with football-readable sequences and inference limits |
@@ -1548,6 +1555,9 @@ evaluators, not a production eligibility pipeline.
 
 ## 38. Phase 2C team/role semantics and attacking orientation
 
+*Historical initial audit. Section 40 records the subsequent human-approved
+restricted lock; the gates and unresolved findings below remain unchanged.*
+
 **9 September 2026 — VALIDATED PARTIALLY — NOT LOCKED.** This additional semantic
 layer does not change the Phase 2A native measurements or the locked Phase 2B
 D-primary, keeper, observation-quality or sensitivity contracts. Semantic
@@ -1727,6 +1737,9 @@ tactical interpretation or outcome analysis on the full sample.**
 
 ## 39. Phase 2C-2 validated spatial-anchor coverage and sequence readiness
 
+*Historical readiness audit and recommendation. Human approval is recorded in
+section 40; the empirical findings below are preserved as originally reviewed.*
+
 **10 September 2026: readiness audit complete — READY — WITH RESTRICTIONS.**
 **Phase 2C = VALIDATED PARTIALLY — NOT LOCKED.** This section records an empirical
 feasibility inventory and a human-review recommendation. It does not supersede
@@ -1862,3 +1875,188 @@ The analytical sequence dataset, eligibility minima, maximum gaps, duration/wind
 choices, final outcomes and tactical interpretation remain unimplemented.
 **This recommendation does not lock Phase 2C.** Detailed distributions and the
 review examples are recorded in the Phase 2C-2 technical appendix.
+
+## 40. Human-approved Phase 2C restricted semantic scope lock
+
+**Human methodological approval — 10 September 2026.**
+**Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE.**
+
+Phase 2C is complete for the restricted semantic/orientation population approved
+for **validated spatial-anchor sequence analysis**. This accepts Recommendation
+A from section 39. It changes approval status only: the exact frame-level gates,
+raw coordinates, source pin and Phase 2A/2B contracts are unchanged. Historical
+progression remains:
+
+| Decision stage | Recorded status |
+| --- | --- |
+| Initial Phase 2C audit, 9 September | VALIDATED PARTIALLY — NOT LOCKED |
+| Phase 2C-2 readiness audit, 10 September | READY — WITH RESTRICTIONS; restricted lock recommended |
+| Human approval, 10 September | LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE |
+
+This is not a resolution of every StatsBomb 360 frame/event type, named identity
+for ordinary off-ball points, correction of unsupported frames, or authorization
+for full-sample spatial normalization/sequence analysis. Section 38's observed
+linked-cloud contradictions, mixed/paired orientation findings and identity
+limitations remain part of the method record. Its former full-sample blockers
+do not prevent the restricted Phase 3 design now authorized below.
+
+### Exact approved population and pinned-run reconciliation
+
+`semantics_status == validated_core_event_team_scope` is the authoritative
+membership decision, implemented by the unchanged `frame_semantics()` gates in
+`leverkusen.spatial.orientation`. Pass, Carry, Shot and Pressure are the only
+currently supported types, **subject to every existing frame-level gate**.
+Type membership alone is insufficient. No gate is loosened, tightened, duplicated
+or replaced by a count target, new helper, proximity heuristic or event-ID list.
+
+The approved reconciliation is specific to immutable revision
+`533862946a73608c134d18b78226b6371ce7173c` and the audited 34-match season. It is
+not a universal expectation for another source revision or research population.
+
+| Locked-run measure | Full season | Leverkusen provider-possession groups |
+| --- | ---: | ---: |
+| Retained events | 137,765 | 86,025 |
+| Uniquely linked 360 frames | 118,581 | 74,647 |
+| Validated semantic/orientation frames | 72,596 | 46,143 |
+| Unsupported linked frames | 45,985 | 28,504 |
+| Possession groups | Not the selected denominator | 2,888 |
+
+Leverkusen groups retain match, period, provider possession ID and possession-team
+ID 904. This preserves the section 39 audit grouping; it does not settle the
+future analytical sequence unit or start/end rules. Among the 46,143 anchors,
+**6,846 are opponent-team events**. The readiness CLI checks both sets of locked
+counts before writing results. The reconciliation check is tied to this exact
+revision and has offline guard tests; it never chooses or changes frame membership.
+Historical CSVs and executed notebooks retain their original dated status. New
+CLI status messages/run metadata report the human-approved lock.
+
+### Team mapping and attacking reference — locked within validated scope
+
+Within validated scope only, literal `teammate=True` maps to the **event team**;
+`teammate=False` maps to the **other known match team**. Therefore:
+
+| Event team | Literal True | Literal False |
+| --- | --- | --- |
+| Bayer Leverkusen | Bayer Leverkusen | Opponent |
+| Opponent | Opponent | Bayer Leverkusen |
+
+Outside this scope, semantic point labels remain unresolved; football-facing
+plots must not infer team labels or apply Leverkusen/opponent semantic colors.
+Point mapping is not named off-ball identity. Event-team and possession-team
+fields remain separate: an opponent event inside a Leverkusen possession is
+still an opponent event. Provider possession-team annotation can define context
+grouping without asserting instantaneous possession/control at every event.
+
+Validated native event coordinates use **event-team attack toward increasing x**.
+For a requested Leverkusen attacking reference, the approved additional coordinates
+and statuses are:
+
+| Event team | Additional `(x_attacking, y_attacking)` | Orientation status |
+| --- | --- | --- |
+| Leverkusen | `(x_raw, y_raw)` | `identity_explicit` |
+| Opponent | `(120 - x_raw, 80 - y_raw)` | `rotated_180` |
+
+The reference then has Leverkusen attacking toward increasing x. Raw coordinates
+are preserved, including finite out-of-bounds values; the same transform applies
+to the supplied observations, polygon and valid explicit event start/end points.
+Half-based, home/away, possession-team flipping and x-only reflection are not
+approved. Unsupported frames return unresolved/missing normalized spatial states.
+
+Approved football language within scope includes Leverkusen/opponent, event team,
+possession team, Leverkusen attacking reference, attacking x/y, visible Leverkusen
+or opponent players, event-aligned spatial state and observed outfield structure.
+Increasing x means toward the named attacking end; forward displacement must be
+explicitly relative to that validated frame. It does not establish danger, actual
+movement between frames, complete team observation, a full tracking state, named
+anonymous-player identity or continuously observed trajectories.
+
+**Pressure caveat:** a validated Pressure frame can be a spatial anchor. It is
+not automatically ball location, a Leverkusen possession action, exact
+defender-to-ball distance or a continuous pressure episode. How action semantics
+and state semantics interact belongs to Phase 3 design.
+
+### Full event context and spatial anchors — locked architecture
+
+The complete provider possession event stream retains ordered validated,
+unsupported, unlinked, opponent and administrative/context events, subject to
+later analytical sequence-method decisions. Only the validated Phase 2C subset
+contributes trusted normalized spatial states. The 45,985 unsupported frames
+remain **unsupported for normalized spatial-semantic analysis**; their events
+are not thereby invalid football events, deleted context or bad data by definition.
+Their spatial states must not be repaired heuristically, interpolated, forward
+filled or inferred. This is an architectural contract, not a final sequence table.
+
+Dribbled Past, Dispossessed, Foul Won, Duel, 50/50, Ball Receipt*, Dribble and other
+unsupported/mixed types retain their existing classifications. No further work
+on these types is needed before restricted sequence design. Revisit them only
+when a specific downstream need requires their spatial state, never simply to
+increase sample size.
+
+Semantic validity and geometry-comparison eligibility remain **separate layers**:
+
+```text
+event exists -> 360 frame exists -> Phase 2C scope passes
+    -> trusted spatial anchor exists
+    -> Phase 2B metric-specific eligibility/support checked
+    -> metric may enter that particular comparison
+```
+
+A semantically validated anchor does not guarantee a usable/comparable value for
+every geometry metric. The unchanged Phase 2B contract still requires metric
+status, actor policy, goalkeeper convention, selected-player count, visible-area
+support, OOB and coincidence flags, metric-specific robustness checks and common
+observational support. Specific downstream comparison implementations remain open.
+
+### Approval rationale, visualization and change control
+
+Human review considered the whole readiness evidence, not a single cutoff:
+93.91/88.54/84.07/78.46/73.51% of the 2,888 groups contain at least 1/2/3/4/5
+anchors, respectively; the median is 10. The 43,431 consecutive intervals have
+median/p90 gaps of 1.103/3.214 seconds, with 88.77% at most three seconds and
+95.97% at most five. Match >=3-anchor rates span approximately 72.09–92.71% across
+all 34 matches. Among 571 Shot-containing groups, 87.74% have >=3 anchors and
+79.51% >=5. All four anchor types appear in all 34 matches. This supports restricted
+design without semantic expansion. These are observational coverage diagnostics,
+not tracking resolution, independent samples or sequence validity thresholds.
+
+The [visualization style guide](visualization_style_guide.md) is now **LOCKED
+within validated scope**: Leverkusen red, opponent charcoal, action/event gold,
+outfield circles, goalkeeper squares, actor halo/outline and useful redundant L/O
+labels. Unsupported frames cannot receive those semantic team colors. A solid
+arrow means a provider-recorded event action vector with explicit valid start/end;
+a dashed arrow means a future event-to-event progression indicator. Neither is a
+continuously tracked ball trajectory. No sequence plotting is implemented here.
+
+**No scientific version bump is required.** The restricted population follows
+pre-outcome semantic validation and the pre-specified feasibility audit. Sequence
+outcomes/effectiveness have not been examined; no primary outcome, tactical result
+or effectiveness finding drove this decision. Descriptive Shot containment in the
+readiness inventory was coverage evidence, not a locked success/danger outcome.
+Raw data, source revision, Phase 2A/2B methods, the football-facing research
+question and the operational formulation remain unchanged. The established chain
+of actions → validated spatial states → observed structural change → next actions
+→ later box-entry/shot/future-xG definitions → interpretable mechanisms remains
+the research aim, without an outcome or causal claim from this lock.
+
+### Remaining boundaries and Phase 3 authorization
+
+Unsupported-type semantics/orientation, ordinary off-ball identities, continuous
+tracking and full-sample normalization remain unresolved or unsupported. Sequence
+unit, start/end and eligibility definitions, minimum anchors, maximum time/event
+gap, possession-duration requirements, rolling windows and spatial-state features
+remain open. Box entry, future-xG horizon, success/failure, comparison-specific
+common-support implementation and tactical mechanism definitions also remain
+unresolved. These are not blockers to completing restricted Phase 2C; a later
+method must address the boundaries it specifically requires. In particular,
+84.07% with >=3 anchors does not imply a three-anchor minimum, and neither the
+median nor p90 time gap defines an allowed maximum.
+
+**Phase 3 — Possession and Spatial-Sequence Method Design is now authorized**
+specifically for **validated spatial-anchor sequence analysis**, using complete
+provider possession events as context, the locked Phase 2C subset as trusted
+states, and the locked Phase 2B contract underneath any geometry comparison.
+No final sequence dataset, segmentation, sequence threshold, outcome, tactic,
+clustering, prediction or causal analysis is implemented or authorized by this
+documentation change. Unrestricted full-sample spatial analysis remains outside
+the approved population. This task stops at recording the lock and design
+authorization; Phase 3 implementation requires its own subsequent work.
