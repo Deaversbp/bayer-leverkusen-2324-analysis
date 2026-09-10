@@ -1430,3 +1430,265 @@ Provider clarification or an explicitly justified restricted research scope
 must resolve the relevant gate. **Full-sample reliable sequence construction
 is not ready to begin.** No possessions, transitions, tactical zones, outcomes,
 clustering, tracking or causal claims were implemented.
+
+## Phase 2C-2 sequence-readiness audit — 10 September 2026
+
+**Readiness classification: READY — WITH RESTRICTIONS. Recommendation A:
+lock the restricted semantic scope for validated spatial-anchor sequence
+analysis, subject to human review. Phase 2C remains VALIDATED PARTIALLY — NOT
+LOCKED.** This is an empirical readiness judgment, not an eligibility decision.
+No unsupported event type, tactical method, dangerous outcome or sequence
+threshold is promoted. Phase 2A/2B data, formulas, source behavior and contracts
+remain unchanged.
+
+### Population and reconciliation
+
+The pinned live run completed at `2026-09-10T17:47:26.095244+00:00` using revision
+`533862946a73608c134d18b78226b6371ce7173c`, Python 3.14.0, pandas 3.0.5 and NumPy
+2.5.2. All 34 matches were processed in memory. Reapplying the existing Phase 2C
+gates reproduced **137,765 events, 118,581 linked frames, 72,596 validated frames
+and 45,985 unsupported frames** exactly. No raw records were saved.
+
+The diagnostic group is match + period + provider possession ID + possession-team
+ID 904. Nineteen provider IDs span periods, so there are **2,888 period-bounded
+Leverkusen possessions**, compared with 2,869 distinct match/provider-possession
+IDs. No new possession-boundary algorithm is introduced. The complete selected
+stream contains **86,025 events**, including opponent, unsupported, unlinked,
+administrative and stoppage events. There are **74,647 linked frames**, of which
+**46,143 (61.8149%)** validate and **28,504 (38.1851%)** remain unsupported.
+Median event/frame/anchor counts per possession are **20/17/10**.
+
+Elapsed times use supplied period-local timestamps, including stoppage time;
+possession duration is last event start minus first event start. Final action
+duration, halftime and an inferred across-period clock are not added. This is
+not active ball-in-play time. Zero-anchor times/spans are missing; one-anchor
+spans are zero. No gap crosses a possession or period boundary.
+
+### Primary anchor-count coverage
+
+Every rate below uses all 2,888 diagnostic possessions as its denominator.
+
+| Validated anchors | Possessions | Percentage |
+| --- | ---: | ---: |
+| 0 | 176 | 6.0942% |
+| >=1 | 2,712 | 93.9058% |
+| >=2 | 2,557 | 88.5388% |
+| >=3 | 2,428 | 84.0720% |
+| >=4 | 2,266 | 78.4626% |
+| >=5 | 2,123 | 73.5111% |
+| >=6 | 1,986 | 68.7673% |
+| >=8 | 1,734 | 60.0416% |
+| >=10 | 1,518 | 52.5623% |
+
+Anchor-count mean is **15.9775**, median **10**, p05 **0**, p25 **4**, p75 **22**,
+p90 **38.3**, p95 **52** and maximum **120**. Quantiles use linear interpolation;
+p90 need not be an observed integer count. All 176 zero-anchor possessions
+remain in the inventory. Their median duration is zero and maximum is 68.246
+seconds, so missing support is neither exclusively an administrative issue nor
+confined to short groups.
+
+### Temporal and event-gap density
+
+There are **43,431 consecutive-anchor intervals**, exactly the sum over
+possessions of `max(anchor_count - 1, 0)`. These describe spacing between trusted
+event-aligned partial observations, **not continuous tracking resolution**.
+Longer/richer possessions contribute more intervals to the pooled distribution.
+
+| Measure | Mean | Median | p25 | p75 | p90 | p95 | Maximum |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Elapsed seconds | 1.5251 | 1.103 | 0.665 | 1.765 | 3.214 | 4.5825 | 31.708 |
+| Event-index difference | 1.7221 | 2 | 1 | 2 | 3 | 4 | 22 |
+| Intervening events | 0.7221 | 1 | 0 | 1 | 2 | 3 | 21 |
+
+| Gap at most | Intervals | Percentage |
+| --- | ---: | ---: |
+| 1 second | 19,356 | 44.5672% |
+| 2 seconds | 34,446 | 79.3120% |
+| 3 seconds | 38,553 | 88.7684% |
+| 5 seconds | 41,679 | 95.9660% |
+| 10 seconds | 43,247 | 99.5763% |
+| 15 seconds | 43,388 | 99.9010% |
+
+Five intervals have identical anchor timestamps and contribute zero-second gaps.
+There are 21,135 adjacent-event anchor pairs and 17,935 pairs with one intervening
+event; the remaining 4,361 skip two or more events. Actual row positions count
+intervening events, independently of provider index differences. They agree with
+index difference minus one in this pinned sample. The longest time interval is
+31.708 seconds in match 3895067, period 1, possession 25, Carry → Carry, with
+three intervening events. Long time gaps and large event gaps therefore need not
+coincide. Nothing is interpolated across them.
+
+### Match and duration distribution
+
+All 34 matches contribute each of the four validated anchor types. The match
+table and figure cover every match; >=3-anchor possession rates range from
+**72.0930% to 92.7083%**. The relatively weakest three are Freiburg (3895121,
+29 October: 72.0930%), RB Leipzig (3895052, 19 August: 74.4186%) and Bayern Munich
+(3895232, 10 February: 74.7126%). These are descriptive ranks, **not exclusions**.
+The maximum is Augsburg (3895194, 13 January: 92.7083%). Match coverage is broad
+enough that candidate sequences are not supplied only by a few fixtures.
+`phase2c2_match_coverage.csv` includes each match's possession count, mean/median
+anchors, >=1/2/3/5 rates, median/p90 time gap and linked-frame validation fraction.
+Its denominator includes opponent events within Leverkusen possessions.
+
+| Duration, seconds | Possessions | Median events | Median anchors | >=2 anchors | >=3 anchors |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| [0,5) | 531 | 5 | 1 | 47.2693% | 31.4501% |
+| [5,15) | 744 | 12 | 6 | 95.0269% | 90.3226% |
+| [15,30) | 648 | 25 | 13 | 99.2284% | 98.6111% |
+| [30,60) | 611 | 46 | 25 | 98.8543% | 98.6907% |
+| [60,infinity) | 354 | 84 | 47 | 99.4350% | 98.0226% |
+
+Longer groups generally supply more anchors. Very short groups account for much
+of the weak count coverage; bins are descriptive and create no future duration
+eligibility rule. The long-duration group still contains sparse exceptions.
+
+### Anchor types, transitions and event team
+
+| Anchor type | Anchors | Share of anchors | Possessions containing | Share of possessions | Matches |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Pass | 20,921 | 45.3395% | 2,588 | 89.6122% | 34 |
+| Carry | 18,525 | 40.1469% | 2,462 | 85.2493% | 34 |
+| Pressure | 6,109 | 13.2393% | 2,086 | 72.2299% | 34 |
+| Shot | 588 | 1.2743% | 541 | 18.7327% | 34 |
+
+The largest consecutive-anchor transitions are Pass → Carry (15,119; 34.8115%),
+Carry → Pass (13,538; 31.1713%), Carry → Pressure (3,556; 8.1877%), Pressure → Pass
+(3,303; 7.6052%) and Pass → Pass (2,439; 5.6158%). The complete transition table
+includes count, percentage of all intervals, median elapsed seconds and match
+coverage for every observed pair. These are event-label frequencies without
+tactical interpretation; related observations are not necessarily independent.
+
+| Event team | Pass | Carry | Pressure | Shot | Total anchors | Share of all anchors |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Leverkusen | 20,092 | 17,892 | 732 | 581 | 39,297 | 85.1635% |
+| Opponent | 829 | 633 | 5,377 | 7 | 6,846 | 14.8365% |
+
+Opponent anchors occur in **2,074 possessions (71.8144%)** and all 34 matches.
+Opponent Pass, Carry and Pressure anchors each cover all 34 matches; the seven
+opponent Shot anchors occur in seven possessions and seven matches. Pressure
+accounts for 78.5422% of opponent anchors. Possession team is therefore materially
+different from event team; automatically dropping opponent events would change
+the available spatial history. Both teams remain explicit and included.
+
+### Shot-containing and literal shot-ending possessions
+
+Shot containment refers to any provider Shot, independently of 360 validation.
+There are 615 Leverkusen and seven opponent Shot events in the selected stream.
+No xG or success/failure definition is used. `has_goal` flags 88 possessions with
+a Shot outcome Goal; it is not a count of season team goals or own goals.
+
+| Group | Possessions | Median anchors | >=2 | >=3 | >=5 | Gap median (s) | Gap p90 (s) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Contains Shot | 571 | 14 | 92.9947% | 87.7408% | 79.5096% | 1.133 | 3.327 |
+| No Shot | 2,317 | 10 | 87.4407% | 83.1679% | 72.0328% | 1.091 | 3.1711 |
+| Literal final event Shot | 42 | 14 | 90.4762% | 88.0952% | 80.9524% | 1.197 | 3.4381 |
+
+The alternate Shot-containing attrition inventory is 571 total → 567 with >=1
+anchor → 531 with >=2 → 501 with >=3 → 480 with >=4 → 454 with >=5. Four have zero
+validated anchors. The 42 literal Shot-ending groups are **not an estimate of
+final meaningful Shot-ending possessions**: goalkeeper or context records can
+follow a Shot within the provider group. Defining which records to disregard is
+deferred. Box-entry inventory is also deferred because full event-location
+semantics and entry/completion conventions are unresolved; no permanent box-entry
+rule is introduced from provisional zone bounds.
+
+### Candidate state counts and temporal windows
+
+The season supplies **46,143 observed anchor states**. Here “state” means an
+eligible semantic frame, not a complete pitch or independently observed 22-player
+configuration. The candidate inventory is not the final sequence dataset.
+
+| States per candidate | Capable possessions | Consecutive overlapping tuples | All anchors in capable possessions |
+| --- | ---: | ---: | ---: |
+| 2 | 2,557 | 43,431 | 45,988 |
+| 3 | 2,428 | 40,874 | 45,730 |
+| 4 | 2,266 | 38,446 | 45,244 |
+| 5 | 2,123 | 36,180 | 44,672 |
+| 6 | 1,986 | 34,057 | 43,987 |
+| 8 | 1,734 | 30,219 | 42,357 |
+
+| Inclusive window | Consecutive pairs | Consecutive triples |
+| --- | ---: | ---: |
+| 3 seconds | 38,553 | 25,915 |
+| 5 seconds | 41,679 | 34,865 |
+| 10 seconds | 43,247 | 40,152 |
+| 15 seconds | 43,388 | 40,731 |
+
+There are **2,424 possessions** with >=3 anchors inside some 10-second interval,
+**2,251** with >=4 inside 10 seconds, and **2,427** with >=3 inside 15 seconds.
+The windows overlap and no window is selected. These are feasibility counts,
+not independent samples or analysis inclusion decisions.
+
+### Deterministic timeline inspection
+
+The manifest selects ten distinct groups using the documented first-key/quantile
+rules in methods section 39; all their events are saved as bounded derived
+timeline rows, with no raw locations. Nine examples come from the first sorted
+match, so selection is not a representative prevalence sample.
+
+| Review stratum | Match / period / possession | Events | Anchors | Duration (s) |
+| --- | --- | ---: | ---: | ---: |
+| Zero anchors | 3895052 / 1 / 1 | 4 | 0 | 0.000 |
+| One anchor | 3895052 / 1 / 75 | 4 | 1 | 0.740 |
+| Two anchors | 3895052 / 1 / 48 | 8 | 2 | 4.602 |
+| Moderate count | 3895052 / 1 / 6 | 16 | 9 | 6.815 |
+| High count | 3895052 / 2 / 120 | 91 | 54 | 95.123 |
+| Contains Shot | 3895052 / 1 / 19 | 35 | 16 | 27.586 |
+| Opponent anchor | 3895052 / 1 / 9 | 13 | 6 | 8.716 |
+| Long / relatively sparse | 3895052 / 1 / 26 | 57 | 25 | 62.576 |
+| Short / relatively dense | 3895052 / 1 / 15 | 9 | 5 | 6.089 |
+| Maximum count | 3895210 / 1 / 15 | 233 | 120 | 173.277 |
+
+The zero-anchor example consists of Starting XI/Half Start records at time zero;
+it demonstrates the unfiltered provider denominator. The one-anchor group keeps
+its unsupported terminal Foul Won. The two-anchor group includes a validated
+opponent Pressure and ends in unsupported Foul Won. The Shot-containing example
+ends in Goal Keeper, illustrating the difference between shot containment and a
+literal final Shot. The maximum-count example still contains 72 unsupported
+linked frames and 41 unlinked events; a large anchor count does not make every
+event a trusted spatial observation. Long/short density is relative to empirical
+quartiles: duration p25/p75 = 7.0025/39.65175 seconds and anchors-per-second
+p25/p75 = 0.467534/0.788185. The long example has 25 anchors over 62.576 seconds,
+so “sparse” here means lower relative rate, not near-zero anchor count.
+
+### Human-review conclusion and validation
+
+The concise machine-readable review table is
+`outputs/diagnostics/phase2c2_sequence_readiness_summary.csv`. It records the
+2,888-possession denominator, median event/frame/anchor counts, every requested
+anchor rate, median/p90 temporal gaps, <=3/5-second rates, Shot-containing >=3
+coverage and minimum/maximum match >=3 coverage. The count attrition and gap/match
+figures are `phase2c2_sequence_readiness_waterfall.png`,
+`phase2c2_anchor_time_gaps.png` and `phase2c2_match_coverage.png`.
+
+**READY — WITH RESTRICTIONS** follows jointly from broad possession coverage,
+substantial anchor counts, short typical time and event gaps, support throughout
+all 34 matches, and strong Shot-containing coverage. This justifies recommending
+**A — lock the restricted semantic scope for validated spatial-anchor sequence
+analysis**. Further unsupported-type semantic work is not necessary before
+restricted sequence design on coverage grounds. Expanding the semantic population
+would still require resolving its existing blockers; no expansion is justified
+merely to increase sample size.
+
+The recommendation retains partial visibility, conditional anonymous-point
+semantics, explicit event/possession-team distinction, sparse/short exceptions,
+long-gap tails and comparison-specific Phase 2B observational support. Semantic
+anchor counts are not counts of valid values for every geometry metric. Future
+sequence definitions must still address timing, repetition, roles, boundary
+context and measurement support through human review. No minimum anchors,
+maximum gap, duration window, final outcome, tactical classification or automatic
+Phase 2C lock is implemented.
+
+Verification: **297 offline tests passed; two optional network tests deselected**.
+The 29 new tests cover provider grouping and selection, period and match context,
+retained unsupported/unlinked events, anchor extraction/order, time/index/row gaps,
+opponent events, match and Shot aggregation, incoming semantic conflicts,
+unpromoted types, empty intervals, no interpolation, no eligibility filter,
+deterministic timelines and raw-input preservation. `python -m ruff check .` and
+`git diff --check` passed. All ten code cells of the new notebook executed
+successfully offline. The three figures were rendered and visually inspected;
+the ECDF shows both its short-gap detail and full long-gap range. The new code
+reuses the unchanged loader and semantic gates, and the full-season scope counts
+reconcile exactly with Phase 2C. Only derived `phase2c2_` outputs are written;
+previous Phase 2A/2B outputs and locked implementation/configuration are untouched.

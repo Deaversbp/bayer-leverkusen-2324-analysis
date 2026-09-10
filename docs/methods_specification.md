@@ -3,6 +3,9 @@
 Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 
 **Current status: Phase 2B = LOCKED / COMPLETE — human approval, 9 September 2026. Phase 2A basic geometry remains LOCKED / IMPLEMENTED.**
+**10 September 2026 update: Phase 2C remains VALIDATED PARTIALLY — NOT LOCKED.
+Phase 2C-2 readiness audit is complete; section 39 recommends a restricted
+semantic lock for human review and does not implement that lock.**
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
@@ -1721,3 +1724,141 @@ lack of independent named identity for ordinary off-ball points. A provider-back
 resolution or a separately justified restricted research population is needed
 before a full method lock. **Do not begin reliable sequence construction,
 tactical interpretation or outcome analysis on the full sample.**
+
+## 39. Phase 2C-2 validated spatial-anchor coverage and sequence readiness
+
+**10 September 2026: readiness audit complete — READY — WITH RESTRICTIONS.**
+**Phase 2C = VALIDATED PARTIALLY — NOT LOCKED.** This section records an empirical
+feasibility inventory and a human-review recommendation. It does not supersede
+the section 38 semantic gates or the locked Phase 2A/2B contracts.
+
+### Diagnostic population, order and timing
+
+`leverkusen.sequences.readiness` reads each pinned match's complete event stream
+and 360 records once in memory. The immutable source remains
+`533862946a73608c134d18b78226b6371ce7173c`. It audits incoming and outgoing related
+links across both possession teams before calling the existing `frame_semantics`
+function. Missing/duplicate event/frame IDs, orphans, ambiguous event indices,
+missing possession/team/time annotations, conflicting possession-team annotations,
+noncontiguous possession identifiers within a period and backwards timestamps
+abort the audit; they are not repaired or silently dropped.
+
+The **full event sequence** is ordered by supplied event `index` and grouped by
+`(match_id, period, possession_id, possession_team_id)`, retaining groups whose
+possession-team ID is 904. This implements the diagnostic grouping already
+specified in section 9, without inventing possession boundaries. Nineteen
+match/provider-possession IDs occur in multiple periods; retaining the period
+boundary yields 2,888 groups versus 2,869 distinct match/provider-possession IDs.
+All events in each group remain context: other-team, unsupported, unlinked,
+administrative and stoppage records are included. No control-at-every-instant
+claim follows from the provider possession-team annotation.
+
+**Validated spatial anchors** are only events whose unique frame returns
+`validated_core_event_team_scope`. Whole event types are not promoted. This run
+reproduces the existing full-season totals exactly: 137,765 events, 118,581 linked
+frames, 72,596 validated frames and 45,985 unsupported frames. It supplies neither
+interpolated states nor trajectories. Repeated/related observations are retained
+as provider events, not asserted to be independent spatial samples. In particular,
+Pressure is a frame anchor, not automatically a ball-location observation.
+
+Timestamp strings are preserved and parsed into seconds **within each period**,
+including supplied stoppage time. There is no new canonical across-period clock.
+Possession duration is last event start minus first event start, not playing time
+or the end of the final action; event `duration` is not added. First/last anchor
+times use the same period-local seconds. Zero-anchor times/spans are missing;
+a one-anchor span is zero. Consecutive gaps never cross possession or period
+boundaries. Five equal-timestamp anchor pairs contribute zero-second gaps.
+
+Event-index gap is next index minus previous index. Intervening-event count is
+the difference between the anchors' positions in the **full retained group**,
+minus one; it is not calculated on a filtered anchor stream. In the pinned sample
+these equal index gap minus one, but the code does not assume consecutive indices.
+Quantiles use pandas' default linear interpolation. Time-gap summaries pool
+intervals, so longer/richer possessions contribute more intervals. Possession and
+match summaries retain their own denominators, without inferential independence
+claims or resampling.
+
+### Descriptive strata and bounded outputs
+
+Simple duration bins are `[0,5)`, `[5,15)`, `[15,30)`, `[30,60)` and `[60,infinity)`
+seconds. These are presentation bins, not eligibility cutoffs. Candidate minimum
+state counts 2/3/4/5/6/8 and inclusive windows 3/5/10/15 seconds are enumerated
+without selection. Consecutive tuples overlap; possession window counts require
+at least one such tuple. With ordered nondecreasing time, an interval containing
+at least N anchors contains a consecutive N-anchor tuple, so no interpolation
+or custom rolling-event inclusion rule is required.
+
+`has_shot` means any provider Shot in the group, with separate Leverkusen and
+opponent shot counts. `has_goal` means a Shot with provider outcome Goal; it is
+not a scoreboard or own-goal inventory. `ends_in_shot` means the **literal last
+recorded event** is Shot. A separate final-meaningful-event convention is deferred:
+Goal Keeper and other terminal/context records cannot be discarded without an
+additional operational choice. These flags define neither danger nor success;
+no xG is read or thresholded. Box-entry inventory is skipped because full-stream
+event-location semantics and entry/completion handling are unresolved; the
+provisional zone configuration is not promoted into an entry definition. No
+cross-event location inference or maximum-x field is necessary for this audit.
+
+Match coverage reports the fraction of frames linked to **Leverkusen possessions**
+that validate, including opponent events. It is distinct from frames attached
+only to Leverkusen-team events. Ascending rank of the >=3-anchor rate identifies
+comparatively weak matches descriptively; it creates no exclusion rule.
+
+Ten distinct representative possessions are selected deterministically. Reserve
+the lexicographically first maximum-anchor group; then choose the first unused
+match/period/possession/team key in each stratum: zero, one, two anchors; moderate
+count (empirical p25–p75 and at least three); high count (at least p95); Shot;
+opponent anchor; long/sparse (duration at least p75, anchors/duration at most p25);
+short/dense (duration at most p25, rate at least p75). Zero durations have missing
+rates. These are review strata only. The sample is intentionally deterministic
+and concentrated in the first sorted match; prevalence comes from season tables.
+Each selected timeline retains all its events and distinguishes validated,
+unsupported-linked and no-360 statuses. These bounded derived timelines contain
+no raw coordinates, nested records or full-season event dump.
+
+The CLI writes 18 derived CSVs under ignored `outputs/diagnostics/`: possession
+coverage; per-pair gaps; count coverage; distributions; gap thresholds; match and
+duration coverage; anchor types and transitions; event-team composition; shot
+coverage; temporal windows; candidate state counts; human-review summary;
+representative manifest and timelines; source inventory; run summary. Every table
+records the source SHA; the source inventory records URLs, and the run summary
+records completion UTC, software versions and reconciliation counts. Three
+neutral figures show all/shot attrition, the gap ECDF (detail and full range) and
+all 34 match rates. `notebooks/05_sequence_readiness.ipynb` presents these outputs
+offline with provenance and denominator checks; reusable logic stays in the package.
+
+### Readiness evidence and recommendation
+
+The full Leverkusen possession stream contains **86,025 events**, **74,647 linked
+frames** and **46,143 validated anchors** (61.8149% of linked frames); 28,504 linked
+frames remain unsupported. Median events/linked frames/anchors per possession
+are **20/17/10**. There are 176 zero-anchor possessions; **84.0720%** have at least
+three anchors and **73.5111%** at least five. All 34 matches contribute substantial
+support: >=3-anchor possession rates range **72.0930–92.7083%**. The 43,431
+consecutive intervals have median/p90 time gaps **1.103/3.214 seconds**; **95.9660%**
+are at most five seconds. Median/p90 intervening-event counts are **1/2**.
+Among **571 Shot-containing possessions**, **87.7408%** have at least three
+anchors. All four anchor types occur in all 34 matches. Opponent events supply
+**6,846 anchors (14.8365%)**, and must remain explicitly distinguished.
+
+**READY — WITH RESTRICTIONS** is an evidence-based judgment across these six
+dimensions, not a score or single cutoff. The count, temporal and event-gap
+support is broad enough for meaningful event-aligned spatial-sequence design
+within the validated population. The restrictions are the existing frame-level
+semantic scope, partial visibility, event/possession-team distinction and pending
+sequence/measurement decisions. Short and zero-anchor possessions, long-gap tails
+and variable observation support must remain visible during that later review.
+Semantic anchor counts do not establish that every Phase 2B geometry metric is
+available or comparable at every anchor; metric status, subset, keeper convention
+and observational support remain required for subsequent comparisons.
+
+**Recommendation A: lock the restricted semantic scope for `validated
+spatial-anchor sequence analysis`, subject to human approval.** Additional work
+on unsupported-type semantics is **not necessary before restricted sequence
+design** on coverage grounds. It remains necessary if those types or a broader
+spatial population are later required. Neither continued semantic expansion merely
+to enlarge the sample nor project redesign is indicated by this readiness audit.
+The analytical sequence dataset, eligibility minima, maximum gaps, duration/window
+choices, final outcomes and tactical interpretation remain unimplemented.
+**This recommendation does not lock Phase 2C.** Detailed distributions and the
+review examples are recorded in the Phase 2C-2 technical appendix.

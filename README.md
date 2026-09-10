@@ -7,8 +7,13 @@ Analyze how Bayer Leverkusen created dangerous attacking space during the unbeat
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
-Linked-cloud team-label contradictions and mixed event-type orientation block
-the full semantic gate and later sequence/tactical work. See the
+Phase 2C-2 readiness audit (10 September 2026) finds **READY — WITH RESTRICTIONS**:
+2,888 Leverkusen possessions contain 46,143 validated anchors; 84.07% have at
+least three, across all 34 matches. A restricted semantic lock is recommended
+for human review; **Phase 2C remains VALIDATED PARTIALLY — NOT LOCKED**.
+Linked-cloud contradictions and mixed event-type orientation remain unresolved
+outside that scope. Final sequence construction and tactical work remain later
+gates. See the [readiness findings](docs/methods_specification.md#39-phase-2c-2-validated-spatial-anchor-coverage-and-sequence-readiness), the
 [Phase 2C decision](docs/methods_specification.md#38-phase-2c-teamrole-semantics-and-attacking-orientation),
 the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
@@ -176,7 +181,8 @@ notebooks/              00 observability audit through 07 effectiveness scaffold
 src/leverkusen/
   data/                 Loader and migrated normalization/context transforms
   spatial/              Basic geometry and diagnostics; later spatial modules reserved
-  sequences/            Reserved possessions, event states, outcomes
+  sequences/            Temporary possession/anchor readiness diagnostics;
+                        analytical sequences and outcomes remain reserved
   tactics/              Reserved defensive structures and attacking patterns
   models/               Reserved baselines and validation
   visualization/        Geometry diagnostics; pitch and sequence figures reserved
@@ -186,8 +192,8 @@ outputs/                Ignored diagnostics, figures, tables
 report/                 Article and technical appendix scaffolds
 ```
 
-Basic geometry and its diagnostic plots are implemented; other spatial, sequence,
-tactical and model modules remain reserved. Feature and analysis script entry
+Basic geometry, semantics and possession-readiness diagnostics are implemented;
+analytical sequence, tactical and model modules remain reserved. Feature and analysis script entry
 points still exit with status 2.
 
 ## Phase 1 observability audit
@@ -336,3 +342,34 @@ This additional layer does not change raw coordinates, Phase 2A geometry or
 Phase 2B eligibility. The [style guide](docs/visualization_style_guide.md) applies
 Leverkusen red, opponent charcoal and gold action markers only to that scope.
 See the [results and blockers](report/technical_appendix.md#phase-2c-semantic-and-orientation-audit--9-september-2026).
+
+## Phase 2C-2 sequence-readiness audit
+
+```powershell
+.\.venv\Scripts\python.exe scripts/sequence_readiness.py
+```
+
+The CLI retrieves the pinned match/event/360 resources in memory and reapplies
+the unchanged Phase 2C frame gates, including complete-match incoming/outgoing
+related-cloud conflict checks. It writes 18 derived `phase2c2_*.csv` files in
+`outputs/diagnostics/` and three neutral aggregate figures in `outputs/figures/`.
+No raw JSON, full-season event table or final analytical sequence dataset is
+persisted. Outputs remain ignored by Git.
+
+Open [notebook 05](notebooks/05_sequence_readiness.ipynb) for offline review of
+the possession inventory, count/gap distributions, all 34 matches, duration and
+shot groups, event-team/type composition, candidate windows and ten complete
+representative timelines. The existing sequence-construction scaffold is unchanged.
+
+The audit retains all 86,025 events in provider Leverkusen possessions, including
+opponent, unsupported, unlinked and administrative events. Match + period +
+provider possession ID + possession-team ID defines each diagnostic unit.
+The median possession supplies 10 validated anchors; median/p90 consecutive gaps
+are 1.103/3.214 seconds. Among 571 shot-containing possessions, 87.74% have at
+least three anchors. Opponent events supply 14.84% of validated anchors.
+
+**Recommendation: A — lock the restricted semantic scope for validated
+spatial-anchor sequence analysis, subject to human review.** More unsupported-type
+semantic work is not necessary before restricted sequence design. No lock,
+anchor minimum, maximum gap, temporal window or outcome is selected here.
+See the [complete evidence and limitations](report/technical_appendix.md#phase-2c-2-sequence-readiness-audit--10-september-2026).
