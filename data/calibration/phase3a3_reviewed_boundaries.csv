@@ -1,0 +1,46 @@
+case_id,boundary_id,boundary_type,onset_event,confirmation_event,resume_event,onset_lower,onset_upper,last_reset_sample,precision,source,review_note
+C03,C03_H01,TERMINAL,3463,3463,,,,,candidate_context,Hard_Boundaries:2-3,One terminal shot context; Block is not another cut.
+C04,C04_R01,CLEAR_RESET,177,189,177,177,177,192,reviewed_warning_candidate,Calibration_Matrix:C04_M04-M06,Warning begins at M04; M05 confirms; M06 is the same established excursion.
+C04,C04_H01,OPPONENT_CONTROL,196,199,200,196,199,,context_aligned,Hard_Boundaries:4,201 is a regained Leverkusen Carry; reviewed opponent spell aligns to Recovery Carry Pass 196-199 and regain Recovery Carry 200-201.
+C04,C04_U01,REVIEW_DEFERRED,217,217,,,,,unresolved,Calibration_Matrix:C04_M08,No additional decisions are inferred in the deferred tail.
+C05,C05_R01,CLEAR_RESET,3612,3614,3612,3612,3612,3616,reviewed_warning_candidate,Calibration_Matrix:C05_M02-M04,Adjacent reviewed warning and confirmation; M04 explicitly same excursion; candidate-resolution onset under new convention.
+C06,C06_H01,OPPONENT_CONTROL,440,442,448,440,442,,context_aligned,Hard_Boundaries:7,Reviewed controlled spell includes Recovery Carry Pass 440-442; Recovery Pass 448 re-establishes Leverkusen control.
+C07,C07_R01,CLEAR_RESET,689,694,689,689,689,699,reviewed_warning_candidate,Calibration_Matrix:C07_M06-M08,Warning followed by confirmation; M08 explicitly same excursion; candidate-resolution onset.
+C07,C07_H01,TERMINAL,731,731,,,,,candidate_context,Hard_Boundaries:8,Terminal shot and opponent goalkeeper context.
+C08,C08_R01,CLEAR_RESET,2766,2768,2766,2766,2766,2772,reviewed_warning_candidate,Calibration_Matrix:C08_M06-M08,Warning followed by confirmation; M08 explicitly same excursion; candidate-resolution onset.
+C08,C08_H01,TERMINAL,2804,2804,,,,,candidate_context,Hard_Boundaries:9-10,Shot and goalkeeper followed by stoppage; one terminal interval.
+C09,C09_R01,CLEAR_RESET,576,576,576,576,576,576,confirmation_action,Calibration_Matrix:C09_M02-M03,Reviewed deep recycle is the first post-clearance Leverkusen action; no earlier warning onset is asserted.
+C09,C09_U01,REVIEW_DEFERRED,602,602,,,,,unresolved,Calibration_Matrix:C09_M04-M05,Deferred tail; not a football boundary or an inferred reset.
+C10,C10_R01,CLEAR_RESET,2416,2420,2416,2416,2416,2422,reviewed_warning_candidate,Calibration_Matrix:C10_M03-M06,M03 and M04 warning transition followed by confirmation; M06 same established reset.
+C10,C10_U01,REVIEW_DEFERRED,2451,2451,,,,,unresolved,Calibration_Matrix:C10_M08-M10,Deferred tail; do not infer additional episodes before terminal context.
+C10,C10_H01,TERMINAL,2507,2507,,,,,candidate_context,Hard_Boundaries:13,Terminal shot and goalkeeper context; later parent events have no reviewed episode assignment.
+C11,C11_R01,CLEAR_RESET,783,783,783,783,783,783,confirmation_action,Calibration_Matrix:C11_M02,Reviewed deep recycle Carry after recovery; no earlier warning onset asserted.
+C11,C11_H01,OPPONENT_CONTROL,809,813,818,809,813,,approximate_loss_interval,Hard_Boundaries:37,Reviewed approximate loss/control interval 809-813; regain Recovery Carry 818-819.
+C11,C11_H02,OPPONENT_CONTROL,824,825,829,824,825,,context_aligned,Hard_Boundaries:38,Second reviewed Recovery Carry spell; Leverkusen Recovery Pass 829.
+C11,C11_R02,CLEAR_RESET,,853,853,832,853,853,unresolved_onset,Calibration_Matrix:C11_M06-M07,M06 continues; M07 confirms a later reset but no onset is recorded. Window begins after last reviewed CONTINUE; no point onset invented.
+C12,C12_R01,CLEAR_RESET,2438,2438,2438,2438,2438,2438,confirmation_action,Calibration_Matrix:C12_M02-M04,Shot at M02 is warning context not a deliberate backward vector; first reviewed deep recycle is Recovery Pass 2438.
+C12,C12_R02,CLEAR_RESET,,2481,2481,2451,2481,2483,unresolved_onset,Calibration_Matrix:C12_M05-M07,M05 continues; later M06 confirms and M07 is same excursion; exact onset after M05 is not recorded.
+C12,C12_H01,OPPONENT_CONTROL,2539,2542,2544,2539,2542,,context_aligned,Hard_Boundaries:39,Reviewed Recovery Carry Pass spell; interception-type Leverkusen Pass 2544 re-establishes control.
+C12,C12_H02,TERMINAL,2550,2550,,,,,candidate_context,Hard_Boundaries:16-17,Clearance out and substitutions are one dead-ball interval.
+C13,C13_H01,OPPONENT_CONTROL,346,351,353,346,351,,reviewed_range_explicit_regain,Hard_Boundaries:40,Review explicitly states new Leverkusen episode begins event 353; loss/control window remains 346-351.
+C14,C14_H01,OPPONENT_CONTROL,2481,2484,2485,2481,2484,,context_aligned,Hard_Boundaries:41,Reviewed Recovery Pass Carry Pass spell; regain Recovery Carry 2485-2486 even though its safe vector is unavailable.
+C16,C16_H01,OPPONENT_CONTROL,531,534,536,531,534,,context_aligned,Hard_Boundaries:42,Reviewed opponent spell; regain Recovery Carry 536-537.
+C16,C16_R01,CLEAR_RESET,,574,574,545,574,574,unresolved_onset,Calibration_Matrix:C16_M05-M08,M05-M06 warning followed by M07 renewed progression; do not promote that cancelled warning to onset of the later M08 clear reset.
+C16,C16_H02,OPPONENT_CONTROL,603,607,613,603,607,,reviewed_failed_action_context,Hard_Boundaries:18,Reviewed failed pass and opponent interception/control; Recovery Pass 613 starts new Leverkusen spell.
+C16,C16_H03,OPPONENT_CONTROL,643,645,651,643,648,,time_description_aligned,Hard_Boundaries:43,Approximately 121 seconds aligns to Recovery Carry Pass 643-645; failed Leverkusen interception 647 does not re-establish control; Recovery Pass 651 does.
+C16,C16_H04,TERMINAL,712,712,,,,,candidate_context,Hard_Boundaries:19,Terminal clearance out.
+C17,C17_H01,OPPONENT_CONTROL,2123,2127,2129,2123,2127,,partial_case_context,Hard_Boundaries:44,Before M09 aligns to goalkeeper Recovery Pass Receipt Pass; regain interception Carry 2129-2130. Rest of case structure remains partial.
+C18,C18_R01,CLEAR_RESET,1296,1304,1296,1296,1296,1309,reviewed_warning_candidate,Calibration_Matrix:C18_M05-M09,M05-M06 warning excursion followed by confirmation; M08-M09 are later samples in same phase.
+C18,C18_H01,OPPONENT_CONTROL,1366,1367,1372,1366,1367,,reviewed_event_context,Hard_Boundaries:21+45,1366 is the explicitly reviewed goalkeeper control; regain Recovery Carry 1372-1373.
+C18,C18_H02,OPPONENT_CONTROL,1421,1424,1427,1421,1424,,context_aligned,Hard_Boundaries:46,Reviewed Recovery Pass Carry Pass spell; Leverkusen Recovery Pass 1427.
+C18,C18_H03,TERMINAL,1485,1485,,,,,candidate_context,Hard_Boundaries:22,Terminal clearance out.
+C19,C19_H01,OPPONENT_CONTROL,106,107,109,106,107,,context_aligned,Hard_Boundaries:23,Review states actual break before M02; Recovery Carry 106-107 and Leverkusen regain Recovery Carry 109-110.
+C19,C19_H02,TERMINAL,111,111,,,,,candidate_context,Hard_Boundaries:24,Terminal shot.
+C21,C21_H01,TERMINAL,263,263,,,,,candidate_context,Hard_Boundaries:25,Pass out ends episode; restart context is not a reset.
+C22,C22_H01,TERMINAL,440,440,,,,,candidate_context,Hard_Boundaries:27,Terminal shot and goalkeeper context; warning-like recycle remains continuation.
+C24,C24_H01,TERMINAL,1942,1942,,,,,candidate_context,Hard_Boundaries:29-30,One foul stoppage; the paired foul records are not two cuts.
+C25,C25_H01,OPPONENT_CONTROL,1255,1261,1264,1255,1261,,reviewed_range_explicit_regain,Hard_Boundaries:47,Review explicitly states new Leverkusen episode begins 1264; do not delay start until a usable spatial vector.
+C25,C25_H02,TERMINAL,1275,1275,,,,,candidate_context,Hard_Boundaries:32,Terminal Block out.
+C26,C26_H01,TERMINAL,2592,2592,,,,,candidate_context,Hard_Boundaries:34,Opening free kick followed by clearance out; no reset is inferred.
+C27,C27_X01,ADMINISTRATIVE_EXCLUDE,1,4,,,,,explicit_no_episode,Hard_Boundaries:35-36;user_request,Administrative match-start parent creates no attacking episode.
+C28,C28_X01,INSUFFICIENT_CONTEXT_EXCLUDE,478,478,,,,,explicit_no_episode,Provenance:C28;user_request,Insufficient goalkeeper-only parent creates no attacking episode.

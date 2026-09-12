@@ -1,0 +1,13 @@
+{
+  "base_commit": "80a9611",
+  "source_sha256": {
+    "outputs/diagnostics/phase3a2_timelines.csv": "7e73ed22cbc150204f17f7247245a2d2b85f81246b092364494eb9b07a7da37f",
+    "outputs/diagnostics/phase3a2_boundary_review_sheet.csv": "3252f8e92ccfd87c284450c15fcbe1cf369d8a994e2dd36e32a7a895b8085671",
+    "outputs/diagnostics/phase3a2_review_manifest.csv": "44ddd01007de54087764b8f7548c0c030e4710eb5f59267320e071c80c695ec7",
+    "outputs/review/phase3a2_boundary_review.html": "c3964521210ba2622378fd6a4edfcc75f1530f535926fca55f741e2009022c44",
+    "docs/methods_specification.md": "f539b906f45694f3c6d26b58b45c7003b404c19b577515213fca3ef733e2ed80",
+    "report/phase3a3_calibration_analysis.md": "0bccdbd45dbfb3b498f0939719f8f5a47ccb1785cb328ff1debd1f2773793e74"
+  },
+  "snapshot_policy": "All 1960 original event rows and 181 original candidate rows preserved via pandas CSV serialization; parent manifest projected to identity/order/provenance columns only. No episode boundaries inferred from the original numerical sampling criteria.",
+  "review_authority": "Original workbook plus current user onset-confirmation instruction; CSV ledger records each encoding and remaining uncertainty."
+}
