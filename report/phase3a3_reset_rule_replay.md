@@ -1,3 +1,12 @@
+# Final replay status
+
+**NOT READY — SEGMENTATION LOGIC REMAINS UNSTABLE**
+
+The v0.3 findings are appended below under **Candidate Rule v0.3 — final bounded replay**.
+The following v0.1/v0.2 sections preserve the historical results and their then-current decisions.
+
+---
+
 # Phase 3A-3: Candidate Rule v0.1 and one v0.2 replay
 
 Bounded C01–C28 replay. **NOT READY — ONE SPECIFIC MATERIAL FAILURE REMAINS.**
@@ -258,3 +267,172 @@ Input SHA-256 values:
 - `data/calibration/phase3a3_reviewed_boundaries.csv`: `8fa9c84899d8e7240432e12b589f360d8e289e20d0f3780faea4d6fb0853e1e4`
 - `outputs/diagnostics/phase3a3_episode_local_candidate_diagnostics.csv`: `e6463c000a58bee185aa54cc8368b71202a834715ff882d66708c54556756246`
 - `outputs/diagnostics/phase3a3_reviewed_episode_map.csv`: `c57b046c9aaf0451a5f95064cf0ee15b6a736899cbcf3dfe40d5d9b0b6acb8f5`
+
+
+# Candidate Rule v0.3 — final bounded replay
+
+## A. v0.3 rule
+
+The three detector states are ACTIVE, WARNING and REBUILD. ACTIVE initially has no measurement;
+the first trustworthy controlled Leverkusen Pass/Carry supplies the local start/end reference,
+including a backward action. No earlier forward action is required. A restart contributes only
+its trusted endpoint and cannot itself trigger a warning. Failed endpoints, unsupported vectors
+and contest-affected drawdown retain the v0.2 exclusions; missing coordinates are never filled.
+
+ACTIVE enters WARNING only on a trusted **nonpositive** action with retreat **>=10.0**.
+Freeze peak x/time and warning onset event/time/retreat. Track the maximum frozen-reference
+retreat and lowest trusted action vertex (start or end), without interpolating between events.
+Forward restoration below a peak cannot initiate a new warning.
+
+WARNING does not confirm on backward magnitude, run length, retreat or elapsed time alone.
+Wait for the first subsequent eligible trusted forward action. At this pivot, confirm if
+**maximum warning retreat >=20.0 OR elapsed time since frozen peak >=5.0 seconds**;
+otherwise cancel (both strictly below their limits). The clock runs from the frozen peak,
+not from warning onset or the last backward action. Backward magnitude/run are diagnostics only.
+Full or partial restoration on the pivot does not override confirmation if either criterion holds.
+
+Confirmation creates one split at the stored warning onset, rebuilds measurements from that onset
+through the pivot, clears old peak/run state and enters REBUILD. The pivot itself cannot immediately
+re-arm. Thereafter preserve the exact v0.2 guard: a trusted forward action must establish a new local
+peak and reach/exceed the stored pre-warning re-entry reference. That separate guard does not become
+the new episode's peak. Cancellation preserves the current episode without requiring old-peak recovery.
+
+Hard boundaries have priority even on a potential pivot event, supersede a warning without a soft split,
+and clear state/reference. Observation end censors an unpivoted warning. Entering an existing review
+mask also censors it, and soft decisions are suppressed while masked. Measurements can continue from
+trusted observations, but no human soft boundary is inserted. Mask definitions and scored target
+alignment are unchanged. This mandated mask behavior differs from the historical replays, which
+logged unscored warnings inside masks; reduced unscored warning frequency is not an accuracy gain.
+
+## B. v0.2 vs v0.3
+
+| metric | v0.2 | v0.3 |
+| --- | --- | --- |
+| matched_resets | 3 | 7 |
+| early_splits | 1 | 1 |
+| late_splits | 1 | 0 |
+| missed_resets | 4 | 1 |
+| extra_final_splits | 13 | 11 |
+| warning_count | 38 | 33 |
+| correctly_cancelled_warnings | 9 | 13 |
+| warning_only_false_positives | 0 | 0 |
+| hard_boundary_mismatches | 0 | 0 |
+| unscored_warnings | 10 | 1 |
+| unscored_ambiguous_case | 9 | 9 |
+
+All nine encoded reset targets remain scored. The three unknown onsets remain unscored.
+Each matched/early/late target appears once; warning rows must not be added again to target counts.
+
+| v0.3 warning outcome | count |
+| --- | --- |
+| forward_pivot_count | 32 |
+| predicted_confirmation_count | 19 |
+| predicted_cancellation_count | 13 |
+| terminated_before_pivot | 1 |
+
+The sole warning without a pivot is C14:2503, censored at review-mask entry 2506. None ends at a hard
+boundary or parent observation end in this particular replay; focused checks cover both mechanisms.
+All 19 confirmations and 13 cancellations reach a pivot. Of the confirmations, eight align with
+reviewed resets (seven exact, one early), and eleven are extra splits. Correct cancellations agree
+with the reviewed continuation intervals; they are not thirteen separately reviewed pivot timestamps.
+
+## C. Reviewed reset alignment
+
+| case_id | classification | reviewed_onset | predicted_onset | reviewed_confirmation | predicted_confirmation |
+| --- | --- | --- | --- | --- | --- |
+| C04 | EARLY_SPLIT | 177 | 176 | 189 | 179 |
+| C05 | MATCH | 3612 | 3612 | 3614 | 3617 |
+| C07 | MATCH | 689 | 689 | 694 | 695 |
+| C08 | MATCH | 2766 | 2766 | 2768 | 2773 |
+| C09 | MATCH | 576 | 576 | 576 | 579 |
+| C10 | MATCH | 2416 | 2416 | 2420 | 2423 |
+| C11 | MATCH | 783 | 783 | 783 | 791 |
+| C12 | MISSED_RESET | 2438 | — | 2438 | — |
+| C18 | MATCH | 1296 | 1296 | 1304 | 1297 |
+
+C09, C10 and C11 change from missed to exact onset matches. C18 changes from late to exact;
+the elapsed criterion confirms its first pivot rather than cancelling its reviewed onset.
+C05 also matches: the observed excursion reaches 47.9 before pivot 3617, despite zero peak age
+at onset. No special case is used. C04 still opens one event early, at 176 instead of 177.
+C12 remains missed because its recovery drawdown is relocation-affected after the corner/clearance;
+the trust safeguard is not relaxed to match the human boundary. Pivot confirmation timings are
+reported separately from the human confirmation events, without claiming they coincide.
+
+## D. Remaining extra splits
+
+Every scored v0.3 extra is shown below. All occur in reviewed continuation, including post-regain
+and rebuilt episodes. The criterion column explains which fixed pivot test produced each cut.
+
+| case_id | predicted_onset | pivot_event | maximum_warning_retreat | pivot_elapsed | criterion |
+| --- | --- | --- | --- | --- | --- |
+| C04 | 168 | 170 | 21.3 | 2.51 | retreat |
+| C04 | 201 | 208 | 11.9 | 6.97 | time |
+| C06 | 448 | 453 | 34 | 3.489 | retreat |
+| C13 | 316 | 318 | 14 | 6.47 | time |
+| C13 | 376 | 378 | 16.6 | 6.664 | time |
+| C14 | 2452 | 2453 | 10.6 | 7.169 | time |
+| C16 | 616 | 618 | 14.9 | 5.517 | time |
+| C18 | 1351 | 1358 | 28.6 | 6.738 | retreat and time |
+| C18 | 1389 | 1392 | 22.7 | 6.364 | retreat and time |
+| C18 | 1437 | 1439 | 20.3 | 5.795 | retreat and time |
+| C18 | 1462 | 1465 | 23.6 | 5.992 | retreat and time |
+
+The net change is only **13 to 11 extra splits**, not a broad removal of false fragmentation.
+C04:168 is an ordinary retreat whose 21.3 maximum now confirms even though its pivot restores
+progression. C04:201 and C06:448 begin in newly regained episodes. Time alone confirms five extras
+(C04:201, C13:316/376, C14:2452, C16:616), even though their maximum retreat remains below 20.
+Other extras meet magnitude or both criteria. Waiting for a pivot does not itself distinguish
+ordinary circulation from attack abandonment under the supplied OR rule.
+
+## E. Stress cases
+
+| Case | v0.3 behavior and comparison |
+| --- | --- |
+| C05 | Exact onset 3612, pivot/confirmation 3617; maximum 47.9, peak age 5.774s. No exception required. |
+| C09 | Miss becomes exact onset 576, pivot 579. Trusted backward recovery initializes reference; failed corner endpoint is excluded. No scored extra remains. |
+| C10 | Miss becomes exact onset 2416, pivot 2423. Unsupported throw-in does not supply a peak; trusted backward action does. No scored extra remains. |
+| C11 | Miss becomes exact onset 783, pivot 791. Failed corner remains excluded; later unknown onset is not inferred. No scored extra remains. |
+| C13 | Former extra 309 cancels, but extras 316/376 confirm on elapsed time. Case extras increase from 1 to 2. |
+| C14 | Former extras 2447/2461 cancel. New extra 2452 confirms on time: extras fall from 2 to 1. Warning 2503 is censored before entering unresolved review. |
+| C16 | Primary failure fixed: warning 541 cancels at pivot 544, maximum 14.1 and peak age 3.305s, despite retreat still 13.8. Extra 624 also cancels, but new time-based extra 616 remains; case extras fall from 2 to 1. |
+| C18 | Exact onset 1296 now confirms at pivot 1297: maximum 10.2, peak age 11.221s. Later extras remain at 1351/1389/1437/1462: four, unchanged in count. |
+| C20 | Zero warnings and splits; failed-action/relocation safeguards remain intact. |
+| C22 | Zero warnings/splits. Forward restoration 425 cannot initiate a warning; no fictitious cancellation is counted. |
+| C24 | Zero warnings/splits; opening backward restart is endpoint context only. |
+| C27 | No episode, warning or split. |
+| C28 | No episode, warning or split. |
+
+The re-arm guard prevents repeated splits while a rebuilt episode stays below the abandoned peak;
+C09/C10's earlier repeated cuts disappear. Later re-entry can still generate false fragmentation,
+as the extra-split table shows. This is not a claim that one cut per internal warning guarantees
+one cut per human-reviewed attack.
+
+## F. Final limitations
+
+- The exact onsets of C11_R02, C12_R02 and C16_R01 remain unknown. Their windows and subsequent
+  provisional membership are not new labels or negative examples.
+- Partial C15/C17, deferred tails in C04/C09/C10 and C14's unresolved warning stay unscored.
+  Nine cases have ambiguous portions; their valid portions retain their existing scoring.
+- C12_R01 is the remaining missed encoded reset; C04_R01 is early. The eleven extra splits
+  remain errors, not acceptable uncertainty masks. Human confirmation and pivot times differ.
+- A warning ending before a trusted forward pivot cannot be confirmed by v0.3. Sparse trusted
+  vectors can delay or censor a pivot; elapsed time does not establish continuously observed retreat.
+- This bounded review does not establish season-wide stability or recall. Zero hard mismatches
+  verifies preservation of the supplied hard ledger (27 scored boundaries plus two exclusions;
+  partial C17 is unscored), not an independently validated hard-boundary detector.
+
+## G. Final lock decision
+
+**NOT READY — SEGMENTATION LOGIC REMAINS UNSTABLE**
+
+v0.3 fixes C16's named warning and improves reset detectability, while preserving the hard boundaries
+and C20/C24/C27/C28 safeguards. It does not sufficiently reduce false fragmentation: eleven extra
+splits remain, C13 worsens, and C18 still has four later extras. Under the stated preference for
+preserving coherent attacks, these are material failures rather than a small number of unusual
+missed resets that could support a conservative lock. No v0.4, threshold variation, alternate rule,
+new analysis phase or production change is proposed.
+
+Validation is built into the same script: legacy transition checks, v0.3 pivot/threshold-edge,
+cancellation-without-recovery, direction, trust, restart, censoring, hard-priority and re-arm checks;
+unchanged historical case results; warning/pivot count reconciliation; source immutability.
+The existing two CSVs now contain v0.1/v0.2/v0.3, with explicit pivot and maximum-retreat fields.

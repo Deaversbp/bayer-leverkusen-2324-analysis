@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 import hashlib
+from io import StringIO
 from pathlib import Path
 
 import numpy as np
@@ -89,11 +90,12 @@ class State:
         )
 
 
-def replay(events, hard_ledger, version="v0.1"):
-    """No reviewed soft onset, confirmation, label or membership enters this function."""
+def replay(events, hard_ledger, version="v0.1", masks=()):
+    """Replay without soft targets; v0.3 uses review masks only for censoring."""
     transitions, warnings, trace = [], [], []
-    assert version in {"v0.1", "v0.2"}
-    state, mode, warning = State(), "DISARMED", None
+    assert version in {"v0.1", "v0.2", "v0.3"}
+    initial_mode = "ACTIVE" if version == "v0.3" else "DISARMED"
+    state, mode, warning = State(), initial_mode, None
     rearm_reference = np.nan
     episode_start = int(events.event_index.min())
     suppressed_until = None
@@ -118,7 +120,7 @@ def replay(events, hard_ledger, version="v0.1"):
             if warning is not None:
                 end_warning(row, "SUPERSEDED_HARD_BOUNDARY")
             emit(row, b.boundary_type, boundary_id=b.boundary_id, resume=b.resume_event)
-            state, mode, history = State(), "DISARMED", []
+            state, mode, history = State(), initial_mode, []
             rearm_reference = np.nan
             suppressed_until = (
                 int(b.resume_event) if pd.notna(b.resume_event) else np.inf
@@ -129,6 +131,10 @@ def replay(events, hard_ledger, version="v0.1"):
             episode_start, suppressed_until = event, None
             emit(row, "HARD_REGAIN_START")
         history.append(row)
+        masked = version == "v0.3" and bool(ambiguous(event, event, masks))
+        if masked and warning is not None:
+            end_warning(row, "CENSORED_REVIEW_MASK")
+            mode = "ACTIVE"
         obs = state.observe(row)
         if obs is None:
             trace.append(
@@ -163,9 +169,13 @@ def replay(events, hard_ledger, version="v0.1"):
                 ),
             )
         )
-        if not obs["eligible"]:
+        if not obs["eligible"] or masked:
             continue
-        if mode == "ACTIVE" and obs["retreat"] >= 10.0:
+        if (
+            mode == "ACTIVE"
+            and obs["retreat"] >= 10.0
+            and (version != "v0.3" or obs["dx"] <= 0)
+        ):
             warning = dict(
                 warning_id=f"W{len(warnings) + 1:02d}",
                 onset=event,
@@ -173,6 +183,8 @@ def replay(events, hard_ledger, version="v0.1"):
                 peak=state.peak,
                 peak_time=state.peak_time,
                 onset_retreat=obs["retreat"],
+                maximum_retreat=obs["retreat"],
+                pivot_event=np.nan,
                 low=row.end_x,
                 episode_start=episode_start,
                 confirmation=np.nan,
@@ -189,8 +201,26 @@ def replay(events, hard_ledger, version="v0.1"):
             continue
         retreat = max(0, warning["peak"] - row.end_x)
         warning["low"] = min(warning["low"], row.end_x)
+        if version == "v0.3":
+            warning["low"] = min(warning["low"], row.start_x)
+        warning["maximum_retreat"] = max(
+            warning["maximum_retreat"], warning["peak"] - warning["low"]
+        )
+        if version == "v0.3":
+            if obs["dx"] <= 0 or event <= warning["onset"]:
+                continue
+            warning["pivot_event"] = event
+            warning["pivot_elapsed"] = row.period_seconds - warning["peak_time"]
+            confirm = (
+                warning["maximum_retreat"] >= 20.0 or warning["pivot_elapsed"] >= 5.0
+            )
+            if not confirm:
+                warning["resolution_retreat"] = retreat
+                end_warning(row, "CANCELLED")
+                mode = "ACTIVE"
+                continue
         # Cancellation has priority over confirmation on the current trusted action.
-        if obs["dx"] > 0 and retreat < 10.0:
+        if version != "v0.3" and obs["dx"] > 0 and retreat < 10.0:
             warning["resolution_retreat"] = retreat
             end_warning(row, "CANCELLED")
             mode = "ACTIVE"
@@ -199,7 +229,9 @@ def replay(events, hard_ledger, version="v0.1"):
         persistence = (
             row.period_seconds - warning["peak_time"] >= 5.0 or state.nonpositive >= 2
         )
-        if magnitude and persistence:
+        if (version == "v0.3" and confirm) or (
+            version != "v0.3" and magnitude and persistence
+        ):
             warning.update(
                 confirmation=event,
                 end_event=event,
@@ -231,7 +263,7 @@ def replay(events, hard_ledger, version="v0.1"):
 
 
 def ambiguity_intervals(case, ledger, episode_map, first, last, candidates):
-    """Scoring masks only: never reset or condition the replay engine."""
+    """Unchanged scoring masks; v0.3 also censors pending warnings on entry."""
     if case in {"C15", "C17"}:
         return [(first, last, "partial case structure")]
     intervals = []
@@ -295,7 +327,7 @@ def evaluate(events, parents, boundaries, candidates, episode_map, version="v0.1
         if len(exclusions):
             warnings, transitions, trace = [], [], []
         else:
-            warnings, transitions, trace = replay(ev, hard, version)
+            warnings, transitions, trace = replay(ev, hard, version, masks=masks)
         all_runs[case] = (warnings, transitions, trace)
         records = []
 
@@ -458,6 +490,9 @@ def evaluate(events, parents, boundaries, candidates, episode_map, version="v0.1
                 onset_backward=w["onset_backward"],
                 onset_run=w["onset_run"],
                 warning_low=w["low"],
+                maximum_warning_retreat=w["maximum_retreat"],
+                pivot_event=w["pivot_event"],
+                pivot_elapsed=w.get("pivot_elapsed"),
                 confirm_retreat=w.get("confirm_retreat"),
                 confirm_elapsed=w.get("confirm_elapsed"),
                 confirm_run=w.get("confirm_run"),
@@ -465,6 +500,11 @@ def evaluate(events, parents, boundaries, candidates, episode_map, version="v0.1
                 cancellation_retreat=w.get("resolution_retreat"),
                 reviewed_warning_samples=";".join(overlap_cancel.candidate_id),
                 explanation=w["ambiguity"]
+                or (
+                    f"Forward pivot: maximum retreat {w['maximum_retreat']:.3f}, peak age {w.get('pivot_elapsed', np.nan):.3f}s; {w['resolution']}."
+                    if version == "v0.3" and pd.notna(w["pivot_event"])
+                    else ""
+                )
                 or (
                     "Warning at a reviewed reset onset was cancelled; the resulting split displacement is scored on the reviewed-reset row."
                     if classification == "MISSED_RESET"
@@ -549,6 +589,10 @@ def evaluate(events, parents, boundaries, candidates, episode_map, version="v0.1
                 predicted_cancellation_count=sum(
                     w["resolution"] == "CANCELLED" for w in warnings
                 ),
+                forward_pivot_count=sum(pd.notna(w["pivot_event"]) for w in warnings),
+                terminated_before_pivot=sum(
+                    w["resolution"] not in {"CONFIRMED", "CANCELLED"} for w in warnings
+                ),
                 warning_only_false_positives=count(
                     "PREDICTED_WARNING", "FALSE_WARNING_ONLY"
                 ),
@@ -631,6 +675,81 @@ def focused_checks():
     assert (
         trace[2]["peak"] != w2[0]["peak"]
     )  # old reference is a guard, not the new peak
+
+
+def v3_checks():
+    def sample(actions):
+        return pd.DataFrame(
+            [
+                dict(
+                    event_index=i + 1,
+                    period_seconds=float(i),
+                    start_x=a,
+                    end_x=b,
+                    provider_context="",
+                    restart_context="",
+                    safe_action=True,
+                    event_team_id=904,
+                    event_type="Pass",
+                )
+                for i, (a, b) in enumerate(actions)
+            ]
+        )
+
+    hard = pd.DataFrame(
+        columns=["onset_event", "boundary_id", "boundary_type", "resume_event"]
+    )
+    x = sample([(80, 50), (50, 40), (40, 60)])
+    w, _, _ = replay(x, hard, "v0.3")
+    assert len(w) == 1 and w[0]["onset"] == 1 and w[0]["confirmation"] == 3
+    assert w[0]["maximum_retreat"] == 40 and w[0]["pivot_event"] == 3
+    # Exact predicate boundaries, not candidate threshold alternatives.
+    for retreat, pivot_time, expected in [
+        (20, 1, "CONFIRMED"),
+        (19, 5, "CONFIRMED"),
+        (19, 4.999, "CANCELLED"),
+    ]:
+        x = sample([(80, 80 - retreat), (80 - retreat, 82 - retreat)])
+        x.loc[1, "period_seconds"] = pivot_time
+        w, _, _ = replay(x, hard, "v0.3")
+        assert w[0]["resolution"] == expected
+    x = sample([(50, 64), (64, 61.8), (61.8, 51.5), (51.5, 49.9), (49.9, 50.2)])
+    w, _, _ = replay(x, hard, "v0.3")
+    assert w[0]["resolution"] == "CANCELLED" and w[0]["resolution_retreat"] > 10
+    x = sample([(80, 100), (100, 95), (70, 80)])
+    assert not replay(x, hard, "v0.3")[0]  # no warning on forward restoration
+    x = sample([(120, 40), (40, 39)])
+    x.loc[0, "restart_context"] = "Kick Off"
+    assert not replay(x, hard, "v0.3")[0]
+    x = sample([(80, 100), (100, 115), (60, 40), (40, 50)])
+    x.loc[1, "provider_context"] = "pass.outcome:Incomplete"
+    assert not replay(x, hard, "v0.3")[0]
+    x = sample([(80, 50), (50, 40), (40, 70), (np.nan, np.nan)])
+    x.loc[3, "safe_action"] = False
+    h = pd.DataFrame(
+        [
+            dict(
+                onset_event=3,
+                boundary_id="H1",
+                boundary_type="OPPONENT_CONTROL",
+                resume_event=4,
+            )
+        ]
+    )
+    w, _, _ = replay(x, h, "v0.3")
+    assert w[0]["resolution"] == "SUPERSEDED_HARD_BOUNDARY" and pd.isna(
+        w[0]["pivot_event"]
+    )
+    w, _, _ = replay(x.iloc[:3], hard, "v0.3", masks=[(2, 3, "deferred")])
+    assert len(w) == 1 and w[0]["resolution"] == "CENSORED_REVIEW_MASK"
+    assert pd.isna(w[0]["confirmation"])
+    w, _, _ = replay(x.iloc[:2], hard, "v0.3")
+    assert w[0]["resolution"] == "CENSORED_PARENT_END"
+    x = sample([(80, 100), (90, 70), (70, 95), (95, 75), (75, 70), (70, 105)])
+    w, transitions, trace = replay(x, hard, "v0.3")
+    assert len(w) == 1 and w[0]["confirmation"] == 3
+    assert trace[3]["mode"] == "REBUILD" and trace[3]["peak"] == 95
+    assert [t["event"] for t in transitions if t["kind"] == "ARMED"] == [6]
 
 
 def table(frame):
@@ -918,8 +1037,207 @@ Input SHA-256 values:
     REPORT.write_text(text, encoding="utf-8")
 
 
+def append_v3_report(cases, details):
+    metrics = [
+        "matched_resets",
+        "early_splits",
+        "late_splits",
+        "missed_resets",
+        "extra_final_splits",
+        "warning_count",
+        "correctly_cancelled_warnings",
+        "warning_only_false_positives",
+        "hard_boundary_mismatches",
+        "unscored_warnings",
+        "unscored_ambiguous_case",
+    ]
+    comparison = (
+        cases[cases.version.isin(["v0.2", "v0.3"])]
+        .groupby("version")[metrics]
+        .sum()
+        .T.reset_index(names="metric")
+    )
+    d = details[details.version.eq("v0.3")]
+    targets = d[
+        d.kind.eq("REVIEWED_RESET") & ~d.classification.eq("UNSCORED_AMBIGUOUS")
+    ][
+        [
+            "case_id",
+            "classification",
+            "reviewed_onset",
+            "predicted_onset",
+            "reviewed_confirmation",
+            "predicted_confirmation",
+        ]
+    ]
+    extras = d[d.kind.eq("PREDICTED_WARNING") & d.classification.eq("EXTRA_RESET")][
+        [
+            "case_id",
+            "predicted_onset",
+            "pivot_event",
+            "maximum_warning_retreat",
+            "pivot_elapsed",
+        ]
+    ].copy()
+    extras["criterion"] = np.where(
+        extras.maximum_warning_retreat.ge(20),
+        np.where(extras.pivot_elapsed.ge(5), "retreat and time", "retreat"),
+        "time",
+    )
+    extras["pivot_elapsed"] = extras.pivot_elapsed.round(3)
+    extras["maximum_warning_retreat"] = extras.maximum_warning_retreat.round(3)
+    counts = (
+        cases[cases.version.eq("v0.3")][
+            [
+                "forward_pivot_count",
+                "predicted_confirmation_count",
+                "predicted_cancellation_count",
+                "terminated_before_pivot",
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+    counts.columns = ["v0.3 warning outcome", "count"]
+    historical = REPORT.read_text(encoding="utf-8")
+    text = f"""
+
+# Candidate Rule v0.3 — final bounded replay
+
+## A. v0.3 rule
+
+The three detector states are ACTIVE, WARNING and REBUILD. ACTIVE initially has no measurement;
+the first trustworthy controlled Leverkusen Pass/Carry supplies the local start/end reference,
+including a backward action. No earlier forward action is required. A restart contributes only
+its trusted endpoint and cannot itself trigger a warning. Failed endpoints, unsupported vectors
+and contest-affected drawdown retain the v0.2 exclusions; missing coordinates are never filled.
+
+ACTIVE enters WARNING only on a trusted **nonpositive** action with retreat **>=10.0**.
+Freeze peak x/time and warning onset event/time/retreat. Track the maximum frozen-reference
+retreat and lowest trusted action vertex (start or end), without interpolating between events.
+Forward restoration below a peak cannot initiate a new warning.
+
+WARNING does not confirm on backward magnitude, run length, retreat or elapsed time alone.
+Wait for the first subsequent eligible trusted forward action. At this pivot, confirm if
+**maximum warning retreat >=20.0 OR elapsed time since frozen peak >=5.0 seconds**;
+otherwise cancel (both strictly below their limits). The clock runs from the frozen peak,
+not from warning onset or the last backward action. Backward magnitude/run are diagnostics only.
+Full or partial restoration on the pivot does not override confirmation if either criterion holds.
+
+Confirmation creates one split at the stored warning onset, rebuilds measurements from that onset
+through the pivot, clears old peak/run state and enters REBUILD. The pivot itself cannot immediately
+re-arm. Thereafter preserve the exact v0.2 guard: a trusted forward action must establish a new local
+peak and reach/exceed the stored pre-warning re-entry reference. That separate guard does not become
+the new episode's peak. Cancellation preserves the current episode without requiring old-peak recovery.
+
+Hard boundaries have priority even on a potential pivot event, supersede a warning without a soft split,
+and clear state/reference. Observation end censors an unpivoted warning. Entering an existing review
+mask also censors it, and soft decisions are suppressed while masked. Measurements can continue from
+trusted observations, but no human soft boundary is inserted. Mask definitions and scored target
+alignment are unchanged. This mandated mask behavior differs from the historical replays, which
+logged unscored warnings inside masks; reduced unscored warning frequency is not an accuracy gain.
+
+## B. v0.2 vs v0.3
+
+{table(comparison)}
+
+All nine encoded reset targets remain scored. The three unknown onsets remain unscored.
+Each matched/early/late target appears once; warning rows must not be added again to target counts.
+
+{table(counts)}
+
+The sole warning without a pivot is C14:2503, censored at review-mask entry 2506. None ends at a hard
+boundary or parent observation end in this particular replay; focused checks cover both mechanisms.
+All 19 confirmations and 13 cancellations reach a pivot. Of the confirmations, eight align with
+reviewed resets (seven exact, one early), and eleven are extra splits. Correct cancellations agree
+with the reviewed continuation intervals; they are not thirteen separately reviewed pivot timestamps.
+
+## C. Reviewed reset alignment
+
+{table(targets)}
+
+C09, C10 and C11 change from missed to exact onset matches. C18 changes from late to exact;
+the elapsed criterion confirms its first pivot rather than cancelling its reviewed onset.
+C05 also matches: the observed excursion reaches 47.9 before pivot 3617, despite zero peak age
+at onset. No special case is used. C04 still opens one event early, at 176 instead of 177.
+C12 remains missed because its recovery drawdown is relocation-affected after the corner/clearance;
+the trust safeguard is not relaxed to match the human boundary. Pivot confirmation timings are
+reported separately from the human confirmation events, without claiming they coincide.
+
+## D. Remaining extra splits
+
+Every scored v0.3 extra is shown below. All occur in reviewed continuation, including post-regain
+and rebuilt episodes. The criterion column explains which fixed pivot test produced each cut.
+
+{table(extras)}
+
+The net change is only **13 to 11 extra splits**, not a broad removal of false fragmentation.
+C04:168 is an ordinary retreat whose 21.3 maximum now confirms even though its pivot restores
+progression. C04:201 and C06:448 begin in newly regained episodes. Time alone confirms five extras
+(C04:201, C13:316/376, C14:2452, C16:616), even though their maximum retreat remains below 20.
+Other extras meet magnitude or both criteria. Waiting for a pivot does not itself distinguish
+ordinary circulation from attack abandonment under the supplied OR rule.
+
+## E. Stress cases
+
+| Case | v0.3 behavior and comparison |
+| --- | --- |
+| C05 | Exact onset 3612, pivot/confirmation 3617; maximum 47.9, peak age 5.774s. No exception required. |
+| C09 | Miss becomes exact onset 576, pivot 579. Trusted backward recovery initializes reference; failed corner endpoint is excluded. No scored extra remains. |
+| C10 | Miss becomes exact onset 2416, pivot 2423. Unsupported throw-in does not supply a peak; trusted backward action does. No scored extra remains. |
+| C11 | Miss becomes exact onset 783, pivot 791. Failed corner remains excluded; later unknown onset is not inferred. No scored extra remains. |
+| C13 | Former extra 309 cancels, but extras 316/376 confirm on elapsed time. Case extras increase from 1 to 2. |
+| C14 | Former extras 2447/2461 cancel. New extra 2452 confirms on time: extras fall from 2 to 1. Warning 2503 is censored before entering unresolved review. |
+| C16 | Primary failure fixed: warning 541 cancels at pivot 544, maximum 14.1 and peak age 3.305s, despite retreat still 13.8. Extra 624 also cancels, but new time-based extra 616 remains; case extras fall from 2 to 1. |
+| C18 | Exact onset 1296 now confirms at pivot 1297: maximum 10.2, peak age 11.221s. Later extras remain at 1351/1389/1437/1462: four, unchanged in count. |
+| C20 | Zero warnings and splits; failed-action/relocation safeguards remain intact. |
+| C22 | Zero warnings/splits. Forward restoration 425 cannot initiate a warning; no fictitious cancellation is counted. |
+| C24 | Zero warnings/splits; opening backward restart is endpoint context only. |
+| C27 | No episode, warning or split. |
+| C28 | No episode, warning or split. |
+
+The re-arm guard prevents repeated splits while a rebuilt episode stays below the abandoned peak;
+C09/C10's earlier repeated cuts disappear. Later re-entry can still generate false fragmentation,
+as the extra-split table shows. This is not a claim that one cut per internal warning guarantees
+one cut per human-reviewed attack.
+
+## F. Final limitations
+
+- The exact onsets of C11_R02, C12_R02 and C16_R01 remain unknown. Their windows and subsequent
+  provisional membership are not new labels or negative examples.
+- Partial C15/C17, deferred tails in C04/C09/C10 and C14's unresolved warning stay unscored.
+  Nine cases have ambiguous portions; their valid portions retain their existing scoring.
+- C12_R01 is the remaining missed encoded reset; C04_R01 is early. The eleven extra splits
+  remain errors, not acceptable uncertainty masks. Human confirmation and pivot times differ.
+- A warning ending before a trusted forward pivot cannot be confirmed by v0.3. Sparse trusted
+  vectors can delay or censor a pivot; elapsed time does not establish continuously observed retreat.
+- This bounded review does not establish season-wide stability or recall. Zero hard mismatches
+  verifies preservation of the supplied hard ledger (27 scored boundaries plus two exclusions;
+  partial C17 is unscored), not an independently validated hard-boundary detector.
+
+## G. Final lock decision
+
+**NOT READY — SEGMENTATION LOGIC REMAINS UNSTABLE**
+
+v0.3 fixes C16's named warning and improves reset detectability, while preserving the hard boundaries
+and C20/C24/C27/C28 safeguards. It does not sufficiently reduce false fragmentation: eleven extra
+splits remain, C13 worsens, and C18 still has four later extras. Under the stated preference for
+preserving coherent attacks, these are material failures rather than a small number of unusual
+missed resets that could support a conservative lock. No v0.4, threshold variation, alternate rule,
+new analysis phase or production change is proposed.
+
+Validation is built into the same script: legacy transition checks, v0.3 pivot/threshold-edge,
+cancellation-without-recovery, direction, trust, restart, censoring, hard-priority and re-arm checks;
+unchanged historical case results; warning/pivot count reconciliation; source immutability.
+The existing two CSVs now contain v0.1/v0.2/v0.3, with explicit pivot and maximum-retreat fields.
+"""
+    notice = "# Final replay status\n\n**NOT READY — SEGMENTATION LOGIC REMAINS UNSTABLE**\n\nThe v0.3 findings are appended below under **Candidate Rule v0.3 — final bounded replay**.\nThe following v0.1/v0.2 sections preserve the historical results and their then-current decisions.\n\n---\n\n"
+    REPORT.write_text(notice + historical + text, encoding="utf-8")
+
+
 def main():
     focused_checks()
+    v3_checks()
     before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in INPUTS}
     events, parents, boundaries, candidates, episode_map = [
         pd.read_csv(p) for p in INPUTS
@@ -933,7 +1251,7 @@ def main():
         assert group.event_index.max() == p.last_event_index
     results = [
         evaluate(events, parents, boundaries, candidates, episode_map, version)
-        for version in ("v0.1", "v0.2")
+        for version in ("v0.1", "v0.2", "v0.3")
     ]
     cases = pd.concat([r[0] for r in results], ignore_index=True)
     details = pd.concat([r[1] for r in results], ignore_index=True)
@@ -950,9 +1268,40 @@ def main():
             splits = [t["split"] for t in transitions if t["kind"] == "CONFIRMED_RESET"]
             assert splits == [w["onset"] for w in confirmed]
             assert len(splits) == len(set(splits))
+    previous_path = DIAG / "phase3a3_reset_rule_replay_cases.csv"
+    if previous_path.exists():
+        previous = pd.read_csv(previous_path)
+        keys = ["version", "case_id"]
+        columns = [c for c in previous.columns if c in cases.columns]
+        prior = (
+            previous[previous.version.isin(["v0.1", "v0.2"])][columns]
+            .sort_values(keys)
+            .reset_index(drop=True)
+        )
+        serialized = pd.read_csv(StringIO(cases.to_csv(index=False)))
+        current = (
+            serialized[serialized.version.isin(["v0.1", "v0.2"])][columns]
+            .sort_values(keys)
+            .reset_index(drop=True)
+        )
+        # Match CSV missing-value representation before comparing historical rows.
+        pd.testing.assert_frame_equal(
+            prior.fillna(""), current.fillna(""), check_dtype=False
+        )
+    v3 = cases[cases.version.eq("v0.3")]
+    assert (
+        v3.warning_count == v3.forward_pivot_count + v3.terminated_before_pivot
+    ).all()
+    assert (
+        v3.forward_pivot_count
+        == v3.predicted_confirmation_count + v3.predicted_cancellation_count
+    ).all()
     cases.to_csv(DIAG / "phase3a3_reset_rule_replay_cases.csv", index=False)
     details.to_csv(DIAG / "phase3a3_reset_rule_replay_details.csv", index=False)
-    write_report(cases, details, before)
+    write_report(
+        cases[~cases.version.eq("v0.3")], details[~details.version.eq("v0.3")], before
+    )
+    append_v3_report(cases, details)
     assert before == {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in INPUTS}
     print(
         cases.groupby("version")[
@@ -972,7 +1321,7 @@ def main():
         .to_string()
     )
     print(
-        "Six focused checks and integrity guards passed. Wrote one report and two CSVs."
+        "Legacy/v0.3 transition checks, baseline comparison and integrity guards passed. Updated one report and two CSVs."
     )
 
 
