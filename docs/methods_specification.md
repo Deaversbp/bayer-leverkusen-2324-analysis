@@ -6,8 +6,10 @@ Bayer Leverkusen 2023/24 Spatial-Sequence Analysis.
 **10 September 2026 human approval: Phase 2C = LOCKED / COMPLETE — RESTRICTED
 SEMANTIC SCOPE. Section 40 records the approved boundary. Phase 3 — Possession
 and Spatial-Sequence Method Design is now authorized within that scope.**
-**Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK.** Section 41 records the completed
-progression/reset diagnostics and the next Phase 3A-2 review step.
+**13 September 2026: PHASE 3A — LOCKED / COMPLETE.** Section 43 defines the
+`attacking_control_spell_id` hard-boundary method. Sections 41–42 and the
+`attacking_episode`/soft-reset calibration reports are historical development;
+their former pending-review gates are superseded by section 43.
 The 7 September 2026 [Phase 2A registry contract](metric_registry.md#1-shared-phase-2a-measurement-contract)
 freezes eight within-frame metrics, subsets, goalkeeper variants and edge cases.
 It supersedes earlier pending-definition wording for those eight measurements;
@@ -16,7 +18,7 @@ Later method definitions remain open. The eight locked geometry
 families are now implemented and tested without a method change. Direction
 normalization is locked only within the validated Phase 2C population; tactical
 classifiers, pattern discovery and predictive models remain deferred. The next
-gate is **possession and spatial-sequence method design**. Section 33 records
+gate is **Phase 2C anchor attachment and spatial-state sequence construction**. Section 33 records
 the geometry implementation boundary; sections 28 and 40 control the current
 roadmap. Tactical interpretation and outcomes still require later method review.
 
@@ -2426,3 +2428,129 @@ adopted automatically. No final episodes, outcomes, ML/clustering or change-poin
 method exists in this review pack. Restricted semantics, partial observation,
 unavailable endpoint timing and uncertain control inside provider possessions
 remain explicit limitations.
+
+## 43. Phase 3A attacking control spell lock
+
+**13 September 2026 — PHASE 3A — LOCKED / COMPLETE, with documented limitations.**
+
+### Primary analytical unit
+
+An attacking control spell is a contiguous interval in which Bayer Leverkusen retains
+or repeatedly re-establishes attacking control without a qualifying hard football
+boundary. StatsBomb provider possession remains the source parent and may contain
+multiple spells. Retreat, recycling and reorganization within uninterrupted control
+do not independently create a new `attacking_control_spell_id`.
+
+Control spell is not tactical sequence. Spells are reliable event containers;
+later tactical patterns/sequences will be studied inside them. The production-facing
+identifier is `attacking_control_spell_id`; `attacking_episode_id` survives only in
+historical reconstruction/calibration artifacts and is not an alias for this method.
+
+The deterministic ID is `<match_id>-p<period>-pp<provider_possession_id>-s<spell_number>`.
+Numbers start at one within each match/period/provider parent and increment only for
+a new control spell. Ordering uses the full provider event index. Administrative-only,
+insufficient goalkeeper-only and empty pre-boundary intervals have no spell ID.
+
+### Construction and exact hard-boundary rules
+
+The implementation is `src/leverkusen/sequences/control_spells.py`; the build/validation
+entry point is `scripts/control_spell_segmentation.py`. It uses the existing pinned loader
+and complete-match event inventory, including its ordering, timestamp and parent-integrity
+checks. The order is full ordered events → hard boundaries → control-spell membership.
+No 360 frames, anchor validity, spatial vectors or geometric measurements determine a cut.
+
+- **Established opponent control:** a completed opponent pass establishes controlled
+  distribution. Otherwise a recovery, won interception, carry, successful ball receipt,
+  completed dribble or supported goalkeeper-control cue must be corroborated by at least
+  another control cue, including a carry/pass/dribble. The exact Recovery–Carry–Pass
+  template is not required: Recovery–Carry suffices. The onset is the first corroborated
+  cue; the later evidence event is recorded separately. An isolated ambiguous contact,
+  recovery, pressure, duel, block or clearance does not end a spell.
+- **Regain:** apply the same ordinary-event control evidence to Leverkusen. A recovery
+  followed by a carry starts at the recovery, not at the later spatially available event.
+  Lost-in-play interceptions and failed passes do not establish a new controller.
+- **Dead ball/stoppage:** literal `out:true`, pass outcome Out/Pass Offside, Offside,
+  Injury Stoppage, Referee Ball-Drop and Half End close an active spell. Foul Won/Committed
+  closes it unless the corresponding provider advantage flag is true. Paired records
+  while already outside a spell create no additional boundary.
+- **Shot:** a Leverkusen shot is terminal only when later parent context reaches a
+  stoppage, established opponent control or parent termination before another Leverkusen
+  Pass/Carry/Shot/Dribble. Goalkeeper reflex contact alone is not established control.
+  A shot followed by Leverkusen recovery and continuation need not end the spell.
+- **Restart:** a Leverkusen Kick Off, Goal Kick, Free Kick, Corner or Throw-in supplies
+  spell-start context. An internal restart ends the prior spell once and starts at that
+  event. Paired administrative start records receive no duplicate spell IDs.
+- **Parent limit:** a provider parent bounds observation. Remaining spell membership ends
+  at its final event; this is a source-container limit, not an invented within-parent cut.
+
+Defensive clearance/contact followed by an immediate Leverkusen second-ball recovery
+remains within the spell unless independent control/stoppage evidence establishes a break.
+Missing 360, unsupported types and time gaps are never boundary evidence. No coordinates
+are interpolated or forward-filled. Shot success, later xG, box entry and other downstream
+attacking success are neither detector inputs nor produced analytical variables.
+
+Terminal and opponent-control boundary events are outside the closing spell; their
+event rows remain in the full membership table as context. This means a terminal-only
+parent (for example Shot/GK with no preceding control interval, or an immediately-out
+pass) has zero pre-boundary spell rows. Such source context is retained, not discarded.
+This membership convention must be revisited explicitly before defining later outcome
+attribution; this task does not attach shots or outcomes to tactical sequences.
+
+### Reviewed validation and accepted timing conventions
+
+The production detector is evaluated against the C01–C28 human hard-boundary ledger,
+which is never supplied as a segmentation constraint. All 27 scored hard targets are
+reproduced: 24 exact onsets and three accepted representations of the same control loss.
+All 14 scored within-parent regains are exact. There are no scored missed or extra hard
+boundaries, and both reviewed no-spell exclusions (C27/C28) pass.
+
+| Case / boundary | Reviewed onset | Detector onset | Common regain | Accepted explanation |
+| --- | ---: | ---: | ---: | --- |
+| C11_H01 | 809 | 811 | 818 | Dispossession/duel records precede the corroborated opponent recovery. |
+| C13_H01 | 346 | 348 | 353 | Dispossession/duel records precede the corroborated opponent recovery. |
+| C16_H02 | 603 | 605 | 613 | Failed pass/incomplete receipt precede the corroborated opponent interception. |
+
+These are explicitly accepted boundary-index conventions, not a generic two-event
+tolerance. Their intervening records describe the same loss and their regains coincide.
+Partial C15/C17 and deferred tails are unscored. Explicitly reviewed terminal boundaries
+in deferred tails are still evaluated. Soft-reset uncertainty is not a required hard cut.
+C20 continuity, clearance/second-ball recovery, nonterminal shots, foul/out contexts and
+no-spell edge cases are covered by review comparisons and focused production tests.
+
+### Inventory, provenance and soft-reset interpretation
+
+The immutable source is `533862946a73608c134d18b78226b6371ce7173c`. Reconciliation is
+34 Bundesliga matches, 2,888 Leverkusen provider parents and 86,025 full-stream events.
+There are 3,202 spells: 132 parents have zero, 2,369 have one and 387 have multiple.
+Detected within-parent boundaries comprise 540 opponent-control changes, 543 ball-out,
+502 terminal-shot, 353 foul-stoppage and 96 other stoppage contexts. There are 446 later
+regains and 1,405 opening-restart spell starts. Counts are inventory, not tactical findings.
+Rerunning segmentation on the same stream produces identical output hashes.
+
+Human review identified recognizable attacking resets and reorganizations, but three
+deterministic candidates could not distinguish them reliably from ordinary recycling
+without material false fragmentation. Soft resets are therefore descriptive within-spell
+phenomena, not primary segmentation boundaries. The work remains empirical justification:
+
+| Historical candidate | Exact reset matches | Missed resets | Extra splits |
+| --- | ---: | ---: | ---: |
+| v0.1 | 3/9 | 4 | 17 |
+| v0.2 | 3/9 | 4 | 13 |
+| v0.3 | 7/9 | 1 | 11 |
+
+Sections 41–42 and the `phase3a3` reset/reconstruction reports retain historical
+terminology and conclusions. No soft-rule version, warning or numeric retreat/run
+setting feeds the locked control-spell method.
+
+### Limitations and next boundary
+
+Control evidence is contextual inference from event data, not continuous tracking.
+Unsupported records remain context; uncorroborated control cues remain flagged, without
+invented cuts. The review sample is purposive, small and not statistically representative;
+partial review remains partial. Parent endpoints can censor football continuation.
+
+Spatial anchors have not been attached. Summary availability is `not_attached_or_evaluated`,
+not a claim of zero coverage. Next: **attach Phase 2C trusted spatial anchors to attacking
+control spells and construct spatial-state sequences**. Preserve all locked Phase 2C
+semantics and Phase 2B support/eligibility rules. Outcome definitions, tactical sequence
+discovery, clustering and attacking-pattern interpretation remain later tasks.

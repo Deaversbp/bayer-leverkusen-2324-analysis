@@ -4,10 +4,14 @@ Analyze how Bayer Leverkusen created dangerous attacking space during the unbeat
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
 **Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE, 10 September 2026.**
-**Phase 3A-1 = DIAGNOSTIC / NOT A METHOD LOCK — diagnostics complete.**
-**Phase 3A-2A = REVIEW PACK READY — HUMAN LABELING PENDING.**
-The next step is human Phase 3A-2B review; final attacking episodes and
-segmentation rules are not implemented.
+**Phase 3A = LOCKED / COMPLETE — attacking control spells, 13 September 2026.**
+The primary unit is `attacking_control_spell_id`, constructed from hard football/control
+boundaries in the full event stream. The pinned season contains 3,202 spells from
+2,888 provider parents. Soft-reset replays remain historical development evidence;
+recycling does not create new spells. See the [implementation and validation report](report/phase3a_control_spell_segmentation.md)
+and [locked method](docs/methods_specification.md#43-phase-3a-attacking-control-spell-lock).
+Next: attach Phase 2C trusted spatial anchors to attacking control spells and construct
+spatial-state sequences. Anchor attachment is not implemented by this lock.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -90,12 +94,11 @@ Finite supplied coordinates and both measurement variants remain preserved.
 
 ## Revised roadmap
 
-The next authorized phase is **Phase 3 — Possession and Spatial-Sequence Method
-Design** for the locked semantic population. Design must retain the complete
-provider possession event stream as context, the validated Phase 2C subset as
-trusted spatial states, and Phase 2B metric-specific eligibility/support for any
-geometry comparison. Sequence units, minimum anchors, maximum gaps, windows and
-start/end rules remain unresolved. After that method review, prioritize:
+Phase 3A control-spell segmentation is locked. The next authorized step attaches the
+validated Phase 2C anchors to these event-stream containers and constructs spatial-state
+sequences, retaining Phase 2B metric-specific eligibility/support. Tactical sequence
+units, minimum anchors, maximum gaps and analytical windows remain later decisions.
+The development order remains:
 
 1. Reliable possession and sequence construction.
 2. Event-aligned spatial-state sequences.
