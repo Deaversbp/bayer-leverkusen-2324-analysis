@@ -21,7 +21,12 @@ The first analysis contains 14,848 Pass and 15,527 Carry transitions. Longitudin
 visible-centroid associations are the clearest findings for both, with magnitude
 depending on observation gap. Extent and spacing findings are weaker and vary by
 starting position. See the [Phase 4A report](report/phase4a_progression_linked_spatial_change.md).
-Next authorized step: **Phase 4B — Multi-Action Spatial Sequence Patterns**; not started.
+**Phase 4B = COMPLETE / MIXED SEQUENCE SIGNAL.** Strict overlapping chains yield
+24,273 two-action and 19,651 three-action windows. PC/CP and CPC/PCP dominate.
+Total progression accounts for much of the visible opponent-centroid association;
+CC retains a positive adjusted contrast, while three-action contrasts are less stable.
+See the [Phase 4B report](report/phase4b_multi_action_spatial_sequences.md).
+Next step: **Phase 5 — Danger and Effectiveness Outcome Design**; not started.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -38,6 +43,23 @@ gates. See the [readiness findings](docs/methods_specification.md#39-phase-2c-2-
 the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
 and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
+
+## Phase 4B multi-action spatial sequence patterns
+
+```powershell
+.venv\Scripts\python.exe scripts/multi_action_spatial_sequences.py
+```
+
+This offline CLI joins consecutive frozen Phase 3B anchors using Phase 4A eligible
+Pass/Carry legs within existing control spells. It writes six `phase4b_*.csv`
+tables and a provenance manifest under ignored `outputs/analysis/`, seven figures
+under `outputs/figures/`, and the report above. Action-type motifs and signed
+direction profiles remain separate; their cross-tables are count audits only.
+Endpoint and per-leg geometry retain metric-specific support. Adjusted centroid
+models use match-clustered uncertainty; sensitivities check every leg's gap,
+terminal team and whole-frame OOB/coincidence flags. The manifest records protected
+Phase 2/3/4A hashes and analytical output hashes for deterministic rerun checks.
+No outcomes, new spell boundaries, tactical categories or clustering are introduced.
 
 ## Phase 4A progression-linked spatial change
 
