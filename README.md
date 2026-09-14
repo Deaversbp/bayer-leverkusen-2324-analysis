@@ -10,8 +10,13 @@ boundaries in the full event stream. The pinned season contains 3,202 spells fro
 2,888 provider parents. Soft-reset replays remain historical development evidence;
 recycling does not create new spells. See the [implementation and validation report](report/phase3a_control_spell_segmentation.md)
 and [locked method](docs/methods_specification.md#43-phase-3a-attacking-control-spell-lock).
-Next: attach Phase 2C trusted spatial anchors to attacking control spells and construct
-spatial-state sequences. Anchor attachment is not implemented by this lock.
+**Phase 3B = CONSTRUCTION COMPLETE / READY FOR METHOD-SPECIFIC SPATIAL ANALYSIS,
+14 September 2026.** Exact attachment produces 43,737 trusted anchors and 40,638
+within-spell observational transitions across all 34 matches. The 2,406 prior
+provider-context anchors outside locked spell membership are fully reconciled.
+Readiness: **READY WITH ANALYSIS-SPECIFIC SUPPORT REQUIREMENTS**. See the
+[Phase 3B construction and readiness report](report/phase3b_spatial_sequence_construction.md).
+Next discussion: **select the first within-control-spell spatial-change analysis**.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -22,12 +27,32 @@ the existing `validated_core_event_team_scope` is locked for **validated
 spatial-anchor sequence analysis**. **Phase 3 — Possession and Spatial-Sequence
 Method Design is now authorized** within that scope.
 Linked-cloud contradictions and mixed event-type orientation remain unresolved
-outside that scope. Final sequence construction and tactical work remain later
+outside that scope. Tactical work and outcome construction remain later
 gates. See the [readiness findings](docs/methods_specification.md#39-phase-2c-2-validated-spatial-anchor-coverage-and-sequence-readiness), the
 [Phase 2C approval and locked boundary](docs/methods_specification.md#40-human-approved-phase-2c-restricted-semantic-scope-lock),
 the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
 and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
+
+## Phase 3B construction
+
+```powershell
+.venv\Scripts\python.exe scripts/spatial_sequence_construction.py
+```
+
+The thin CLI uses `leverkusen.sequences.spatial_sequences` and
+`leverkusen.sequences.spatial_readiness`. It reads existing Phase 3A membership,
+the protected geometry artifact and pinned public event/360 resources; it writes
+seven `phase3b_*.csv` files and a provenance manifest under ignored
+`outputs/diagnostics/`, plus the report above. The outputs contain full event
+context, ordered anchors, transitions, every spell's readiness, match coverage,
+metric availability and a compact aggregate audit. No raw cache is written.
+
+Rerunning verifies identical analytical bytes and source/code hashes; a different
+existing artifact is never overwritten. Metric-specific statuses and endpoint
+support remain explicit. No interpolation, gap exclusion, new segmentation,
+outcome construction or tactical classification is applied. Earlier phase reports
+and artifacts remain historical records of their respective completion stages.
 
 ## Research objective and dataset
 
