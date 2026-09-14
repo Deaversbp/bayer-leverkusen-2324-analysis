@@ -92,6 +92,75 @@ def provider_signals(event):
     return signals
 
 
+def trusted_action_vector(event, *, event_type, event_team_id, validated_anchor, semantics_status, teams):
+    """Existing Phase 3A-1 explicit-vector contract, shared without a new gate."""
+    own_vector_type = event_team_id == TEAM_ID and event_type in (
+        "Pass",
+        "Carry",
+    )
+    start = valid_point(event.get("location"))
+    end = (
+        valid_point(event.get(event_type.lower(), {}).get("end_location"))
+        if own_vector_type
+        else None
+    )
+    start_normalized = normalize_attacking_point(
+        event.get("location"),
+        reference_team_id=event_team_id,
+        target_team_id=TEAM_ID,
+        match_team_ids=teams,
+        semantics_status=semantics_status,
+    )
+    end_normalized = (
+        normalize_attacking_point(
+            end,
+            reference_team_id=event_team_id,
+            target_team_id=TEAM_ID,
+            match_team_ids=teams,
+            semantics_status=semantics_status,
+        )
+        if end
+        else {}
+    )
+    safe = (
+        own_vector_type
+        and validated_anchor
+        and start is not None
+        and end is not None
+    )
+    row = {
+        "event_id": event["id"],
+        "safe_action": safe,
+        "action_candidate": own_vector_type,
+        "explicit_vector_available": own_vector_type
+        and start is not None
+        and end is not None,
+        "action_status": "safe_validated_frame_vector"
+        if safe
+        else "not_leverkusen_pass_carry"
+        if not own_vector_type
+        else "unsupported_or_unlinked_frame"
+        if not validated_anchor
+        else "missing_or_invalid_endpoint",
+        "anchor_x": start_normalized["x_attacking"],
+        "anchor_y": start_normalized["y_attacking"],
+        "start_x_raw": start[0] if start else np.nan,
+        "start_y_raw": start[1] if start else np.nan,
+        "end_x_raw": end[0] if end else np.nan,
+        "end_y_raw": end[1] if end else np.nan,
+        "start_x": start_normalized["x_attacking"] if safe else np.nan,
+        "start_y": start_normalized["y_attacking"] if safe else np.nan,
+        "end_x": end_normalized.get("x_attacking") if safe else np.nan,
+        "end_y": end_normalized.get("y_attacking") if safe else np.nan,
+    }
+    row["delta_x"] = row["end_x"] - row["start_x"] if safe else np.nan
+    row["delta_y"] = row["end_y"] - row["start_y"] if safe else np.nan
+    row["euclidean_displacement"] = (
+        float(np.hypot(row["delta_x"], row["delta_y"])) if safe else np.nan
+    )
+    return row
+
+
 def enrich_match(match, events, frames, *, source_revision):
     """Reuse complete-match semantic audit; add scalar context, never mutate raw."""
     full = match_event_inventory(match, events, frames, source_revision=source_revision)
@@ -104,71 +173,11 @@ def enrich_match(match, events, frames, *, source_revision):
     signals = []
     for r in full.itertuples(index=False):
         event = by_index[r.event_index]
-        own_vector_type = r.event_team_id == TEAM_ID and r.event_type in (
-            "Pass",
-            "Carry",
-        )
-        start = valid_point(event.get("location"))
-        end = (
-            valid_point(event.get(r.event_type.lower(), {}).get("end_location"))
-            if own_vector_type
-            else None
-        )
-        start_normalized = normalize_attacking_point(
-            event.get("location"),
-            reference_team_id=r.event_team_id,
-            target_team_id=TEAM_ID,
-            match_team_ids=teams,
-            semantics_status=r.semantics_status,
-        )
-        end_normalized = (
-            normalize_attacking_point(
-                end,
-                reference_team_id=r.event_team_id,
-                target_team_id=TEAM_ID,
-                match_team_ids=teams,
-                semantics_status=r.semantics_status,
-            )
-            if end
-            else {}
-        )
-        safe = (
-            own_vector_type
-            and r.validated_anchor
-            and start is not None
-            and end is not None
-        )
-        row = {
-            **r._asdict(),
-            "event_id": event["id"],
-            "safe_action": safe,
-            "action_candidate": own_vector_type,
-            "explicit_vector_available": own_vector_type
-            and start is not None
-            and end is not None,
-            "action_status": "safe_validated_frame_vector"
-            if safe
-            else "not_leverkusen_pass_carry"
-            if not own_vector_type
-            else "unsupported_or_unlinked_frame"
-            if not r.validated_anchor
-            else "missing_or_invalid_endpoint",
-            "anchor_x": start_normalized["x_attacking"],
-            "anchor_y": start_normalized["y_attacking"],
-            "start_x_raw": start[0] if start else np.nan,
-            "start_y_raw": start[1] if start else np.nan,
-            "end_x_raw": end[0] if end else np.nan,
-            "end_y_raw": end[1] if end else np.nan,
-            "start_x": start_normalized["x_attacking"] if safe else np.nan,
-            "start_y": start_normalized["y_attacking"] if safe else np.nan,
-            "end_x": end_normalized.get("x_attacking") if safe else np.nan,
-            "end_y": end_normalized.get("y_attacking") if safe else np.nan,
-        }
-        row["delta_x"] = row["end_x"] - row["start_x"] if safe else np.nan
-        row["delta_y"] = row["end_y"] - row["start_y"] if safe else np.nan
-        row["euclidean_displacement"] = (
-            float(np.hypot(row["delta_x"], row["delta_y"])) if safe else np.nan
-        )
+        row = {**r._asdict(), **trusted_action_vector(
+            event, event_type=r.event_type, event_team_id=r.event_team_id,
+            validated_anchor=r.validated_anchor, semantics_status=r.semantics_status,
+            teams=teams,
+        )}
         rows.append(row)
         if r.possession_team_id == TEAM_ID:
             for signal in provider_signals(event):

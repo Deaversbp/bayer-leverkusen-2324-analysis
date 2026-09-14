@@ -33,6 +33,7 @@ outputs/diagnostics/*
 outputs/figures/*
 outputs/tables/*
 outputs/review/*
+outputs/analysis/*
 !outputs/diagnostics/.gitkeep
 !outputs/figures/.gitkeep
 !outputs/tables/.gitkeep

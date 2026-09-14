@@ -16,7 +16,12 @@ within-spell observational transitions across all 34 matches. The 2,406 prior
 provider-context anchors outside locked spell membership are fully reconciled.
 Readiness: **READY WITH ANALYSIS-SPECIFIC SUPPORT REQUIREMENTS**. See the
 [Phase 3B construction and readiness report](report/phase3b_spatial_sequence_construction.md).
-Next discussion: **select the first within-control-spell spatial-change analysis**.
+**Phase 4A = COMPLETE / STABLE SINGLE-ACTION SPATIAL RELATIONSHIPS IDENTIFIED.**
+The first analysis contains 14,848 Pass and 15,527 Carry transitions. Longitudinal
+visible-centroid associations are the clearest findings for both, with magnitude
+depending on observation gap. Extent and spacing findings are weaker and vary by
+starting position. See the [Phase 4A report](report/phase4a_progression_linked_spatial_change.md).
+Next authorized step: **Phase 4B — Multi-Action Spatial Sequence Patterns**; not started.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
@@ -33,6 +38,24 @@ gates. See the [readiness findings](docs/methods_specification.md#39-phase-2c-2-
 the Phase 2B
 [approved contract](docs/methods_specification.md#37-human-approved-phase-2b-lock-and-operational-research-scope)
 and [calibration matrix](docs/phase2b3_metric_calibration_matrix.csv).
+
+## Phase 4A progression-linked spatial change
+
+```powershell
+.venv\Scripts\python.exe scripts/progression_spatial_change.py
+# Reanalyze the verified derived dataset without public-source downloads:
+.venv\Scripts\python.exe scripts/progression_spatial_change.py --offline
+```
+
+This reads the existing Phase 3B pairs, verifies pinned event-source hashes and
+reuses the inherited progression-vector and measurement guards. Pass and Carry
+remain separate. Six CSVs and two provenance manifests are generated under ignored
+`outputs/analysis/`, with six figures under `outputs/figures/` and the report above.
+The CSVs cover the analytical dataset, all metrics, requested sensitivities,
+starting thirds, sample reconciliation and descriptive progression quantiles.
+Regression uncertainty is clustered by match. There is no outcome conditioning,
+causal model or sequence discovery. Locked Phase 2/3 artifacts are hash-checked
+and preserved; shared measurement helpers were extracted without changing their rules.
 
 ## Phase 3B construction
 
