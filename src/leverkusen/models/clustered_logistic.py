@@ -16,7 +16,7 @@ def standardize(values):
     return (values - mean) / sd, mean, sd
 
 
-def fit_logistic(data, outcome, predictor, controls=(), *, reporting_sd=None):
+def fit_logistic(data, outcome, predictor, controls=(), *, reporting_sd=None, return_parameters=False):
     """Fit one geometry metric; no iid p-values or automatic model selection.
 
     Bread = inverse observed information; meat = outer products of match-level
@@ -43,7 +43,7 @@ def fit_logistic(data, outcome, predictor, controls=(), *, reporting_sd=None):
     if not np.isin(y, [0, 1]).all():
         raise ValueError("Logistic response must be binary")
     try:
-        scaled, _, scales = standardize(frame[columns])
+        scaled, means, scales = standardize(frame[columns])
     except ValueError:
         result["model_status"] = "constant_predictor"
         return result
@@ -114,4 +114,12 @@ def fit_logistic(data, outcome, predictor, controls=(), *, reporting_sd=None):
                   odds_ratio_1sd=np.exp(coefficient * sd), or_1sd_ci_low=np.exp(low * sd),
                   or_1sd_ci_high=np.exp(high * sd), log_likelihood=-fit.fun,
                   mcfadden_r2=1 - (-fit.fun) / null_ll, model_status="ok")
+    if return_parameters:
+        # Optional general-design output for categorical contrasts/probabilities.
+        # Default Phase 5B results and numerical estimation remain unchanged.
+        transform = np.diag(np.r_[1., 1 / scales])
+        transform[0, 1:] = -means / scales
+        result.update(parameters=transform @ fit.x,
+                      covariance=transform @ covariance @ transform.T,
+                      terms=["intercept", *columns])
     return result
