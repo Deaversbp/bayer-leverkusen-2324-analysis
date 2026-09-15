@@ -2554,3 +2554,39 @@ not a claim of zero coverage. Next: **attach Phase 2C trusted spatial anchors to
 control spells and construct spatial-state sequences**. Preserve all locked Phase 2C
 semantics and Phase 2B support/eligibility rules. Outcome definitions, tactical sequence
 discovery, clustering and attacking-pattern interpretation remain later tasks.
+
+## 44. Phase 5A: locked danger outcome layer
+
+The reference population is all **43,737 trusted Phase 3B anchors** with valid
+`attacking_control_spell_id` membership across 34 matches and 3,202 locked Phase 3A
+spells. Every anchor receives one outcome row, including opponent-context anchors.
+Search starts at the reference event and proceeds in source event order within the
+same spell only; earlier same-timestamp events and events beyond a hard boundary
+are excluded. Terminal boundary records retain their existing exclusion from spell
+membership and are not reassigned to the closing spell.
+
+- **Box entry:** a Bayer Leverkusen completed Pass (no provider pass outcome value)
+  or Carry with valid, finite, on-pitch start and endpoint, starting outside and
+  ending inside `x >= 102, 18 <= y <= 62` on the StatsBomb 120×80 pitch. Box edges
+  are inclusive; failed Passes, missing endpoints and inside-to-inside actions do
+  not qualify. Recorded endpoints define entry without interpolation.
+- **Shot:** a Bayer Leverkusen Shot inside the same control spell. Set pieces and
+  penalties receive no additional exclusion.
+- **Future xG:** sum of StatsBomb provider `shot.statsbomb_xg` for all eligible
+  Shots. No Shots yields zero; a missing Shot xG propagates to the affected sum
+  without imputation while the Shot binary remains valid.
+
+**10 seconds is the primary horizon**; 5 and 15 seconds are sensitivity horizons.
+Rest-of-spell outcomes are secondary. Elapsed time uses period-local event timestamps
+with inclusive `0 <= elapsed <= H` limits, without Pass/Carry arrival estimates.
+Immediate reference box entries and Shots count in every horizon and have explicit
+indicators; reference Shot xG is retained. The next qualifying event is the first
+in source order at or after the reference, with missing ID/time when none exists.
+
+Box entry, Shot and future xG remain separate: there is **no composite success
+outcome**. Outcome construction uses only pinned provider events and locked Phase
+3A/3B identity/membership inputs. Phase 4 action/centroid/width/depth/spacing deltas,
+motifs, coefficients and analytical results are not inputs; labels are unchanged
+if Phase 4 analytical outputs do not exist. No predictor/outcome relationship is
+tested in Phase 5A. Definitions and validation are recorded in
+`report/phase5a_danger_outcome_design.md`.
