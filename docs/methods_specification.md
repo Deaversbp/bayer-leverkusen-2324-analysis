@@ -2590,3 +2590,23 @@ motifs, coefficients and analytical results are not inputs; labels are unchanged
 if Phase 4 analytical outputs do not exist. No predictor/outcome relationship is
 tested in Phase 5A. Definitions and validation are recorded in
 `report/phase5a_danger_outcome_design.md`.
+
+## 45. Final research status — Phase 6B
+
+**PROJECT ANALYSIS COMPLETE.** Phases 1–6B are complete within their documented
+scopes. The [final research report](../report/final_bayer_leverkusen_2324_spatial_tactical_analysis.md)
+and [technical appendix](../report/final_bayer_leverkusen_2324_technical_appendix.md)
+synthesize frozen Phase 2B–6A results and link the canonical evidence.
+
+The principal findings are the consistent progression–visible-centroid relationship,
+the positive centroid–box-entry association after progression/location/gap adjustment,
+uncertain independent short-motif effectiveness, and limited, gap-sensitive starting
+defensive-context moderation. Partial event-aligned observation, anonymous off-ball
+players, inclusive terminal-anchor outcomes and restricted terminal-Shot coverage
+remain explicit limits. No causal, tracking, formation or full-block claim is added.
+
+Phase 6B introduces no analytical code, model, threshold, outcome, classification or
+new statistical analysis. Earlier methods, reports, datasets and figures retain their
+frozen definitions and results. Historical prospective language above records the
+development sequence; this section supplies the closing status without rewriting
+those decisions. No additional phase is required; future extensions are optional.

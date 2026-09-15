@@ -3,6 +3,29 @@
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
+## Project complete
+
+**PROJECT ANALYSIS COMPLETE — Phase 6B final synthesis.** Read the
+[final research report](report/final_bayer_leverkusen_2324_spatial_tactical_analysis.md)
+and [technical appendix](report/final_bayer_leverkusen_2324_technical_appendix.md).
+
+Forward progression was consistently associated with deeper next-observed visible
+opponent centroids, with a steeper descriptive relationship for Carries. Centroid
+displacement retained a positive near-term box-entry association after progression,
+starting-position and gap adjustment. No uniquely superior short Pass/Carry motif
+was established; defensive-context moderation was limited and gap-sensitive.
+These are associations in partial event-aligned 360 observations, not tracking,
+causal effects or formation recognition.
+
+Phases 1–6B are complete within their locked scopes. Phase 5A's outcome layer is
+locked; Phase 5B identifies robust spatial-danger associations; Phase 5C finds motif
+effectiveness mostly explained by progression/context; Phase 6A finds limited
+defensive-context moderation. No further phase is required. Earlier development
+notes below preserve historical decisions; their prospective gates and next-step
+language describe those earlier stages, not the current project status.
+
+## Historical phase notes and reproduction
+
 **Phase 2C = LOCKED / COMPLETE — RESTRICTED SEMANTIC SCOPE, 10 September 2026.**
 **Phase 3A = LOCKED / COMPLETE — attacking control spells, 13 September 2026.**
 The primary unit is `attacking_control_spell_id`, constructed from hard football/control
@@ -26,7 +49,7 @@ starting position. See the [Phase 4A report](report/phase4a_progression_linked_s
 Total progression accounts for much of the visible opponent-centroid association;
 CC retains a positive adjusted contrast, while three-action contrasts are less stable.
 See the [Phase 4B report](report/phase4b_multi_action_spatial_sequences.md).
-Next step: **Phase 5 — Danger and Effectiveness Outcome Design**; not started.
+Phases 5A–6B subsequently completed; see the final reports linked above.
 Phase 1/1B, locked Phase 2A and human-approved Phase 2B remain complete. The
 34-match semantic audit supports a conservative 72,596-frame core scope;
 45,985 frames remain unsupported for operational team/orientation mapping.
