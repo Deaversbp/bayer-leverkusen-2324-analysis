@@ -1,5 +1,31 @@
 # Bayer Leverkusen 2023/24 Spatial Sequence Analysis
 
+A reproducible spatial data-science study of how Bayer Leverkusen’s attacking progression changed the visible opponent structure during their unbeaten 2023/24 Bundesliga season.
+
+## Key findings
+
+- Greater forward progression was consistently associated with a deeper next-observed opponent centroid.
+- Carries showed the strongest descriptive longitudinal relationship.
+- Opponent-centroid displacement remained associated with 10-second box-entry danger after controlling for progression, starting position, and observation gap.
+- No uniquely superior short Pass/Carry motif was established after adjustment.
+
+## Start here
+
+- [Portfolio Case Study](portfolio/case_study.md)
+- [Full Research Report](report/final_bayer_leverkusen_2324_spatial_tactical_analysis.md)
+- [Technical Appendix](report/final_bayer_leverkusen_2324_technical_appendix.md)
+
+![Observed spatial change and near-term box entry](portfolio/figures/phase5b_centroid_quartiles.png)
+
+> StatsBomb 360 provides event-aligned partial spatial observations, not continuous tracking. All spatial findings are interpreted within that limitation.
+
+
+
+
+
+
+# Bayer Leverkusen 2023/24 Spatial Sequence Analysis
+
 Analyze how Bayer Leverkusen created dangerous attacking space during the unbeaten
 2023/24 Bundesliga season using StatsBomb event and 360 data.
 
